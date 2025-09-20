@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Capítulo 17</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    p {
+      line-height: 1.6;
+      color: #444;
+    }
+    .volver {
+      display: block;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .volver a {
+      color: #0077cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .volver a:hover {
+      color: #005999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Capítulo 17</h1>
+
+  <nav>
+    <ul>
+      <li><a href="#17-1">15.1 Introducción</a></li>
+      <li><a href="#17-2">15.2</a></li>
+      <li><a href="#17-3">15.3</a></li>
+      <li><a href="#17-4">15.4</a></li>
+      <li><a href="#17-5">15.5</a></li>
+      <li><a href="#17-6">15.6</a></li>
+      <li><a href="#17-7">15.7</a></li>
+      <li><a href="#17-8">15.8</a></li>
+    </ul>
+  </nav> 
+
+  <section id="17-1">
+  <h2>17.1 Introducción</h2>
+  <p>El proceso de arranque de una computadora pasa por varios pasos distintos, comenzando desde que no hay energía aplicada hasta completarse con un sistema operativo en pleno funcionamiento. El <em>bootloader</em> (gestor de arranque) es una parte crítica del inicio del sistema, esencialmente llevando la computadora desde la lectura del firmware de un dispositivo de arranque hasta el punto en el que se transfiere el control al esquema de inicialización del sistema operativo elegido para ejecutar la computadora.</p>
+
+  <p>Los dos <em>bootloaders</em> más utilizados con Linux son el <strong>Grand Unified Bootloader (GRUB)</strong> y el <strong>Grand Unified Bootloader 2 (GRUB 2)</strong>, aunque este último es el más común hoy en día. Anteriormente, el <strong>Linux Loader (LILO)</strong> fue el más implementado, pero ha caído en desuso y está presente principalmente en sistemas antiguos o heredados.</p>
+
+  <div class="consider">
+    <p><strong>Ten en cuenta:</strong> LILO fue el primer gran gestor de arranque usado para ejecutar Linux en PCs Intel. Aunque es un programa sencillo, LILO aún es capaz de arrancar múltiples sistemas operativos (<em>multi-boot</em>). La forma en que funciona LILO es que, en lugar de analizar los sistemas de archivos que pueden contener la imagen del kernel, almacena esta información al instalarse. De esta forma, LILO no necesita conocer el sistema de archivos subyacente. Sin embargo, cuando se realizan cambios en la configuración, LILO debe actualizarse manualmente con la nueva información.</p>
+  </div>
+
+  <p><strong>GRUB</strong> es un proyecto GNU con el objetivo de crear un gestor de arranque capaz de iniciar muchos kernels diferentes en una variedad de sistemas. GRUB puede leer sistemas de archivos y aprender dinámicamente sobre el hardware. Un administrador puede arrancar en GRUB, consultar los discos, descubrir e iniciar una imagen de kernel. Además, en lugar de reemplazar la instalación del gestor de arranque en disco cada vez que se realiza un cambio en la configuración, GRUB lee automáticamente los archivos de configuración.</p>
+
+  <p>Como gestor de arranque dinámico, GRUB también ofrece una interfaz de línea de comandos que puede sobrescribir las configuraciones del archivo de configuración. El uso más común de esto es arrancar en modo de rescate pasando parámetros adicionales al kernel o especificando limitaciones como las que se utilizan para la resolución de problemas de memoria.</p>
+
+  <p>Cuando se instala una distribución, normalmente también se instala un <em>bootloader</em> de forma automática, reflejando las características de hardware del sistema. En la mayoría de los casos, el gestor de arranque predeterminado será <strong>GRUB Legacy</strong> (versión 0-0.9) o <strong>GRUB 2</strong>. Las personalizaciones más comunes en el momento de la instalación incluyen agregar otros sistemas operativos para el arranque múltiple, cambios relacionados con actualizaciones del kernel y configuraciones para arrancar en modo de mantenimiento.</p>
+
+  <div class="consider">
+    <p><strong>Ten en cuenta:</strong> Una diferencia importante entre GRUB/GRUB2 y LILO es que LILO necesita ser actualizado manualmente después de realizar cambios en los archivos de configuración.</p>
+  </div>
+
+  <div class="note">
+    <p><strong>Nota:</strong> Ten en cuenta además que otras plataformas de hardware tienen sus propios gestores de arranque, pero no están dentro del alcance del examen LPIC-1.</p>
+  </div>
+  </section>
+  <hr>
+
+  <section id="17-2">
+  <h2>17.2 Gestor de arranque GRUB Legacy</h2>
+  <p>Debido al lanzamiento de una versión más reciente del gestor de arranque GRUB, llamada <strong>GRUB 2</strong>, la versión anterior de GRUB ahora se denomina <strong>GRUB Legacy</strong>. Esta sección cubrirá las particularidades de GRUB Legacy.</p>
+  </section>
+  <hr>
+
+  <section id="17-3">
+  <h2>17.3 Etapas de arranque de GRUB Legacy</h2>
+  <p>Todos los gestores de arranque funcionan en etapas, ya que el espacio disponible para el código inicial del <em>bootloader</em> es muy pequeño (menos de 512 KB). <strong>GRUB Legacy</strong> resuelve esta limitación utilizando 2.5 etapas para cargar completamente el gestor de arranque y alcanzar el cargador principal del sistema.</p>
+
+  <p>GRUB Legacy normalmente escribe el <strong>cargador de arranque de la etapa 1</strong> en el <em>Master Boot Record</em> (MBR), y ese código es suficiente para cargar el <strong>cargador de arranque de la etapa 1.5</strong>, que suele ocupar los primeros 30 KiB del disco justo después del MBR. El cargador de la etapa 1.5 contiene el código necesario para cargar los controladores del sistema de archivos que permiten acceder al <strong>cargador de arranque de la etapa 2</strong> desde la ubicación <code>/boot/grub</code>.</p>
+
+  <p>Las etapas de arranque de GRUB Legacy finalmente entregan el control al proceso <code>/sbin/init</code> o a su equivalente en <code>systemd</code>, para continuar con el arranque del sistema.</p>
+  </section>
+  <hr>
+
+  <section id="17-4">
+  <h2>17.4 Configuración de GRUB Legacy</h2>
+  <p>Dentro del archivo de configuración de <strong>GRUB Legacy</strong>, los discos se refieren con una sintaxis especial que no varía según el tipo de disco. Esto es diferente a cómo el sistema operativo Linux nombra los discos IDE.</p>
+
+  <p>En GRUB Legacy, el primer disco detectado se denomina <code>hd0</code>, el segundo <code>hd1</code>, y así sucesivamente. Las particiones en los discos también se numeran empezando en cero. Por lo tanto, <code>hd0,0</code> se refiere a la primera partición en el primer disco, <code>hd1,0</code> a la primera partición en el segundo disco, etc.</p>
+
+  <div class="note">
+    <p><strong>Nota:</strong> Los archivos de dispositivo son usados por el sistema operativo para referirse a discos duros y particiones. La convención de nombres es diferente de la usada por GRUB Legacy, lo que puede causar frustración.</p>
+  </div>
+
+  <p>Por ejemplo:</p>
+  <ul>
+    <li>El primer dispositivo SATA es <code>/dev/sda</code>, y su primera partición <code>/dev/sda1</code>.</li>
+    <li>El primer dispositivo IDE es <code>/dev/hda</code>, y su primera partición <code>/dev/hda1</code>.</li>
+  </ul>
+
+  <p>GRUB Legacy no distingue entre discos SATA e IDE y no los numera con letras, como hace el sistema operativo. En cambio, el primer disco es <strong>0</strong>, no <em>a</em>. Además, los números de partición difieren: en Linux la primera partición es la 1, mientras que en GRUB Legacy es la 0. Por ejemplo:</p>
+  <ul>
+    <li><code>/dev/sda1</code> podría corresponder a <code>hd0,0</code>.</li>
+    <li><code>/dev/hdb3</code> podría corresponder a <code>hd1,2</code>.</li>
+  </ul>
+
+  <p>El cargador GRUB Legacy normalmente se instala durante la instalación del sistema. Si fuera necesario reinstalarlo, se puede usar el siguiente comando:</p>
+  <pre><code>sysadmin@localhost:~$ grub-install '(hd0)'</code></pre>
+
+  <p>GRUB Legacy puede usar cualquiera de estos dos archivos principales de configuración: <code>/boot/grub/menu.lst</code> o <code>/boot/grub/grub.conf</code>, dependiendo de la distribución. Algunos sistemas crean un enlace simbólico entre ambos para evitar confusión. En esta sección nos enfocamos en <code>/boot/grub/grub.conf</code>.</p>
+
+  <p>Normalmente, este archivo ya existe y funciona tras la instalación del sistema, pero si se corrompe puede regenerarse con:</p>
+  <pre><code>sysadmin@localhost:~$ grub-mkconfig -o /boot/grub/grub.cfg</code></pre>
+
+  <p>En algunos sistemas también existe un enlace simbólico en <code>/etc/grub.conf</code> que apunta a <code>/boot/grub/grub.conf</code>, facilitando su localización para el administrador.</p>
+
+  <p>Un ejemplo típico de <code>/boot/grub/grub.conf</code> sería:</p>
+  <pre><code># opciones globales
+default=0
+fallback=1
+timeout=5
+splashimage=(hd0,0)/grub/splash.xpm.gz
+hiddenmenu
+password notencrypted
+
+# secciones de títulos de arranque
+title CentOS (2.6.32-358.6.1.el6.i686)
+  root (hd0,2)
+  kernel /vmlinuz-2.6.32-358.6.1.el6.i686 ro root=/dev/mapper/vg_livecd-lv_root ...
+  initrd /initramfs-2.6.32-358.6.1.el6.i686.img
+
+title OtherOS (Windows)
+  rootnoverify (hd0,0)
+  chainloader +1</code></pre>
+
+  <p>Las opciones globales aparecen primero, seguidas por bloques <code>title</code>, que contienen las directivas <code>root</code>, <code>kernel</code> e <code>initrd</code>. Cada bloque define un sistema operativo a arrancar.</p>
+
+  <h3>Directivas principales</h3>
+  <ul>
+    <li><code>default=</code> → título que se arranca por defecto tras el <code>timeout</code>.</li>
+    <li><code>fallback=</code> → título alternativo en caso de fallo del arranque.</li>
+    <li><code>timeout=</code> → segundos de espera antes de arrancar por defecto.</li>
+    <li><code>splashimage=</code> → imagen de fondo del menú.</li>
+    <li><code>hiddenmenu</code> → oculta el menú salvo que el usuario pulse una tecla.</li>
+    <li><code>title</code> → inicia un bloque de configuración de un sistema operativo.</li>
+    <li><code>root</code> → ubicación del directorio <code>/boot</code>.</li>
+    <li><code>kernel</code> → archivo de imagen del kernel y sus parámetros.</li>
+    <li><code>initrd</code> → especifica el disco RAM inicial.</li>
+    <li><code>password</code> → define contraseñas globales o por título.</li>
+    <li><code>rootnoverify</code> → indica una partición de otro sistema operativo.</li>
+    <li><code>chainloader</code> → carga otro gestor de arranque o sector de arranque.</li>
+  </ul>
+
+  <p>Las contraseñas pueden declararse en texto plano:</p>
+  <pre><code>password notencrypted</code></pre>
+
+  <p>O cifradas con MD5:</p>
+  <pre><code>password --md5 $1$D20Ia1$iN6djlheGF0NQoyerYgpp/</code></pre>
+
+  <p>Para generar una contraseña cifrada se usa:</p>
+  <pre><code>sysadmin@localhost:~$ grub-md5-crypt</code></pre>
+  </section>
+  <hr>
+
+  <section id="17-5">
+  <h2>17.5 Interactuando con GRUB Legacy</h2>
+  <p>Cuando un sistema inicia con <strong>GRUB Legacy</strong> como gestor de arranque, puede mostrar únicamente el título predeterminado y la cuenta regresiva de tiempo si la directiva <code>hiddenmenu</code> está especificada en el archivo <code>/boot/grub/grub.conf</code>. Si no está especificada, GRUB Legacy mostrará todos los títulos junto con la cuenta regresiva. Si no hay interacción antes de que la cuenta llegue a cero, GRUB Legacy intentará arrancar el título predeterminado.</p>
+
+  <p>Si se presiona cualquier tecla excepto <kbd>Enter</kbd>, el temporizador se detiene y se debe seleccionar un título manualmente para intentar arrancar. Las teclas de flecha <kbd>↑</kbd> y <kbd>↓</kbd> permiten seleccionar un título, y luego se presiona <kbd>Enter</kbd> para iniciar el arranque.</p>
+
+  <p>Si se usa la directiva global <code>password</code>, es necesario presionar la tecla <kbd>P</kbd> y proporcionar la contraseña para desbloquear las funciones de añadir, editar y usar la línea de comandos de GRUB Legacy. Si existe una contraseña definida por título, GRUB solicitará esa contraseña al seleccionar dicho título.</p>
+
+  <div align="center">
+    <img src="ch17_a.png" alt="Descripción de la imagen" width="500" height="400" align="center">
+  </div>
+
+  <p>Si no se usa una contraseña global o GRUB Legacy ya fue desbloqueado, en la pantalla aparecerán las siguientes opciones:</p>
+
+  <div align="center">
+    <img src="ch17_b.png" alt="Descripción de la imagen" width="500" height="400" align="center">
+  </div>
+
+  <ul>
+    <li><kbd>A</kbd> → Permite añadir parámetros adicionales al kernel (por ejemplo, especificar el <em>runlevel</em> al que arrancar el sistema).</li>
+    <li><kbd>E</kbd> → Permite editar las directivas dentro del título seleccionado (<code>root</code>, <code>kernel</code>, <code>initrd</code>). Los cambios no son permanentes en el archivo <code>/boot/grub/grub.conf</code>.</li>
+    <li><kbd>C</kbd> → Abre el intérprete de comandos de GRUB, donde se pueden introducir manualmente directivas como <code>root</code>, <code>kernel</code>, <code>initrd</code> y <code>boot</code>.</li>
+  </ul>
+
+  <h3>Arrancar en un runlevel diferente</h3>
+  <p>Una de las tareas más comunes al interactuar con GRUB Legacy es arrancar en un runlevel diferente. Un runlevel define cuántos y cuáles servicios se ejecutan en el sistema. Uno de los más importantes es el <strong>runlevel de usuario único</strong>, donde solo el usuario <code>root</code> tiene acceso y se ejecutan servicios mínimos. Este nivel se usa para tareas administrativas y recuperación.</p>
+
+  <p>Para iniciar en este runlevel:</p>
+  <ol>
+    <li>Usar las teclas de flecha para seleccionar el título adecuado en el menú de GRUB Legacy.</li>
+    <li>Presionar la tecla <kbd>A</kbd> para añadir parámetros a la línea del kernel.</li>
+    <li>Agregar el parámetro <code>single</code> al final de la línea del kernel.</li>
+  </ol>
+
+  <pre><code>[ Minimal BASH-like line editing is supported. For the first word, TAB 
+  lists possible command completions. Anywhere else TAB lists the possible
+  completions of a device/filename. ESC at any time cancels. ENTER
+  at any time accepts your changes.]
+
+&lt;c KEYTABLE=us rd_NO_DM rhgb quiet single_</code></pre>
+
+  <p>Después de escribir <code>single</code>, presione <kbd>Enter</kbd>. El sistema arrancará en modo de usuario único, iniciando sesión automáticamente como <code>root</code>.</p>
+
+  <p>Cuando termine el trabajo en este modo, puede volver al arranque normal con la combinación <kbd>Ctrl</kbd> + <kbd>D</kbd>.</p>
+  </section>
+  <hr>
+
+  <section id="17-6">
+  <h2>17.6 GRUB 2</h2>
+  <p>El nuevo <strong>GRUB 2 (GRand Unified Bootloader 2)</strong> reemplaza a GRUB Legacy y ofrece varias ventajas significativas sobre su predecesor. Está diseñado para ser más flexible, modular y compatible con configuraciones modernas de hardware y software.</p>
+
+  <h3>Principales ventajas de GRUB 2</h3>
+  <ul>
+    <li><strong>Módulos cargados dinámicamente</strong> → Permite cargar solo las funcionalidades necesarias durante el arranque, reduciendo el tamaño inicial del cargador y aumentando su flexibilidad.</li>
+    <li><strong>Soporte para caracteres no ASCII</strong> → Facilita el uso de diferentes idiomas y alfabetos en los menús de arranque.</li>
+    <li><strong>Compatibilidad con LVM y RAID</strong> → Puede arrancar desde particiones ubicadas dentro de <em>Logical Volume Management</em> o dispositivos en configuraciones RAID, lo que no era posible en GRUB Legacy.</li>
+    <li><strong>Compatibilidad con arquitecturas sin BIOS de PC</strong> → Funciona en sistemas modernos que no dependen del BIOS tradicional, como aquellos que utilizan exclusivamente UEFI u otras plataformas.</li>
+  </ul>
+  </section>
+  <hr>
+
+  <section id="17-7">
+  <h2>17.7 GRUB 2 Boot Steps</h2>
+  <p>El proceso de arranque de <strong>GRUB 2</strong> se desarrolla en varias etapas, cada una con responsabilidades específicas hasta llegar a la carga del sistema operativo.</p>
+
+  <h3>Etapas de arranque de GRUB 2</h3>
+  <ol>
+    <li>
+      <strong>Primera etapa – boot.img</strong>  
+      <p>Se encuentra en los primeros 440 bytes del <em>Master Boot Record (MBR)</em> o en el <em>Partition Boot Record (PBR)</em>. Su función es ubicar el cargador de la segunda etapa.</p>
+    </li>
+    <li>
+      <strong>Segunda etapa – diskboot.img</strong>  
+      <p>Actúa como el primer sector de la tercera etapa y apunta directamente hacia ella.</p>
+    </li>
+    <li>
+      <strong>Tercera etapa – core.img</strong>  
+      <p>Se descomprime a sí mismo, carga el núcleo de GRUB 2 y los controladores de sistema de archivos necesarios. Luego intenta acceder al directorio <code>/boot/grub</code> en el sistema raíz.</p>
+    </li>
+    <li>
+      <strong>Cuarta etapa – normal.mod</strong>  
+      <p>Si el directorio <code>/boot/grub</code> es accesible, GRUB 2 carga el módulo <code>normal.mod</code>, el cual interpreta el archivo <code>/boot/grub/grub.cfg</code>. Finalmente, se presenta al usuario un menú gráfico o una interfaz de línea de comandos (CLI) para elegir la imagen del sistema operativo a arrancar.</p>
+    </li>
+  </ol>
+  </section>
+  <hr>
+
+  <section id="17-8">
+  <h2>17.8 Configuración de GRUB 2</h2>
+  <p>Aunque tanto Fedora como Ubuntu utilizan GRUB 2, cada una usa una ubicación distinta para el archivo principal de configuración. Fedora usa <code>/boot/grub2/grub.cfg</code>, mientras que las distribuciones basadas en Ubuntu usan <code>/boot/grub/grub.cfg</code>.</p>
+
+  <p>Aun cuando es posible editar el archivo principal de configuración, cualquier cambio se perderá al actualizar el kernel o si un administrador ejecuta <code>update-grub</code> (en sistemas basados en Ubuntu) o <code>grub2-mkconfig</code> (en sistemas basados en Fedora). Esto se debe a que el archivo de configuración de GRUB 2 está diseñado para regenerarse automáticamente cada vez que se agrega o elimina un archivo de kernel en el directorio <code>/boot</code>.</p>
+
+  <p>Mientras que GRUB Legacy esperaba que se editara el archivo de configuración principal, <strong>GRUB 2</strong> espera que las personalizaciones se realicen en el directorio <code>/etc/grub.d</code> o en el archivo <code>/etc/default/grub</code>.</p>
+
+  <p>En GRUB Legacy, los archivos de GRUB se mantenían en <code>/boot/grub</code>. Ahora, <strong>GRUB 2</strong> utiliza varias ubicaciones para sus archivos:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Ubicación</th>
+        <th>Detalles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>/boot/grub2</code></td>
+        <td>
+          Contiene muchos archivos de módulos.<br>
+          Incluye el archivo <code>grub.cfg</code> (no debe editarse manualmente).<br>
+          Incluye el archivo <code>grubenv</code> (no debe editarse manualmente).
+        </td>
+      </tr>
+      <tr>
+        <td><code>/etc/default/grub</code></td>
+        <td>Contiene las entradas para crear una entrada de arranque predeterminada; normalmente aquí es donde el administrador realiza personalizaciones.</td>
+      </tr>
+      <tr>
+        <td><code>/etc/grub.d</code></td>
+        <td>
+          Contiene scripts que ejecuta GRUB 2. Pueden personalizarse o añadirse.<br>
+          Scripts ejecutables por defecto:<br>
+          <code>/etc/grub.d/00_header</code><br>
+          <code>/etc/grub.d/10_linux</code><br>
+          <code>/etc/grub.d/20_linux_xen</code><br>
+          <code>/etc/grub.d/30_os-prober</code><br>
+          <code>/etc/grub.d/40_custom</code><br>
+          <code>/etc/grub.d/41_custom</code><br>
+          <code>/etc/grub.d/90_persistent</code>
+        </td>
+      </tr>
+      <tr>
+        <td><code>/usr/lib/grub</code></td>
+        <td>Almacena algunos archivos de librería.</td>
+      </tr>
+      <tr>
+        <td><code>/sbin/grub2-mkconfig</code></td>
+        <td>Comando usado para regenerar el archivo <code>/boot/grub2/grub.cfg</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Ejemplo de <code>/etc/default/grub</code> (Fedora 16)</h3>
+  <pre><code>GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_SAVEDEFAULT=true
+# GRUB_TERMINAL="serial console"
+# GRUB_SERIAL_COMMAND="serial --unit=0 --speed=9600"
+GRUB_CMDLINE_LINUX="quiet rhgb"
+GRUB_DISABLE_RECOVERY="true"</code></pre>
+
+  <p>GRUB 2 permite elegir y “guardar” un nuevo elemento del menú como predeterminado. Añade lo siguiente al archivo <code>/etc/default/grub</code> y regenera la configuración:</p>
+  <pre><code>GRUB_DEFAULT=saved
+GRUB_SAVEDEFAULT=true</code></pre>
+
+  <p>Para especificar manualmente qué imagen de kernel arrancar (siempre la primera entrada del menú):</p>
+  <pre><code>GRUB_DEFAULT=0
+GRUB_SAVEDEFAULT=false</code></pre>
+
+  <p>Estas opciones indican: usa la primera entrada del menú como predeterminada; no guardes una nueva predeterminada cuando el usuario elija desde el menú. GRUB 2 crea las entradas del menú buscando imágenes de kernel en <code>/boot</code> y las numera desde 0 (la más reciente), 1 (la siguiente), etc.</p>
+
+  <p>El archivo <code>/etc/default/grub</code> también puede modificarse automáticamente con <code>grub-set-default</code>. Para establecer la segunda entrada del menú como predeterminada:</p>
+  <pre><code>root@localhost:~# grub-set-default 1</code></pre>
+
+  <p>El valor <code>GRUB_TIMEOUT</code> en <code>/etc/default/grub</code> define cuántos segundos esperar antes de arrancar automáticamente la entrada predeterminada. Si el usuario presiona cualquier tecla excepto <kbd>Enter</kbd>, se cancela la cuenta atrás y se puede elegir una entrada manualmente.</p>
+
+  <h3>Instalación y regeneración de GRUB 2</h3>
+  <pre><code>root@localhost:~# /sbin/grub2-install /dev/sda</code></pre>
+  <p>Tras instalar GRUB 2, genera por primera vez el archivo de configuración:</p>
+  <pre><code>[root@localhost]# grub2-mkconfig -o /boot/grub2/grub.cfg</code></pre>
+  <p>En una distribución basada en Ubuntu:</p>
+  <pre><code>root@localhost:~# update-grub</code></pre>
+
+  <div class="consider">
+    <p><strong>Considera esto:</strong> Se puede encontrar documentación adicional sobre la configuración de GRUB 2 en el sitio web de GNU (gnu.org).</p>
+  </div>
+  </section>
+
+
+
+
+
+
+
+  
+
+  <hr>
+  <div class="volver">
+    <a href="../index.html">← Volver al índice</a>
+  </div>
+
+</body>
+</html>

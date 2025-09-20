@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Capítulo 15</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    p {
+      line-height: 1.6;
+      color: #444;
+    }
+    .volver {
+      display: block;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .volver a {
+      color: #0077cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .volver a:hover {
+      color: #005999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Capítulo 15</h1>
+
+  <nav>
+    <ul>
+      <li><a href="#15-1">15.1 Introducción</a></li>
+      <li><a href="#15-2">15.2</a></li>
+      <li><a href="#15-3">15.3</a></li>
+      <li><a href="#15-4">15.4</a></li>
+      <li><a href="#15-5">15.5</a></li>
+      <li><a href="#15-6">15.6</a></li>
+      <li><a href="#15-7">15.7</a></li>
+      <li><a href="#15-8">15.8</a></li>
+      <li><a href="#15-9">15.9</a></li>
+      <li><a href="#15-10">15.10</a></li>
+    </ul>
+  </nav> 
+
+   <section id="15-1">
+      <h2>15.1 Introducción</h2>
+      
+      <p>Comprender cómo visualizar y configurar el hardware del sistema informático es una habilidad fundamental para un administrador de Linux. Aunque algunos componentes de hardware pueden no requerir ninguna configuración, un administrador puede beneficiarse de entender la función de ese hardware al intentar diagnosticar cualquier problema. El uso de la virtualización y de máquinas virtuales no disminuye la necesidad de comprender el hardware, ya que el concepto de hardware sigue existiendo en el entorno de máquinas virtuales, y los entornos de virtualización se ejecutan sobre hardware físico.</p>
+  </section>
+
+  <hr>
+
+  <section id="15-2">
+    <h2>15.2 Hardware central</h2>
+    
+    <p>Los componentes que son esenciales para que una computadora funcione se consideran hardware central. Cada sistema debe incluir una unidad central de procesamiento (CPU), memoria de acceso aleatorio (RAM) y algún tipo de firmware. Este módulo definirá estos componentes y mostrará comandos y archivos que se pueden usar para ver información del hardware central en la terminal.</p>
+    <p>Otro hardware que es esencial para un sistema completo incluye algún tipo de dispositivo de almacenamiento persistente, como un disco duro mecánico o una unidad de estado sólido (SSD), un método para controlar el dispositivo (ya sea de forma remota o usando un dispositivo de visualización/monitor), un teclado y un ratón. La mayoría de los sistemas también incluyen uno o más dispositivos de red, posiblemente un dispositivo de sonido y puertos para conectar dispositivos externos.</p>
+  </section>
+  
+  <hr>
+
+  <section id="15-2-1">
+    <h2>15.2.1 Unidad Central de Procesamiento (CPU)</h2>
+    <p>La unidad central de procesamiento (CPU) es el cerebro de la computadora, donde se procesan las instrucciones para realizar cálculos o manipular datos. Existen numerosos tipos de CPU que pueden funcionar con Linux, pero el más común es el tipo x86_64 de 64 bits y, en menor medida, el tipo x86 de 32 bits. Ambos tipos de CPU son compatibles hacia atrás con la CPU utilizada en la primera computadora personal de IBM (PC), la Intel 8088.</p>
+    
+    <p>Conocer el tipo y la capacidad de la CPU de un sistema es esencial para saber qué software se puede instalar en él y cómo funcionará. Hay varias formas de obtener información sobre el tipo de CPU en un sistema. Nos centraremos en determinar esta información desde un sistema Linux ya instalado.</p>
+    
+    <p>Un lugar clave para obtener información de la CPU son los ajustes del firmware. Ver el contenido del archivo <code>/proc/cpuinfo</code> mostrará información muy detallada, incluyendo el nombre del modelo, la velocidad en MHz y las características específicas disponibles en una lista de <em>flags</em>.</p>
+    
+    <p>El comando <code>uname</code> es una herramienta valiosa para determinar rápidamente información del sistema desde la línea de comandos. Ejecutar el comando <code>uname</code> sin parámetros solo muestra el nombre del kernel, como se ve a continuación:</p>
+    
+    <pre><code>sysadmin@localhost:~$ uname
+  Linux</code></pre>
+    
+    <p>El comando <code>uname</code> tiene acceso a los archivos en los directorios <code>/proc</code> y <code>/sys</code>, los cuales pueden mostrar mucha información organizada sobre tu sistema. Ejecutar <code>uname</code> con la opción <code>-a</code> mostrará la siguiente información (en orden de aparición):</p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Información</th>
+          <th>Opción</th>
+          <th>Ejemplo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Nombre del kernel</td><td>-s</td><td>Linux</td></tr>
+        <tr><td>Nombre del nodo</td><td>-n</td><td>localhost</td></tr>
+        <tr><td>Versión del kernel</td><td>-r</td><td>4.4.0-72-generic</td></tr>
+        <tr><td>Revisión del kernel</td><td>-v</td><td>#93~14.04.1-Ubuntu SMP Fri Mar 31 15:05:15 UTC 2017</td></tr>
+        <tr><td>Hardware de la máquina</td><td>-m</td><td>x86_64</td></tr>
+        <tr><td>Procesador</td><td>-p</td><td>x86_64</td></tr>
+        <tr><td>Plataforma de hardware</td><td>-i</td><td>x86_64</td></tr>
+        <tr><td>Sistema operativo</td><td>-o</td><td>GNU/Linux</td></tr>
+      </tbody>
+    </table>
+    
+    <pre><code>sysadmin@localhost:~$ uname -a
+  Linux localhost 4.4.0-72-generic #93~14.04.1-Ubuntu SMP Fri Mar 31 15:05:15 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux</code></pre>
+    
+    <p>Cada elemento puede mostrarse individualmente con la opción correspondiente. Para un resumen menos detallado de las CPU en tu sistema, ejecuta el comando <code>uname -p</code>:</p>
+    
+    <pre><code>sysadmin@localhost:~$ uname -p
+  x86_64</code></pre>
+    
+    <p>Otra manera de obtener información más detallada que la que puede dar <code>uname</code> es ejecutar el comando <code>lscpu</code>. Gran parte de la información que devuelve <code>lscpu</code> está fuera del alcance de este objetivo, pero puede ser muy útil para determinar las capacidades del hardware.</p>
+    
+    <pre><code>sysadmin@localhost:~$ lscpu
+  Architecture:          x86_64
+  CPU op-mode(s):        32-bit, 64-bit
+  Byte Order:            Little Endian
+  CPU(s):                8
+  On-line CPU(s) list:   0-7
+  Thread(s) per core:    1
+  Core(s) per socket:    4
+  Socket(s):             2
+  NUMA node(s):          1
+  Vendor ID:             GenuineIntel
+  CPU family:            6
+  Model:                 44
+  Stepping:              2
+  CPU MHz:               2394.000
+  BogoMIPS:              4788.00
+  Hypervisor vendor:     VMware
+  Virtualization type:   full
+  L1d cache:             32K
+  L1i cache:             32K
+  L2 cache:              256K
+  L3 cache:              12288K
+  NUMA node0 CPU(s):     0-7</code></pre>
+</section>
+
+<hr>
+
+<section id="15-2-2">
+  <h2>15.2.2 Memoria de Acceso Aleatorio (RAM)</h2>
+  <p>La memoria de acceso aleatorio (RAM) de un sistema se utiliza para almacenar temporalmente datos e instrucciones del sistema operativo y de los programas que se están ejecutando. Cuando la PC de IBM debutó en 1981, podía acceder a 1 MiB de memoria, de los cuales 640 KiB eran RAM y 384 KiB eran para la ROM del sistema.</p>
+
+  <p>La cantidad máxima de memoria que se puede usar con un procesador de 32 bits es 4 GiB, mientras que un procesador de 64 bits puede usar teóricamente 16 EiB de memoria. En la práctica, muchos sistemas de 32 bits están limitados a usar 3 GiB de memoria, y aún no existe el hardware capaz de usar la cantidad máxima en un sistema de 64 bits.</p>
+
+  <p>Desde una perspectiva práctica, si un sistema no tiene al menos 1 GiB de RAM, es posible que no pueda usar la interfaz gráfica de usuario (GUI) con Linux. Cuando solo se utiliza la interfaz de línea de comandos (CLI), los requisitos de memoria son mucho menores.</p>
+
+  <h3>Unidades de memoria</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Unidad</th>
+        <th>Abreviatura</th>
+        <th>Valor (Bytes)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>kibibyte</td><td>KiB</td><td>1024</td></tr>
+      <tr><td>mebibyte</td><td>MiB</td><td>1024² = 1,048,576</td></tr>
+      <tr><td>gibibyte</td><td>GiB</td><td>1024³ = 1,073,741,824</td></tr>
+      <tr><td>tebibyte</td><td>TiB</td><td>1024⁴ = 1,099,511,627,776</td></tr>
+      <tr><td>exbibyte</td><td>EiB</td><td>1024⁶ = 1,152,921,504,606,846,976</td></tr>
+    </tbody>
+  </table>
+
+  <p>Una computadora de escritorio típica en el año 2019 tiene 16 GiB de RAM. ¡Eso es más de 26,000 veces la cantidad de RAM de una PC de IBM totalmente equipada en 1981!</p>
+
+  <p>Normalmente, un sistema tendrá suficiente RAM para realizar sus operaciones normales, ejecutar algunos servicios y tal vez aplicaciones. Si un sistema no tiene suficiente RAM para los procesos que se están ejecutando, entonces utilizará memoria virtual, llamada espacio de intercambio (<em>swap</em>) en Linux. El espacio de intercambio es espacio en el disco duro que se usa temporalmente para contener datos que superan la cantidad de RAM disponible. Cuando el sistema comienza a quedarse sin memoria, "intercambiará" los datos que menos se necesiten en ese momento para liberar espacio en la RAM para algo que sí se necesita (típicamente un nuevo proceso). Si el sistema usa el espacio de intercambio constantemente, tendrá un rendimiento pobre en comparación con uno que no lo usa; se podría obtener un aumento de rendimiento si se agregara más RAM al sistema.</p>
+
+  <p>El espacio de intercambio puede presentarse de dos formas: un archivo de intercambio (<em>swapfile</em>) que reside en un sistema de archivos existente, o una partición de intercambio, que es una sección del disco dedicada exclusivamente al intercambio y formateada con el sistema de archivos <em>swap</em>. Una partición de intercambio es una parte esencial de un sistema Linux correctamente configurado y ofrece el mejor rendimiento. Los archivos de intercambio tienen la sobrecarga de estar en un sistema de archivos existente y deben usarse con moderación y solo si es absolutamente necesario.</p>
+
+  <p>La cantidad de RAM de un sistema se puede ver en los ajustes del firmware. Para un desglose detallado de cuánta memoria tiene un sistema y cómo se está utilizando, se puede ver el archivo <code>/proc/meminfo</code>:</p>
+
+  <pre><code>sysadmin@localhost:~$ cat /proc/meminfo
+MemTotal:       132014640 kB
+MemFree:        67439868 kB
+MemAvailable:   99487364 kB
+Buffers:         2116936 kB
+Cached:         27429740 kB
+SwapCached:           40 kB
+Active:         14409408 kB
+Inactive:       23724500 kB
+Active(anon):    8400252 kB
+Inactive(anon):   191680 kB
+Active(file):    6009156 kB
+Inactive(file): 23532820 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+SwapTotal:      134196220 kB
+SwapFree:       134195752 kB
+Output Omitted...</code></pre>
+
+  <p>Para un resumen rápido de la memoria RAM y del espacio de intercambio, ejecuta el comando <code>free</code>:</p>
+
+  <pre><code>sysadmin@localhost:~$ free
+              total        used        free      shared  buff/cache   available
+Mem:         128920       35120       89205           2        4594       93190
+Swap:        131050         140      130910</code></pre>
+
+  <p>La salida anterior muestra que este sistema contiene aproximadamente 128 MiB de RAM; casi toda está en uso. Muy poca memoria está libre porque el sistema configura cualquier memoria no usada como búferes y cachés, que son almacenes temporales de datos para acelerar el sistema.</p>
+
+  <p>A pesar de tener tan poca RAM libre, observa que el espacio de intercambio de aproximadamente 131 MiB no ha sido utilizado; aunque si se añadiera una carga de procesos que demandara mucha memoria, este espacio de intercambio está disponible y probablemente sería usado.</p>
+
+  <p>Otro dato destacable de esta salida es que el espacio de intercambio configurado es aproximadamente el doble de la cantidad de RAM. Para sistemas con pequeñas cantidades de RAM (menos de 16–32 GiB), es común configurar el espacio de intercambio con el doble de la cantidad de RAM.</p>
+</section>
+
+<hr>
+
+<section id="15-2-3">
+  <h2>15.2.3 Firmware</h2>
+  <p>El firmware es software que ha sido escrito en memoria no volátil, como la memoria de solo lectura (ROM) o la memoria flash. Existen varios tipos de firmware que pueden estar presentes en un sistema informático. En cada dispositivo que proporciona servicios a un sistema (como una tarjeta de red o una tarjeta gráfica), normalmente hay un chip ROM que contiene el firmware del dispositivo.</p>
+
+  <p>El firmware de la placa base contiene el código que permite que los componentes integrados del sistema funcionen juntos. Este firmware prueba los componentes al iniciar, identifica e inicializa dichos componentes e intenta encontrar un gestor de arranque (<em>bootloader</em>) para cargar un sistema operativo.</p>
+
+  <aside><strong>Nota:</strong> Los gestores de arranque (<em>bootloaders</em>) se tratarán con más detalle más adelante en el curso.</aside>
+
+  <p>Originalmente, este firmware era conocido como el Sistema Básico de Entrada/Salida (<em>BIOS</em>), ROM del sistema o ROM BIOS. El BIOS se utiliza para proporcionar servicios básicos, llamados servicios de entrada y salida, antes de que se cargue un sistema operativo, de modo que el usuario pueda proporcionar entrada mediante el teclado o ver la salida en un monitor incluso antes de que se ejecute el gestor de arranque o el sistema operativo.</p>
+
+  <p>Recientemente, los fabricantes de computadoras han comenzado a reemplazar el BIOS tradicional por algo llamado Interfaz de Firmware Extensible Unificada (<em>UEFI</em>); sin embargo, las funciones de UEFI son tan similares a las de BIOS que muchas personas todavía se refieren al firmware del sistema como BIOS.</p>
+
+  <p>Tanto los sistemas basados en UEFI como los basados en BIOS proporcionan un programa de menú propietario que permite habilitar o deshabilitar dispositivos integrados. El firmware incluido varía según el fabricante del sistema, por lo que, lamentablemente, no existe una forma estándar de iniciar este programa ni un elemento de menú estándar para habilitar o deshabilitar dispositivos.</p>
+
+  <p>Ingresar al programa que permite realizar ajustes en la configuración del firmware normalmente requiere presionar una tecla específica inmediatamente después de encender el sistema. Muchos sistemas usan una tecla de función como F2 o F12, mientras que otros pueden usar las teclas Esc o Supr. Cuando una computadora se enciende, normalmente aparecen mensajes en la pantalla de inicio (<em>splash screen</em>) indicando la tecla adecuada que se debe presionar. Si no aparece la tecla correcta en la pantalla de inicio, puede ser necesario consultar la documentación del fabricante.</p>
+
+  <p>Si un sistema tiene firmware UEFI, podría ser más difícil arrancar el sistema operativo Linux debido a una función llamada <em>Secure Boot</em> (Arranque Seguro). Si Secure Boot está habilitado, el gestor de arranque debe estar firmado criptográficamente con una clave digital reconocida por el firmware. Si el gestor de arranque no está firmado correctamente, aún podría ser posible arrancar deshabilitando Secure Boot en la configuración del firmware, utilizando en su lugar el <em>Compatibility Support Module</em> (CSM).</p>
+
+  <p>Además de habilitar o deshabilitar Secure Boot, la configuración del firmware también permite cambiar qué dispositivos, y en qué orden, buscará el firmware para arrancar un sistema. Incluso se pueden usar los ajustes del firmware para controlar el uso de dispositivos externos como teclados.</p>
+
+  <p>A medida que han avanzado las integraciones de periféricos, más componentes se han colocado directamente en la placa base del sistema. Estos periféricos integrados también pueden gestionarse a través del firmware. Históricamente, un periférico se añadía al sistema insertando una tarjeta en el bus de periféricos, como una tarjeta de video o de red. Luego el periférico debía configurarse manualmente mediante puentes (<em>jumpers</em>) o interruptores físicos para usar la dirección de memoria e IRQ (número de petición de interrupción) correctos. Todo esto normalmente viene preconfigurado de fábrica en los sistemas que tienen periféricos integrados, por lo que el usuario de la computadora no suele tener que intervenir.</p>
+
+  <p>Habitualmente, los sistemas de servidores pueden estar configurados para funcionar sin periféricos de entrada o salida (modo <em>headless</em>), es decir, sin teclado, ratón ni monitor. Normalmente, el BIOS impide que una computadora arranque sin un teclado presente. Puede ser necesario cambiar la configuración del firmware para desactivar esta función en los sistemas <em>headless</em>.</p>
+</section>
+
+<hr>
+
+<section id="15-2-4">
+  <h2>15.2.4 Dispositivos de Almacenamiento Masivo</h2>
+  <p>Aunque Linux no requiere estrictamente un dispositivo de almacenamiento masivo, la mayoría de los sistemas incluirán uno o más de estos dispositivos. El dispositivo de almacenamiento masivo más común es el disco duro mecánico (o disco fijo). Estos tipos de discos vienen con una variedad de interfaces o formas de conectarse al sistema informático.</p>
+
+  <p>Actualmente existen varias interfaces de almacenamiento masivo que todavía se usan:</p>
+  <ul>
+    <li><strong>Small Computer System Interface (SCSI):</strong> es una de las más antiguas y requiere un controlador SCSI en el sistema para controlar una o más unidades de disco que se conectan a él.</li>
+    <li><strong>Integrated Drive Electronics (IDE)</strong> o <strong>Parallel Advanced Technology Attachment (PATA):</strong> este tipo de interfaz incluye el controlador directamente en cada unidad y fue muy popular para discos duros durante la década de 1990. Este tipo todavía se utiliza en algunas unidades ópticas actualmente.</li>
+    <li><strong>Serial Advanced Technology Attachment (SATA):</strong> es la interfaz más común utilizada hoy en día para dispositivos de almacenamiento masivo internos. Cada unidad SATA se conecta directamente a la placa base del sistema mediante un cable. Para configurar la unidad SATA principal, conéctala con un cable al conector de la placa base designado como puerto principal.</li>
+    <li>Para unidades externas, la interfaz más común es <strong>Universal Serial Bus (USB)</strong>, aunque también existen otros estándares como <strong>FireWire</strong> y <strong>Thunderbolt</strong>.</li>
+  </ul>
+
+  <aside><strong>Nota:</strong> Los dispositivos de almacenamiento de datos usan interfaces seriales o paralelas. La "S" en SCSI, en SATA y en USB significa <em>serial</em>. Por eso aparecen como <code>/dev/sda1</code>, que significa <em>Device Serial Drive A partition 1</em> (Dispositivo Serial Unidad A partición 1).</aside>
+
+  <p>El comando <code>df -h</code> puede utilizarse para determinar qué tipo de unidad se está usando en una computadora con Linux.</p>
+
+  <pre><code>sysadmin@localhost:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda9        58G  7.7G   49G  14% /
+tmpfs           7.9G     0  7.9G   0% /dev
+shm              64M     0   64M   0% /dev/shm
+/dev/sda9        58G  7.7G   49G  14% /etc/hosts</code></pre>
+
+  <p>El comando <code>df</code> se tratará con más detalle más adelante en el curso.</p>
+</section>
+
+<hr>
+
+<section id="15-3">
+  <h2>15.3 Plug and Play</h2>
+  <p>Además del hardware central, existen muchos otros componentes, comúnmente conocidos como periféricos, que pueden usarse con el sistema informático. Es importante saber si un periférico requiere que el sistema esté apagado en el momento de conectarlo, o si puede conectarse mientras el sistema está encendido. Si el sistema está encendido y el periférico requiere que esté apagado, conectarlo podría dañar el periférico, el sistema informático o ambos.</p>
+
+  <p>Los dispositivos que deben conectarse cuando el sistema está apagado se conocen como dispositivos <em>coldplug</em>. Los dispositivos que pueden conectarse cuando el sistema está encendido se conocen como dispositivos <em>hotplug</em>. Para poder “conectar y usar” (<em>plug and play</em>), es decir, conectar un dispositivo mientras el sistema está encendido y que funcione, el dispositivo, la interfaz, el controlador y el sistema operativo deben ser compatibles con la funcionalidad <em>hotplug</em> para ese dispositivo.</p>
+
+  <aside><strong>Nota:</strong> Normalmente, los dispositivos USB son <em>hotpluggable</em>. Esto significa que el sistema operativo en ejecución reconocerá automáticamente el dispositivo USB, por lo que no es necesario hacer nada para que el sistema lo “vea”; basta con conectarlo, y los controladores USB lo detectarán, configurarán automáticamente y lo conectarán correctamente.</aside>
+</section>
+
+
+<hr>
+
+<section id="15-4">
+  <h2>15.4 Recursos de Hardware</h2>
+  <p>Para que un dispositivo funcione correctamente, deben asignársele ciertos recursos. Originalmente, las PC tenían recursos muy limitados que debían ser gestionados manualmente; el administrador tenía que colocar <em>jumpers</em> o interruptores en los dispositivos para configurarlos con los recursos que iban a utilizar. Esto era problemático, ya que un error podía crear una situación en la que un mismo recurso era asignado a más de un dispositivo, lo que provocaba que uno o ambos dispositivos dejaran de funcionar. En algunos casos, una asignación incorrecta de recursos podía incluso dejar el sistema inoperable.</p>
+
+  <p>Actualmente no solo hay más recursos disponibles, sino que además son asignados y gestionados automáticamente por el sistema operativo en lugar de manualmente por el administrador.</p>
+
+  <p>Existen cuatro tipos de recursos de hardware que los dispositivos usan para comunicarse con el sistema. Como algunos de estos recursos hacen referencia a entrada y salida, parte de su nombre puede aparecer abreviado como IO. Los cuatro recursos son: puertos IO, memoria IO, solicitudes de interrupción (IRQ) y canales de acceso directo a memoria (DMA):</p>
+
+  <ul>
+    <li>
+      <strong>Puertos IO:</strong> Direcciones de memoria que permiten la comunicación con dispositivos de hardware. Las direcciones actuales en uso pueden verse ejecutando el siguiente comando:
+      <pre><code>sysadmin@localhost:~$ cat /proc/ioports
+0000-0cf7 : PCI Bus 0000:00
+  0000-001f : dma1
+  0020-0021 : pic1
+  0040-0043 : timer0
+  0050-0053 : timer1
+  0060-0060 : keyboard
+  0064-0064 : keyboard
+Output Omitted...</code></pre>
+    </li>
+
+    <li>
+      <strong>Memoria IO:</strong> Una sección o ubicación que actúa de forma similar a la RAM y que se presenta al procesador a través del bus del sistema. Se usa para pasar y almacenar datos, así como para acceder a dispositivos del sistema. La información de memoria IO puede verse ejecutando:
+      <pre><code>sysadmin@localhost:~$ cat /proc/iomem
+00010000-0009ffff : System RAM
+000a0000-000bffff : PCI Bus 0000:00
+000c0000-000c7fff : Video ROM
+000c8000-000cdfff : Adapter ROM
+000f0000-000fffff : System ROM
+00100000-be777fff : System RAM
+  06000000-0680bdb2 : Kernel code
+  0680bdb3-06f45abf : Kernel data
+Output Omitted...</code></pre>
+    </li>
+
+    <li>
+      <strong>Solicitudes de Interrupción (IRQ):</strong> Una interrupción es una señal de hardware que pausa o detiene un programa en ejecución para que el manejador de interrupciones pueda ejecutar otro programa o enviar y recibir datos. Existen un conjunto de interrupciones comúnmente definidas llamadas IRQ que se asignan a interfaces comunes, como el temporizador del sistema, el controlador del teclado, los puertos serie y paralelo, y los controladores de disquete. El directorio <code>/proc/irq</code> contiene la información de configuración de cada IRQ del sistema.
+    </li>
+
+    <li>
+      <strong>Acceso Directo a Memoria (DMA):</strong> Un método mediante el cual ciertos dispositivos de hardware del sistema pueden acceder directamente a la RAM sin pasar por la CPU. Esto acelera el acceso, ya que de otra manera la CPU tendría que encargarse de toda la transferencia, quedando ocupada y sin poder realizar otras tareas durante ese tiempo. La información de DMA puede verse ejecutando:
+      <pre><code>sysadmin@localhost:~$ cat /proc/dma
+ 4: cascade</code></pre>
+    </li>
+  </ul>
+
+  <p>Ten en cuenta que, con la excepción de las solicitudes de interrupción (IRQ), estos recursos no pueden compartirse entre dispositivos. Además, los administradores rara vez necesitan ver estos datos en sistemas Linux modernos, ya que la configuración de dispositivos casi siempre es transparente y automática.</p>
+</section>
+
+<hr>
+
+<section id="15-5">
+  <h2>15.5 Visualización del Hardware</h2>
+  <p>Ver los detalles del hardware conectado (incluidos periféricos conectados por USB, etc.) o incluido en un sistema Linux en ejecución es importante para poder solucionar con éxito los problemas que puedan ocurrir durante el arranque y las operaciones diarias.</p>
+
+  <h3>Considera lo siguiente</h3>
+  <p>Las computadoras modernas normalmente usan el bus <em>Peripheral Component Interconnect Express (PCIe)</em> para conectar los componentes internos de la computadora. Por ejemplo, los controladores de video, sonido, red y discos normalmente se encuentran en el bus PCIe.</p>
+
+  <p>Un bus no solo se refiere a conexiones físicas reales, sino también a componentes de software diseñados para conectar programas y ciertos protocolos de comunicación. Los componentes se conectan mediante un tipo de bus y se comunican a través de él a gran velocidad.</p>
+
+  <p>Los buses se pueden agrupar en tipos internos y externos. Los buses internos se encuentran dentro de la computadora, mientras que los buses externos o de “expansión” se utilizan para conectar dispositivos externos a la computadora. Ejemplos de buses internos son el bus PCIe mencionado, el más antiguo <em>Industry Standard Architecture (ISA)</em> y el popular <em>Small Computer Systems Interface (SCSI)</em>. Un ejemplo de bus externo o de expansión es el universalmente disponible <em>Universal Serial Bus (USB)</em>.</p>
+
+  <div align="center">
+    <img src="ch15_a.png" alt="Descripción de la imagen" width="500" height="400" align="center">
+  </div>
+  
+
+  <p>Los puentes (<em>bridges</em>) conectan los distintos buses de un sistema entre sí y permiten la comunicación entre buses cuando es necesario.</p>
+
+  <p>Aunque hay archivos y directorios en <code>/proc</code> y <code>/sys</code> que contienen información de hardware, los usuarios pueden ejecutar varios comandos para ver los distintos aspectos del hardware que compone o está conectado al sistema.</p>
+
+  <h3>Comando <code>lspci</code></h3>
+  <p>El comando <code>lspci</code> está diseñado para mostrar los buses PCI y los dispositivos conectados a ellos. En la salida se pueden ver varios <em>bridges</em> listados; estos son conexiones entre los distintos buses del sistema.</p>
+
+  <pre><code>sysadmin@localhost:~$ lspci
+00:00.0 Host bridge: Intel Corporation 5520 I/O Hub to ESI Port (rev 13)
+00:01.0 PCI bridge: Intel Corporation 5520/5500/X58 I/O Hub PCI Express Root Port 1 (rev 13)
+00:03.0 PCI bridge: Intel Corporation 5520/5500/X58 I/O Hub PCI Express Root Port 3 (rev 13)
+...
+00:14.1 PIC: Intel Corporation 7500/5520/5500/X58 I/O Hub GPIO and Scratch Pad Registers (rev 13)</code></pre>
+
+  <h3>Comando <code>lsusb</code></h3>
+  <p>Para ver dispositivos externos, el comando <code>lsusb</code> mostrará los dispositivos conectados específicamente al bus USB.</p>
+
+  <pre><code>sysadmin@localhost:~$ lsusb
+Bus 002 Device 006: ID 0624:0249 Avocent Corp. Virtual Keyboard/Mouse
+Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+...
+Bus 003 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub</code></pre>
+
+  <h3>Comando <code>usb-devices</code></h3>
+  <p>Otra herramienta para ver detalles sobre dispositivos USB conectados es el comando <code>usb-devices</code>. Este script muestra información sobre el dispositivo USB (número de dispositivo, proveedor, puerto, etc.) que también puede encontrarse en los directorios <code>/sys</code> o <code>/proc</code>:</p>
+
+  <pre><code>sysadmin@localhost:~$ usb-devices | tail -n 15
+S:  Manufacturer=Avocent
+S:  Product=USB Composite Device-0
+S:  SerialNumber=20120430
+...
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub</code></pre>
+
+  <h3>Opciones avanzadas</h3>
+  <p>Si el usuario necesita más información de la que normalmente muestran los comandos <code>lspci</code> y <code>lsusb</code>, puede añadir la opción <code>-v</code> a cualquiera de ellos para mostrar mucha más información (pasando de una línea por elemento a una salida detallada por bloques).</p>
+
+  <pre><code>sysadmin@localhost:~$ lspci -v
+00:00.0 Host bridge: Intel Corporation 5520 I/O Hub to ESI Port (rev 13)
+        Subsystem: Dell 5520 I/O Hub to ESI Port
+        Flags: fast devsel, IRQ 15
+        Capabilities: &lt;access denied&gt;
+...</code></pre>
+
+  <p>Si el usuario tiene un problema con un componente que aparece en la salida de <code>lspci -v</code>, puede obtener más información sobre ese componente usando el código de proveedor y dispositivo con las opciones <code>-v -s</code>:</p>
+
+  <pre><code>sysadmin@localhost:~$ lspci -v -s 00:07.0
+00:07.0 PCI bridge: Intel Corporation 5520/5500/X58 I/O Hub PCI Express Root Port 7 (rev 13)
+        Flags: bus master, fast devsel, latency 0, IRQ 30
+        Bus: primary=00, secondary=06, subordinate=06, sec-latency=0
+        Capabilities: &lt;access denied&gt;
+        Kernel driver in use: pcieport</code></pre>
+
+  <p>Para aislar los detalles de un dispositivo USB específico, busca el código de proveedor y dispositivo en la salida de <code>lsusb</code> y luego usa <code>lsusb -v -d</code> para ver solo ese dispositivo:</p>
+
+  <pre><code>sysadmin@localhost:~$ lsusb -v -d 0624:0248 | less
+Bus 005 Device 003: ID 0624:0248 Avocent Corp. Virtual Hub
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               1.10
+  ...
+  bNumConfigurations      1</code></pre>
+
+  <aside><strong>Nota:</strong> Presiona la tecla <strong>Q</strong> para salir del comando <code>less</code>.</aside>
+</section>
+
+<hr>
+
+<section id="15-6">
+  <h2>15.6 Subsistemas de Hardware</h2>
+  <p>Las distribuciones de Linux son más capaces que nunca, especialmente en el área de la gestión de dispositivos. Los dispositivos integrados en el sistema informático normalmente no son extraíbles a menos que el sistema esté apagado y sin energía por seguridad.</p>
+
+  <p>El concepto de <em>hotplugging</em> —conectar dispositivos a un puerto de un sistema Linux y que el sistema en ejecución los reconozca automáticamente y posiblemente ejecute un programa o un conjunto de acciones— funciona extremadamente bien en las distribuciones modernas de Linux gracias a un trío de herramientas de gestión de dispositivos.</p>
+
+  <p>El trío de herramientas comienza con <strong>udev</strong>, un subsistema de gestión de dispositivos que administra el directorio <code>/dev</code> y que crea y elimina automáticamente los nodos (referencias a dispositivos) para los dispositivos que se conectan o se retiran del sistema.</p>
+
+  <p>Para lograrlo, el subsistema <strong>udev</strong> mantiene un seudosis­tema de archivos montado como el directorio <code>/dev</code>. Los archivos en <code>/dev</code> representan los dispositivos actualmente conectados. Cuando el núcleo de Linux detecta un dispositivo conectado, el demonio <em>udev</em> crea un archivo de dispositivo (nodo) en <code>/dev</code>. Si el dispositivo se desconecta, el demonio elimina ese nodo de <code>/dev</code>.</p>
+
+  <aside><strong>Nota:</strong> Los sistemas Unix antiguos solían crear todos los nodos de dispositivo posibles en <code>/dev</code> por si eran necesarios; <strong>udev</strong> solo crea y mantiene nodos para los dispositivos actualmente conectados. Esto mantiene el directorio limpio y facilita la resolución de problemas.</aside>
+
+  <p>Los archivos de configuración en <code>/etc/udev/rules.d</code> permiten definir reglas que asignan propiedad, permisos y nombres persistentes a los dispositivos. Estos archivos permiten configurar cómo <em>udev</em> gestiona los dispositivos.</p>
+
+  <p>La segunda parte del trío es el subsistema <strong>sysfs</strong>, otro sistema de archivos en memoria que consiste en directorios y archivos de texto que contienen valores sobre la operación y configuración del kernel.</p>
+
+  <p>El subsistema <strong>sysfs</strong> suele montarse en el directorio <code>/sys</code>. Este directorio existe porque es necesario proporcionar información sobre el kernel, sus atributos y contenidos a programas como <code>ps</code> o <code>top</code>. Para ver el contenido de <code>/sys</code> en el sistema:</p>
+
+  <pre><code>sysadmin@localhost:~$ ls /sys
+block  class  devices   fs          kernel  power
+bus    dev    firmware  hypervisor  module</code></pre>
+
+  <p>Los sistemas modernos (kernels 2.5 en adelante) usan <strong>sysfs</strong> para expresar información del kernel en <code>/sys</code> porque el subsistema <strong>procfs</strong> (<code>/proc</code>) se había vuelto cada vez más saturado y desordenado. Aunque <code>/proc</code> también contiene información sobre el hardware y el kernel, su estructura es más caótica. En cambio, <code>/sys</code> impone un diseño más limpio con la regla de “un elemento por archivo”.</p>
+
+  <p>Esto permite una representación mucho más ordenada y comprensible de los objetos del kernel y sus atributos, facilitando la documentación y la programación.</p>
+
+  <p>Por ejemplo, en el directorio <code>/proc</code>, puedes usar el comando <code>tree</code> para mostrar una vista jerárquica:</p>
+
+  <pre><code>sysadmin@localhost:~$ tree /proc | less
+/proc
+|-- 1
+|   |-- attr
+|   |   |-- current
+|   |   |-- exec
+|   |   |-- fscreate
+|   |   |-- keycreate
+|   |   |-- prev
+|   |   `-- sockcreate
+|   |-- cmdline
+|   |-- comm
+|   |-- coredump_filter
+|   ...
+</code></pre>
+
+  <p>Muchos de los archivos en <code>/proc</code> contienen más de un valor, mientras que los archivos en <code>/sys</code> contienen un único valor de texto, lo que los hace más predecibles y fáciles de usar.</p>
+
+  <p>Finalmente, la última herramienta del trío es el demonio <strong>Hardware Abstraction Layer (HAL)</strong> (<em>hald</em>). A medida que el kernel detecta un dispositivo, coloca la información en los archivos correspondientes de <code>/sys</code>. <em>hald</em> es responsable de descubrir y mantener una lista de dispositivos conectados y sus atributos supervisando esos archivos.</p>
+
+  <p>Para ver la lista de dispositivos y atributos almacenados por <em>hald</em>, ejecuta el comando <code>lshal</code>. Su salida puede tener miles de líneas, por lo que se recomienda usar <code>grep</code> para filtrar, como en este ejemplo:</p>
+
+  <pre><code>sysadmin@localhost:~$ lshal | grep cdrom | grep true
+ storage.cdrom.dvd = true   (bool)
+ storage.cdrom.mrw = true   (bool)
+ storage.cdrom.mrw_w = true   (bool)
+ storage.cdrom.support_media_changed = true   (bool)
+ storage.cdrom.support_multisession = true   (bool)</code></pre>
+
+  <aside><strong>Considera esto:</strong> Desde 2011, <em>hald</em> ha sido desaprobado por muchas distribuciones de Linux y eliminado de versiones recientes. En su lugar, el subsistema <em>udev</em> se ha ampliado e integrado con <em>Systemd</em>. Sin embargo, <em>hald</em> aún puede encontrarse en sistemas heredados.</aside>
+
+  <p>Cuando los programas necesitan información sobre dispositivos, pueden consultarla a través de <strong>D-Bus</strong>.</p>
+
+  <p><strong>D-Bus</strong> es un método de comunicación entre procesos (<em>Interprocess Communication - IPC</em>), principalmente entre componentes de los entornos de escritorio Linux como KDE y GNOME. Sin D-Bus, estos entornos se comunicarían entre componentes mediante muchos procesos separados, cada uno con su propio canal, lo que provocaría confusión e ineficiencia.</p>
+
+  <div align="center">
+    <img src="ch15_b.png" alt="Descripción de la imagen" width="500" height="400" align="center">
+  </div>
+
+  <p>D-Bus actúa como un bus de software que permite que procesos individuales o grupos de procesos se comuniquen en un único bus o canal virtual. D-Bus opera con un bus del sistema disponible para todos los procesos, y además, cada usuario que inicia sesión tiene su propio bus de sesión para los procesos de su entorno de escritorio.</p>
+
+  <p>Los programas pueden registrarse en D-Bus para recibir notificaciones de <em>hald</em> cuando ocurren ciertos eventos de hardware. Cuando el estado de un dispositivo cambia, <em>hald</em> usa D-Bus para enviar notificaciones a los programas registrados para ese tipo de evento.</p>
+
+  <p><em>Systemd</em> normalmente utiliza <em>udev</em> para sus tareas de gestión de dispositivos. La función de <em>udev</em> es notificar al sistema sobre eventos de dispositivos, entre otras tareas. Un usuario normalmente no tendrá que interactuar directamente con <em>udev</em> a menos que tenga dispositivos muy antiguos o inusuales que requieran configuración manual.</p>
+
+  <p><em>udev</em> puede gestionar cualquier dispositivo que aparezca en el directorio <code>/dev</code> cuando está conectado al sistema, lo cual logra mediante scripts conocidos como <strong>reglas de udev</strong>. Una regla de udev realiza una acción cuando se inserta un dispositivo (por ejemplo, una memoria USB).</p>
+
+  <p>En la mayoría de los dispositivos, el kernel ya sabrá qué hacer. Por ejemplo, si conectas una memoria USB, probablemente el kernel la montará automáticamente en alguno de los dispositivos <code>/dev/sd*</code> disponibles. Si lo hace, podrás accederla y usarla según su formato y compatibilidad.</p>
+
+  <p><em>udev</em> puede detectar cuándo un dispositivo ha sido conectado o retirado. Las reglas de <em>udev</em> pueden establecer acciones personalizadas que se ejecutan cuando ocurren estos eventos.</p>
+
+  <p>Escribir reglas de <em>udev</em> está fuera del alcance de este curso; sin embargo, puedes usar el comando <code>udevadm</code> para ver la información necesaria que permitiría especificar un dispositivo dentro de una regla de <em>udev</em> y luego ejecutar acciones específicas sobre él.</p>
+
+  <p>Hay dos maneras de hacer esto:</p>
+  <ul>
+    <li>Cuando un dispositivo es insertado.</li>
+    <li>Cuando se quiere consultar un dispositivo ya conectado o integrado, como el dispositivo de almacenamiento principal (<code>/dev/sda</code> por ejemplo).</li>
+  </ul>
+
+  <p>Para observar lo que sucede cuando se conecta un dispositivo:</p>
+
+  <pre><code>sysadmin@localhost:~$ udevadm monitor
+monitor will print the received events for:
+UDEV: the event udev sends out after rule processing
+KERNEL - the kernel uevent</code></pre>
+
+  <p>Para consultar un dispositivo ya conectado y obtener su información:</p>
+
+  <pre><code>sysadmin@localhost:~$ udevadm info /dev/sda
+P: /devices/pci0000:00/0000:00:07.1/ata1/host0/target0:0:0/0:0:0:0/block/sda
+N: sda
+S: disk/by-id/ata-VMware_Virtual_IDE_Hard_Drive_00000000000000000001
+S: disk/by-id/wwn-0x5000c2947bd39bdb
+S: disk/by-path/pci-0000:00:07.1-ata-1
+E: DEVLINKS=/dev/disk/by-id/wwn-0x5000c2947bd39bdb /dev/disk/by-path/pci-0000:00:07.1-ata-1 /dev/disk/by-id/ata-VMware_Virtual_IDE_Hard_Drive_00000000000000000001
+E: DEVNAME=/dev/sda
+E: DEVPATH=/devices/pci0000:00/0000:00:07.1/ata1/host0/target0:0:0/0:0:0:0/block/sda
+E: DEVTYPE=disk</code></pre>
+
+  <p>Estos dos comandos y un breve estudio de las páginas del manual (<code>man udev</code>) sobre reglas proporcionarán a los administradores y principiantes la información necesaria para crear reglas personalizadas para dispositivos.</p>
+</section>
+
+
+<hr>
+
+<section id="15-7">
+  <h2>15.7 Módulos del Kernel</h2>
+  <p>Además de detectar dispositivos, el kernel de Linux puede cargar software llamado <em>módulos del kernel</em> para dar soporte a esos dispositivos. Algunos dispositivos son tan comunes que el software para soportarlos normalmente está compilado directamente en el kernel (por ejemplo, el software para la CPU). Otros dispositivos menos comunes tienen módulos que solo se cargan si se detecta ese dispositivo (por ejemplo, una tarjeta de red específica).</p>
+
+  <p>El módulo del kernel incluso puede cargar software adicional como firmware desde un archivo o desde el propio dispositivo. Una preocupación de algunos usuarios es que estos archivos de firmware pueden contener código que no es de código abierto, lo que significa que no hay forma de saber exactamente qué hace ese código. Si el kernel carga código “no libre”, entonces el kernel se considera “manchado” (<em>tainted</em>), ya que el código original del kernel es libre.</p>
+
+  <p>Los módulos del kernel pueden usarse para más cosas además de soportar dispositivos; dado que los módulos son simplemente software que puede ejecutarse dentro del kernel, pueden utilizarse prácticamente para cualquier tarea. Algunos usos comunes, aparte de los controladores de dispositivos, incluyen módulos de sistemas de archivos, módulos de protocolos de red y módulos de algoritmos criptográficos.</p>
+
+  <p>Para ver la lista de módulos del kernel cargados, usa el comando <code>lsmod</code>:</p>
+
+  <pre><code>sysadmin@localhost:~$ lsmod
+Module                  Size  Used by
+af_packet_diag         16384  0
+netlink_diag           16384  0
+dccp_diag              16384  0
+dccp                   73728  1 dccp_diag
+...
+</code></pre>
+
+  <p>Las columnas en la salida significan lo siguiente:</p>
+  <ul>
+    <li><strong>Module:</strong> El nombre del módulo cargado.</li>
+    <li><strong>Size:</strong> El tamaño del módulo en bytes.</li>
+    <li><strong>Used by:</strong> Cuántos elementos dependen de ese módulo (pueden ser otros módulos, procesos u otras funciones). También muestra los nombres de los módulos que dependen de él.</li>
+  </ul>
+
+  <p>Puede que necesites buscar módulos por nombre, tamaño o dependencias. Para filtrar la salida de <code>lsmod</code> y mostrar solo módulos específicos, usa <code>grep</code>:</p>
+
+  <pre><code>sysadmin@localhost:~$ lsmod | grep ext4
+ext4                  465245  2
+crc16                  12503  1 ext4
+mbcache                17476  1 ext4
+jbd2                   82480  1 ext4</code></pre>
+
+  <p>La salida anterior muestra los módulos que trabajan juntos para soportar el sistema de archivos ext4.</p>
+
+  <p>Además, puedes obtener más detalles sobre un módulo usando <code>modinfo</code>. Por ejemplo, para ver información sobre el módulo <code>snd</code>:</p>
+
+  <pre><code>sysadmin@localhost:~$ modinfo snd
+filename:     /lib/modules/3.13.0-35-generic/kernel/sound/core/snd.ko
+alias:        char-major-116-*
+license:      GPL
+description:  Advanced Linux Sound Architecture driver for soundcards.
+author:       Jaroslav Kysela &lt;perex@perex.cz&gt;
+...
+parm:         cards_limit:Count of auto-loadable soundcards. (int)</code></pre>
+
+  <p>Para obtener una lista de todos los módulos disponibles en el sistema, usa <code>modprobe -l</code>:</p>
+
+  <pre><code>sysadmin@localhost:~$ modprobe -l | head
+kernel/arch/x86/kernel/cpu/mcheck/mce-inject.ko
+kernel/arch/x86/kernel/cpu/cpufreq/powernow-k8.ko
+...
+kernel/arch/x86/crypto/twofish-i586.ko</code></pre>
+
+  <p>Normalmente, los módulos del kernel se cargan automáticamente. Para cargar uno manualmente, ejecuta <code>modprobe</code> con el nombre del módulo. Por ejemplo:</p>
+
+  <pre><code>sysadmin@localhost:~$ modprobe ext4</code></pre>
+
+  <p>Si se carga correctamente, no habrá salida en pantalla. Puedes usar <code>lsmod</code> después para verificar que se haya cargado.</p>
+
+  <p>Una ventaja de <code>modprobe</code> es que carga automáticamente todos los módulos de los que depende el módulo solicitado (por ejemplo, al cargar <code>ext4</code> también cargará <code>crc16</code>, <code>mbcache</code> y <code>jbd2</code>).</p>
+
+  <p>También puedes usar <code>modprobe</code> para eliminar módulos de la memoria usando la opción <code>-r</code>. Por ejemplo:</p>
+
+  <pre><code>sysadmin@localhost:~$ lsmod | grep ext4
+ext4                  465245  2
+crc16                  12503  1 ext4
+mbcache                17476  1 ext4
+jbd2                   82480  1 ext4
+sysadmin@localhost:~$ modprobe -r ext4
+sysadmin@localhost:~$ lsmod | grep ext4</code></pre>
+
+  <p>Este comando eliminará el módulo <code>ext4</code> y, si ya no son necesarios, también eliminará de la memoria los módulos <code>crc16</code>, <code>mbcache</code> y <code>jbd2</code>.</p>
+</section>
+
+<hr>
+
+  <div class="volver">
+    <a href="../index.html">← Volver al índice</a>
+  </div>
+</body>
+</html>
