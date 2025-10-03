@@ -53,19 +53,218 @@
     </ul>
   </nav> 
 
-  <section id="1X-1">
-    <h2>16.1 Introducción</h2>
-    <p>El arranque (<em>booting</em>) es el proceso de llevar el sistema desde un estado apagado hasta un sistema operativo en ejecución. Es muy importante comprender este proceso para poder solucionar problemas de arranque cuando ocurran y para modificar los estados del sistema llamados <em>runlevels</em> o, en dispositivos con systemd, <em>targets</em>.</p>
+<section id="23-1">
+  <h2>23.1 Introducción</h2>
+  <p>Los sistemas de archivos y los datos que contienen son componentes extremadamente importantes de cualquier sistema, por lo que saber cómo solucionar problemas cuando ocurren es igualmente crítico. Esta es una de las principales razones por las que la información que se almacena en un sistema de archivos debe copiarse en múltiples ubicaciones o asegurarse mediante copias de seguridad más tradicionales. También destaca lo importante que es entender cómo reparar un sistema de archivos, en caso de que se rompa.</p>
+  <p>Los sistemas de archivos pueden requerir reparación por varias razones:</p>
+  <ul>
+    <li>Corte repentino de energía que resulta en un desmontaje incorrecto de las particiones. Típicamente se utiliza una fuente de alimentación ininterrumpida (UPS) para evitar esto.</li>
+    <li>Expulsar medios extraíbles de lectura/escritura, como una memoria USB o una unidad flash, antes de que se haya producido un desmontaje limpio (es decir, retirar el medio antes de emitir el comando <code>umount</code>).</li>
+    <li>Pérdida de conectividad de red entre un host y una partición montada como sistema de archivos de red (NFS).</li>
+    <li>Desgaste normal que lleva a sectores de disco corruptos y fallas graduales del disco.</li>
+    <li>Sobretensiones eléctricas o exposición a campos magnéticos.</li>
+    <li>Malware.</li>
+  </ul>
+</section>
+<hr>
 
-    <p>El proceso de arranque ocurre en cuatro etapas principales, algunas de las cuales pueden ser modificadas por los administradores, mientras que en otras basta con estar al tanto de las acciones que tienen lugar:</p>
+<section id="23-2">
+  <h2>23.2 El comando fsck</h2>
+  <p>El comando <code>fsck</code> se utiliza para verificar sistemas de archivos en busca de problemas de consistencia y para reparar esos problemas cuando se encuentran. El comando <code>fsck</code> tiene algunas similitudes con el comando <code>mkfs</code>. En primer lugar, es una herramienta genérica para usar con sistemas de archivos; su propósito es verificar los sistemas de archivos en busca de errores e intentar repararlos. En segundo lugar, <code>fsck</code> es en realidad una interfaz para los diversos verificadores de sistemas de archivos, lo que significa que llamará al comando de backend apropiado, como el comando <code>e2fsck</code>, basándose en el tipo de sistema de archivos.</p>
+  <p>Los archivos que vinculan la interfaz con el backend se nombran siguiendo patrones como <code>fsck.TIPO-DE-SISTEMA-DE-ARCHIVOS</code>, por ejemplo <code>fsck.ext4</code> o <code>fsck.vfat</code>. Estos archivos entre los comandos de interfaz y backend pueden ser una excelente manera de encontrar documentación.</p>
+  <p>Por ejemplo, para descubrir el comando real específico del sistema de archivos que se utiliza para verificar sistemas de archivos <code>vfat</code>, ejecute el comando <code>man fsck.vfat</code>. Esto mostrará la página del manual para el comando de backend real para verificar sistemas de archivos <code>vfat</code>, que es el comando <code>dosfsck</code>. Del mismo modo, ver la página del manual de <code>fsck.ext4</code> muestra el comando <code>e2fsck</code> utilizado para verificar sistemas de archivos <code>ext2</code>, <code>ext3</code> y <code>ext4</code>.</p>
+  <p>No es necesario saber qué backend usar. Simplemente ejecute el comando <code>fsck</code> con la ruta del sistema de archivos o su punto de montaje. El comando <code>fsck</code> determinará el programa específico del sistema de archivos a llamar basándose en el tipo de sistema de archivos de la entrada en el archivo <code>/etc/fstab</code>. Si el sistema de archivos no tiene una entrada en el archivo <code>/etc/fstab</code>, entonces se puede usar la opción <code>-t</code> con el comando <code>fsck</code> para especificar el tipo de sistema de archivos.</p>
+  <h3>Advertencias sobre el comando fsck</h3>
+  <p>Aunque esta herramienta está diseñada para verificar y reparar sistemas de archivos, ¡también puede dañar sistemas de archivos! La utilidad <code>fsck</code> no está diseñada para ejecutarse en sistemas de archivos actualmente en uso (sistemas que ya están montados). Si el comando <code>fsck</code> se ejecuta en un sistema de archivos actualmente montado, aparecerá el siguiente error:</p>
+  <p><strong>Nota</strong></p>
+  <p>El siguiente ejemplo puede no coincidir con la salida en nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# fsck /dev/sda1
+fsck de util-linux-ng 2.17.2
 
-    <ul>
-      <li><strong>Etapa de firmware</strong></li>
-      <li><strong>Gestor de arranque (Bootloader)</strong></li>
-      <li><strong>Etapa del kernel</strong></li>
-      <li><strong>Etapa Init</strong></li>
-    </ul>
-  </section>
+e2fsck 1.41.12 (17-May-2010)
+/dev/sda1 está montado.
+
+¡¡ADVERTENCIA!! El sistema de archivos está montado. Si continúa, ***CAUSARÁ*** un daño ***GRAVE*** al sistema de archivos.
+
+¿Realmente desea continuar (s/n)? no
+
+verificación abortada</code></pre>
+  <p>En este caso, definitivamente escriba <code>n</code> para no. Tenga en cuenta que, si el sistema de archivos ya está montado, no necesita ser verificado. El hecho mismo de que esté montado significa que está funcionando correctamente.</p>
+  <p>Se debe implementar una política de respaldo para facilitar la recuperación de archivos importantes en caso de que se pierdan o se corrompan. Es muy común que no se consideren los respaldos hasta que sea demasiado tarde.</p>
+  <h3>Considera esto</h3>
+  <p>Cuando se trata de respaldos, tarde puede ser mejor que nunca. Si un sistema de archivos está dañado y no se puede montar, considere hacer un respaldo con el comando <code>dd</code> antes de intentar repararlo con el comando <code>fsck</code>. De esa manera, si la reparación que realiza el comando <code>fsck</code> empeora las cosas de lo que estaban originalmente, aún es posible volver a la condición preservada en el respaldo.</p>
+  <p>Una de las opciones más útiles para el comando <code>fsck</code> es la opción <code>-y</code>, que hará que <code>fsck</code> asuma una respuesta afirmativa a todas las preguntas que normalmente haría. El uso de esta opción puede evitar horas escribiendo la letra <code>y</code> en respuesta a preguntas de la herramienta como, <em>¿Le gustaría arreglar esto?</em></p>
+  <p>Dado que el sistema de archivos raíz no se puede desmontar mientras el sistema está en ejecución, puede ser difícil verificarlo. Un enfoque para verificar el sistema de archivos raíz es iniciar otro sistema operativo Linux con un sistema de archivos raíz diferente. Un enfoque común es descargar y usar un Live CD-ROM, DVD o USB, que son sistemas operativos Linux de arranque que caben en esos medios.</p>
+  <p>Otro enfoque no interactivo es forzar la verificación de un sistema de archivos, ejecutando el comando <code>touch /forcefsck</code> como usuario root. Si este archivo existe en el momento del arranque, el comando <code>fsck</code> se ejecuta en todos los sistemas de archivos en el archivo <code>/etc/fstab</code> que tienen un valor distinto de cero para la columna <code>FSCK</code>. Una vez completado, el archivo <code>/forcefsck</code> se eliminará y la marca de tiempo del archivo <code>/.autofsck</code> se actualizará a la hora en que finalizó la verificación.</p>
+  <p>Para particiones que se pueden desmontar mientras el sistema está en ejecución, el comando <code>fsck</code> se puede iniciar interactivamente para realizar la verificación. Por ejemplo:</p>
+  <p><strong>Nota</strong></p>
+  <p>Los siguientes ejemplos pueden no coincidir con la salida en nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# mount | grep /data
+/dev/sdb1 on /data type ext4 (rw)
+root@localhost:~# umount /data
+root@localhost:~# fsck /dev/sdb1
+fsck de util-linux-ng 2.17.2
+e2fsck 1.41.12 (17-May-2010)
+/dev/sdb1: limpio, 11/12824 archivos, 6532/51200 bloques</code></pre>
+  <p>Tenga en cuenta que el comando <code>fsck</code> no realizó una verificación del sistema de archivos en el ejemplo anterior. Dado que el sistema de archivos se desmontó limpiamente (lo que también ocurriría durante un apagado o reinicio normal del sistema), el estado del sistema de archivos se estableció en limpio. El comando <code>fsck</code> no realiza ninguna verificación cuando el estado del sistema de archivos es limpio.</p>
+  <p>Se puede forzar una verificación del sistema de archivos usando la opción <code>-f</code>:</p>
+  <pre><code>root@localhost:~# fsck -f /dev/sdb1
+fsck de util-linux-ng 2.17.2
+e2fsck 1.41.12 (17-May-2010)
+Paso 1: Verificando inodos, bloques y tamaños
+Paso 2: Verificando la estructura del directorio
+Paso 3: Verificando la conectividad del directorio
+Paso 4: Verificando los recuentos de referencias
+Paso 5: Verificando la información de resumen del grupo
+/dev/sdb1: 11/12824 archivos (9.1% no contiguos), 6532/51200 bloques</code></pre>
+  <p>Cuando una partición tiene un problema, intentar montarla puede resultar en un mensaje de error como este:</p>
+  <pre><code>mount: debe especificar el tipo de sistema de archivos</code></pre>
+  <p>Normalmente, el comando <code>mount</code> leerá el primer bloque del sistema de archivos (el superbloque) donde se guarda la información sobre el tipo de sistema de archivos. Cuando un superbloque está dañado, el comando <code>mount</code> no puede leer esa información.</p>
+  <p>En este caso, use el comando <code>fsck</code> para reparar el sistema de archivos. La salida puede verse algo así:</p>
+  <pre><code>fsck de util-linux-ng 2.17.2
+
+e2fsck 1.41.12 (17-May-2010)
+
+fsck.ext2: Superbloque inválido, intentando bloques de respaldo...
+mydata no se desmontó limpiamente, se forzó la verificación.
+Paso 1: Verificando inodos, bloques y tamaños
+Paso 2: Verificando la estructura del directorio
+Paso 3: Verificando la conectividad del directorio
+Paso 4: Verificando los recuentos de referencias
+Paso 5: Verificando la información de resumen del grupo
+
+mydata: ***** EL SISTEMA DE ARCHIVOS FUE MODIFICADO *****
+mydata: 11/25688 archivos (0.0% no contiguos), 4800/102400 bloques</code></pre>
+  <p>Observe que el texto resaltado de la salida muestra que el comando intentó usar bloques de respaldo. El comando <code>fsck</code> a menudo podrá encontrar una copia de seguridad del superbloque que se creó la última vez que se modificó el sistema de archivos.</p>
+</section>
+<hr>
+
+<section id="23-3">
+  <h2>23.3 El comando e2fsck</h2>
+  <p>El comando <code>e2fsck</code> es el verificador de sistemas de archivos llamado por <code>fsck</code> para sistemas de archivos ext2, ext3 y ext4. Existen opciones que se pueden usar con el comando <code>e2fsck</code> que no están documentadas en la página del manual del comando <code>fsck</code>. Estas opciones específicas del sistema de archivos se pueden usar directamente con el comando <code>e2fsck</code> o con el comando <code>fsck</code> (que pasará las opciones al comando <code>e2fsck</code>).</p>
+  <p>Por ejemplo, el comando <code>fsck</code> puede requerir la ubicación exacta de un superbloque de respaldo. El superbloque es un componente crítico del sistema de archivos y, cuando está corrupto, es difícil de recuperar. Los superbloques de respaldo son utilizados por el comando <code>fsck</code> para reparar un superbloque corrupto.</p>
+  <p>Si se utilizaron configuraciones personalizadas al crear un sistema de archivos, los superbloques de respaldo pueden no estar en una ubicación estándar. En ese caso, la salida del comando <code>mkfs</code> debe documentarse porque esa salida incluye la ubicación de los superbloques de respaldo. Estos superbloques de respaldo se pueden localizar utilizando el comando <code>dumpe2fs</code>:</p>
+  <p><strong>Nota</strong></p>
+  <p>Los siguientes ejemplos pueden no coincidir con la salida en nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# dumpe2fs /dev/sdb1 | grep superblock
+dumpe2fs 1.41.12 (17-May-2010)
+  Superbloque primario en 1, Descriptores de grupo en 2-2
+  Superbloque de respaldo en 8193, Descriptores de grupo en 8194-8194
+  Superbloque de respaldo en 24577, Descriptores de grupo en 24578-24578
+  Superbloque de respaldo en 40961, Descriptores de grupo en 40962-40962</code></pre>
+  <p>Use la opción <code>-b</code> con el comando <code>e2fsck</code> para especificar un respaldo cuando el superbloque primario se haya corrompido. Por ejemplo:</p>
+  <pre><code>root@localhost:~# e2fsck -b 8193 /dev/sdb1</code></pre>
+  <p>El comando <code>fsck</code> también podría usarse con la misma opción, ya que pasará esta opción al comando <code>e2fsck</code>:</p>
+  <pre><code>root@localhost:~# fsck -b 8193 /dev/sdb1</code></pre>
+  <p>Existen otras opciones para automatizar el comando <code>e2fsck</code>. La opción <code>-n</code> asume que la entrada para cada solicitud es "no". La opción <code>-n</code> puede ser útil al ejecutar el comando para probar posibles problemas, pero optando por no repararlos en este momento. La salida se puede capturar para un análisis y discusión posterior, quizás con otro administrador.</p>
+</section>
+<hr>
+
+<section id="23-4">
+  <h2>23.4 El directorio lost+found</h2>
+  <p>En la mayoría de los casos, después de ejecutar el comando <code>fsck</code>, el sistema de archivos reparado se monta y no se requiere ninguna acción adicional. Sin embargo, si el comando <code>fsck</code> produce errores de archivos no referenciados, puede ser prudente buscar dentro del directorio <code>lost+found</code> que se encuentra en el punto de montaje del sistema de archivos. Esta es la ubicación donde se almacenan todos los archivos perdidos.</p>
+  <p>Un archivo puede estar "perdido" si su nombre de archivo se corrompe y, por lo tanto, no se puede colocar en un directorio normal. Después de <code>fsck</code>, dicho archivo se reubica en el directorio <code>lost+found</code>, y su número de inodo aparecerá en lugar del nombre del archivo.</p>
+  <p><strong>Nota</strong></p>
+  <p>Los siguientes ejemplos pueden no coincidir con la salida en nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# ls -l /data
+lost+found
+root@localhost:~# ls -l /data/lost+found
+total 5
+-rw-r--r--. 1 root root   83 Mar  4 06:37 #34234
+-rw-r--r--. 1 root root 1911 May 20  2013 #4596</code></pre>
+  <p>¿Qué se debe hacer con estos "pobres archivos perdidos"? Sin un nombre, puede ser difícil encontrar a dónde pertenecen, pero tenga en cuenta que el comando <code>file</code> se puede usar para determinar el tipo de archivo. Para archivos de texto, ver el contenido puede ser útil. Las marcas de tiempo y la propiedad de los archivos también pueden ayudar a determinar a dónde pertenecen estos archivos.</p>
+</section>
+<hr>
+
+<section id="23-5">
+  <h2>23.5 Reparación de sistemas de archivos XFS</h2>
+  <p>El sistema de archivos XFS tiene un amplio uso. Algunas distribuciones lo utilizan para la mayoría, si no todos, los sistemas de archivos, otras lo utilizan como sistema de archivos para la parte del directorio personal del usuario de un sistema. Es estable, con muchas funciones y de confianza.</p>
+  <p>Cada sistema de archivos, por muy fiable que sea, necesita ser reparado de vez en cuando, ya que ocurren cortes de energía, la corrupción del sistema de archivos ocurre debido a programas maliciosos, etc.</p>
+  <p>Los sistemas de archivos XFS se reparan de manera diferente a otros sistemas de archivos. Como XFS es capaz de contener un número inmensamente grande de archivos (inodos), esto haría que la verificación en el momento del arranque fuera poco práctica, incluso usando un diario del sistema de archivos, lo cual XFS hace.</p>
+  <p>XFS se basa en el diario para la mayoría de las correcciones de errores, o cuando se trata de que el sistema de archivos se marque como no haber sido desmontado correctamente. Si un sistema de archivos no se desmonta limpiamente, se marca como que necesita ser verificado, lo que XFS hace reproduciendo el registro del diario; generalmente esto es suficiente para asegurar que los datos se escriban correctamente.</p>
+  <p>En los casos en que los metadatos o la estructura de XFS se han corrompido, puede ocurrir un error como <code>mount: Structure needs cleaning</code>, y la utilidad <code>xfs_repair</code> deberá ejecutarse en el sistema de archivos para reparar cualquier inconsistencia.</p>
+  <h3>Considera esto</h3>
+  <p>Siempre que un sistema de archivos parece estar corrupto, es mejor tener una copia de seguridad de los datos en el sistema de archivos. Los comandos <code>xfs_copy</code> y <code>xfsdump</code> pueden ser útiles en ese sentido. El comando <code>xfs_copy</code> puede crear una duplicación exacta del sistema de archivos cuestionable para experimentar con las reparaciones.</p>
+  <p>Estos comandos están fuera del alcance de los objetivos y de este curso.</p>
+  <p>En el caso de que deba intentar reparar un sistema de archivos XFS, es bastante sencillo de usar. El comando <code>xfs_repair</code> solo se puede ejecutar en un sistema de archivos desmontado, lo que significa que si el sistema de archivos XFS en un dispositivo se usa como directorio <code>/home</code>, entonces todos los usuarios deben estar fuera del sistema de archivos para poder desmontarlo y repararlo.</p>
+  <p>Para desmontar el sistema de archivos <code>/dev/sda3</code>, como usuario root (y no en la estructura del directorio <code>/home</code>) use el comando:</p>
+  <p><strong>Nota</strong></p>
+  <p>Los siguientes ejemplos pueden no coincidir con la salida en nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# umount /dev/sda3</code></pre>
+  <p>Para usar <code>xfs_repair</code> en el sistema de archivos, use el siguiente comando:</p>
+  <pre><code>root@localhost:~# xfs_repair /dev/sda3
+
+Phase 1 - find and verify superblock... (Fase 1 - encontrar y verificar el superbloque...)
+Phase 2 - using internal log (Fase 2 - usando el registro interno)
+    	- zero log... (	- limpiar registro...)
+    	- scan filesystem freespace and inode maps... (	- escanear mapas de espacio libre y inodos del sistema de archivos...)
+    	- found root inode chunk (	- encontrado fragmento de inodo raíz)
+Phase 3 - for each AG... (Fase 3 - para cada AG...)
+    	- scan and clear agi unlinked lists... (	- escanear y limpiar listas de agi desvinculadas...)
+    	- process known inodes and perform inode discovery... (	- procesar inodos conocidos y realizar descubrimiento de inodos...)
+    	- agno = 0
+    	- agno = 1
+    	- agno = 2
+    	- agno = 3
+    	- process newly discovered inodes... (	- procesar inodos recién descubiertos...)
+Phase 4 - check for duplicate blocks... (Fase 4 - verificar bloques duplicados...)
+    	- setting up duplicate extent list... (	- configurando lista de extensiones duplicadas...)
+    	- check for inodes claiming duplicate blocks... (	- verificar inodos que reclaman bloques duplicados...)
+    	- agno = 0
+    	- agno = 1
+    	- agno = 2
+    	- agno = 3
+Phase 5 - rebuild AG headers and trees... (Fase 5 - reconstruir encabezados y árboles AG...)
+    	- reset superblock... (	- restablecer superbloque...)
+Phase 6 - check inode connectivity... (Fase 6 - verificar conectividad de inodos...)
+    	- resetting contents of realtime bitmap and summary inodes (	- restableciendo contenidos de bitmap en tiempo real e inodos de resumen)
+    	- traversing filesystem ... (	- recorriendo sistema de archivos ...)
+    	- traversal finished ... (	- recorrido finalizado ...)
+    	- moving disconnected inodes to lost+found ... (	- moviendo inodos desconectados a lost+found ...)
+Phase 7 - verify and correct link counts... (Fase 7 - verificar y corregir recuentos de enlaces...)
+done (listo)</code></pre>
+  <p><strong>Nota</strong></p>
+  <p>En ciertas circunstancias, puede ser ventajoso borrar el registro del diario del sistema de archivos XFS, como cuando el registro del diario se ha corrompido. Borrar un registro del diario XFS es una medida extrema y solo debe hacerse como último recurso.</p>
+  <p>Para borrar el registro del diario de un sistema de archivos XFS, use el comando:</p>
+  <pre><code>root@localhost:~# xfs_repair -L /dev/sda3</code></pre>
+  <p>En situaciones en las que se desea una reparación manual del sistema de archivos XFS, el comando <code>xfs_db</code> se puede usar para iniciar dicha reparación en un sistema de archivos XFS. El comando <code>xfs_db</code> se utiliza para realizar opciones de depuración y posibles reparaciones en un sistema de archivos XFS, pero si se usa de forma inexperta puede hacer que el sistema de archivos sea inutilizable e irrecuperable.</p>
+  <p>Para usar <code>xfs_db</code> en modo experto, use el comando:</p>
+  <p><strong>Importante</strong></p>
+  <p>¡El modo experto del comando <code>xfs_db</code> permite la modificación de estructuras de datos, lo cual puede ser peligroso!</p>
+  <pre><code>root@localhost:~# xfs_db -x /dev/sda3</code></pre>
+  <p>Como método para mantener sus sistemas de archivos XFS en buen estado, el comando <code>xfs_fsr</code> o "Reorganizador del sistema de archivos para XFS" se puede usar en sus sistemas de archivos XFS montados para mantenerlos organizados y funcionando bien.</p>
+  <p>El comando <code>xfs_fsr</code> funciona en un archivo a la vez, anotando dónde están sus datos, compactando y reorganizando los archivos para que sean lo más optimizados posible con el fin de mejorar los tiempos de lectura y escritura, lo que afecta el rendimiento del sistema.</p>
+  <p>Antes de invocar el comando <code>xfs_fsr</code> para usar los recursos del sistema reorganizando los sistemas de archivos, es una buena idea verificar si necesitan este tipo de mantenimiento. El comando <code>xfs_db</code> se puede usar para evaluar la necesidad de reorganización:</p>
+  <pre><code>root@localhost:~# xfs_db -r /dev/sda3
+xfs_db>frag
+actual 345, ideal 289, factor de fragmentación 16.23%
+Nota, este número es en gran parte insignificante.
+Los archivos en este sistema de archivos promedian 1.19 extensiones por archivo
+xfs_db>quit</code></pre>
+  <p>El uso del comando interno <code>frag</code> informará el estado de fragmentación del sistema de archivos, y esto funcionará en sistemas de archivos montados o desmontados. El estado del sistema de archivos de ejemplo tiene una fragmentación bastante baja, por lo que la reorganización probablemente produciría pocos o ningún resultado real en el rendimiento.</p>
+  <p>Si el factor de fragmentación supera el 25% aproximadamente, entonces la reorganización produciría resultados de rendimiento medibles.</p>
+  <p>Para reorganizar y optimizar todos los sistemas de archivos montados en su sistema y ver una salida detallada de lo que se está haciendo exactamente con qué archivos, use el comando:</p>
+  <pre><code>root@localhost:~# xfs_fsr -v /dev/sda3
+No se realizará ninguna mejora (saltando): ino=3147588472
+ino=1247877226
+No se realizará ninguna mejora (saltando): ino=1247877226
+ino=124787727
+No se realizará ninguna mejora (saltando): ino=1247877440
+ino=1247877470
+extensiones antes:2 después:1 HECHO ino=1247877470
+ino=1247849901
+extensiones antes:2 después:1 HECHO ino=1247849901
+ino=1247849973
+No se realizará ninguna mejora (saltando): ino=1247849973
+ino=1247877640
+Salida Omitida...</code></pre>
+  <p>Otra característica muy útil del comando <code>xfs_fsr</code> es que puede configurarlo para que se ejecute durante un período de tiempo determinado, por lo que se puede iniciar manual o programadamente para que se ejecute durante un par de horas cada noche cuando el sistema está menos utilizado. Para ejecutar <code>xfs_fsr</code> durante 1 hora y luego detenerlo:</p>
+  <pre><code>root@localhost:~# xfs_fsr -t 3600</code></pre>
+  <p>La utilidad entonces trabajará hasta por una hora, reorganizando los archivos de las unidades archivo por archivo hasta que se acabe el tiempo límite o los archivos terminen de reorganizarse.</p>
+  <p>Si por alguna razón <code>xfs_fsr</code> se interrumpe o necesita ser detenido, mantiene un registro de dónde se encontraba en el proceso de reorganización y puede reanudar donde lo dejó cuando se ejecute de nuevo.</p>
+</section>
+<hr>
+
 
   
 

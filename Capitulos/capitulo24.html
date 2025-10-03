@@ -53,19 +53,1141 @@
     </ul>
   </nav> 
 
-  <section id="1X-1">
-    <h2>16.1 Introducción</h2>
-    <p>El arranque (<em>booting</em>) es el proceso de llevar el sistema desde un estado apagado hasta un sistema operativo en ejecución. Es muy importante comprender este proceso para poder solucionar problemas de arranque cuando ocurran y para modificar los estados del sistema llamados <em>runlevels</em> o, en dispositivos con systemd, <em>targets</em>.</p>
+  <section id="24-1">
+  <h2>24.1 Introducción</h2>
+  <p>Los dos sistemas de gestión de software más comunes fueron iniciados por dos de las distribuciones de Linux más populares: Red Hat y Debian. Ambos sistemas ofrecen funcionalidades similares, incluyendo la capacidad de descargar e instalar manualmente un programa de software, así como automatizar el proceso. Si bien algunos pueden argumentar que un sistema es mejor que el otro, la discusión es en su mayoría irrelevante, ya que la mayoría de los administradores generalmente no tienen la opción de elegir qué sistema de gestión de software está disponible para su distribución.</p>
+  <p>Aunque existe la posibilidad de que solo necesites aprender un sistema (el que se usa en tu distribución de Linux), conocer ambos sistemas te proporciona la flexibilidad de poder gestionar software en muchas distribuciones de Linux diferentes. La buena noticia es que una vez que entiendes un sistema, comprender el otro no es demasiado difícil.</p>
+  <p>Otra distribución de Linux, SUSE, utiliza el sistema de gestión de paquetes desarrollado por Red Hat, así como su propio sistema de gestión de paquetes llamado Zypper. En este capítulo, aprenderás sobre la gestión de paquetes por línea de comandos de Red Hat, Debian y SUSE.</p>
+</section>
+<hr>
 
-    <p>El proceso de arranque ocurre en cuatro etapas principales, algunas de las cuales pueden ser modificadas por los administradores, mientras que en otras basta con estar al tanto de las acciones que tienen lugar:</p>
+<section id="24-2">
+  <h2>24.2 Gestión de paquetes RPM</h2>
+  <p>El sistema de gestión de paquetes de Red Hat se basa en el formato de archivo utilizado para empaquetar los archivos de software dentro de esa distribución, conocido como RPM Package Manager. Aunque fue inventado en Red Hat, RPM se utiliza para gestionar software en muchas distribuciones diferentes y es el sistema de gestión de software base definido por la Linux Standards Base.</p>
+  <h3>Considera esto</h3>
+  <p>Originalmente, este sistema de gestión de software se llamaba simplemente RPM, o Red Hat Package Manager. Parece extraño que ahora se le conozca como RPM Package Manager, ya que el "PM" en RPM originalmente significaba "Package Manager". En cierto sentido, es similar a referirse a un cajero automático como "máquina ATM" cuando ATM significa "Automated Teller Machine".</p>
+  <p>En realidad, RPM ya no significa "Red Hat Package Manager". Cuando RPM se convirtió en parte de la Linux Standards Base (LSB), se le cambió el nombre a RPM Package Manager para evitar incluir "Red Hat" en su nombre. Esto se debe principalmente a que la LSB intenta ser lo más neutral posible en lo que respecta a las distribuciones de Linux.</p>
+  <p>Típicamente, RPM Package Manager se conoce simplemente como RPM.</p>
+  <p>Los archivos RPM están disponibles en dos formatos: archivos .src.rpm y archivos .rpm. A menos que estés compilando el software tú mismo o viendo el código fuente del software, no necesitas preocuparte por los archivos .src.rpm. Estos archivos contienen el código fuente que se utiliza para construir los archivos binarios .rpm. Los archivos binarios .rpm son los que contienen el código compilado que está listo para usar.</p>
+  <p>Los archivos utilizados por RPM tienen una convención de nomenclatura específica para ayudar a identificar el paquete, su número de versión, su identificador de lanzamiento y para qué arquitectura se compiló el software. Por ejemplo, si un archivo se llamara:</p>
+  <pre><code>x3270-x11-3.3.6-10.5.el6.i686.rpm</code></pre>
+  <p>Entonces se podría extraer información crítica solo del nombre del archivo:</p>
+  <pre><code>nombre_paquete-versión-lanzamiento.arquitectura.rpm</code></pre>
+  <h4>Nombre del paquete</h4>
+  <pre><code>x3270-x11-3.3.6-10.5.el6.i686.rpm</code></pre>
+  <p>El nombre del paquete puede incluir un guion. El nombre termina donde comienza el número de versión; el número de versión siempre es un número delimitado por decimales.</p>
+  <h4>Número de versión</h4>
+  <pre><code>x3270-x11-3.3.6-10.5.el6.i686.rpm</code></pre>
+  <p>Inmediatamente después del nombre del paquete y del guion que le sigue, se encuentra el número de versión. Este número de versión es establecido por el desarrollador original del software.</p>
+  <h4>Identificador de lanzamiento</h4>
+  <pre><code>x3270-x11-3.3.6-10.5.el6.i686.rpm</code></pre>
+  <p>Después del guion posterior al número de versión, se encuentra el identificador de lanzamiento. Los identificadores de lanzamiento son elegidos por el empaquetador (no por los desarrolladores del software) del software, que normalmente es el proveedor de la distribución.</p>
+  <h4>Arquitectura</h4>
+  <pre><code>x3270-x11-3.3.6-10.5.el6.i686.rpm</code></pre>
+  <p>Si un paquete contiene código binario, la arquitectura de la computadora en la que se compiló el código será la parte final del nombre del archivo antes de la extensión .rpm. Existen varios tipos de arquitectura:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Arquitectura</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>noarch</code></td>
+        <td>Paquetes que no contienen código binario, como aquellos que pueden contener solo archivos de script</td>
+      </tr>
+      <tr>
+        <td><code>src</code></td>
+        <td>Paquetes que no han sido compilados</td>
+      </tr>
+      <tr>
+        <td><code>i686</code></td>
+        <td>Paquetes compilados para ejecutarse en modo de 32 bits en un procesador Pentium 4 o posterior</td>
+      </tr>
+      <tr>
+        <td><code>x86_64</code></td>
+        <td>Paquetes compilados para ejecutarse en modo de 64 bits en un procesador AMD de 64 bits o un procesador compatible con Intel EM64T de 64 bits</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<hr>
 
-    <ul>
-      <li><strong>Etapa de firmware</strong></li>
-      <li><strong>Gestor de arranque (Bootloader)</strong></li>
-      <li><strong>Etapa del kernel</strong></li>
-      <li><strong>Etapa Init</strong></li>
-    </ul>
-  </section>
+<section id="24-2-1">
+  <h2>24.2.1 Consultas RPM</h2>
+  <p>Cualquier usuario puede realizar consultas RPM para mostrar información sobre paquetes que están actualmente instalados en el sistema o sobre archivos RPM que aún no se han instalado (ya sea en el sistema de archivos o accesibles mediante una URL). La diferencia entre hacer una consulta sobre un paquete instalado y un archivo RPM es doble:</p>
+  <ul>
+    <li>Para consultar un paquete que no está instalado, usa la opción <kbd>-p FILE</kbd>. El argumento <kbd>FILE</kbd> especifica la ruta a un archivo .rpm local o la URL de un archivo .rpm en internet (ftp o http).</li>
+    <li>Para consultar un paquete instalado, usa solo el nombre del paquete.</li>
+  </ul>
+  <h3>Nota</h3>
+  <p>Algunos de los archivos necesarios para los siguientes ejemplos no están disponibles en nuestro entorno virtual. Por lo tanto, algunos de los ejemplos pueden no coincidir con la salida en la VM.</p>
+  <p>En el laboratorio se proporciona práctica adicional para la gestión de paquetes RPM.</p>
+  <p>Para realizar cualquier consulta RPM, siempre usa la opción <kbd>-q</kbd> con el comando <kbd>rpm</kbd>. Para consultar información básica del paquete, usa la opción <kbd>-i</kbd>:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qi bash
+Name        : bash
+Version     : 4.2.46
+Release     : 31.el7
+Architecture: x86_64
+Install Date: Tue Dec  4 14:38:13 2018
+Group       : System Environment/Shells
+Size        : 3667773
+License     : GPLv3+
+Signature   : RSA/SHA256, Mon Nov 12 14:21:49 2018, Key ID 24c6a8a7f4a80eb5
+Source RPM  : bash-4.2.46-31.el7.src.rpm
+Build Date  : Tue Oct 30 17:09:33 2018
+Build Host  : x86-01.bsys.centos.org
+Relocations : (not relocatable)
+Packager    : CentOS BuildSystem &lt;http://bugs.centos.org&gt;
+Vendor      : CentOS
+URL         : http://www.gnu.org/software/bash
+Summary     : The GNU Bourne Again shell
+Description :
+The GNU Bourne Again shell (Bash) is a shell or command language
+interpreter that is compatible with the Bourne shell (sh). Bash
+incorporates useful features from the Korn shell (ksh) and the C shell
+(csh). Most sh scripts can be run by bash without modification.</code></pre>
+  <p>Para realizar una consulta similar en el archivo RPM de bash, se añadiría la opción <kbd>-p</kbd> junto con las opciones <kbd>-q</kbd> y <kbd>-i</kbd>:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qip bash-4.2.46-31.el7.src.rpm</code></pre>
+  <h3>Considera esto</h3>
+  <p>¿Dónde se encuentra este archivo .rpm? En la mayoría de las distribuciones, los archivos .rpm no se almacenan por defecto en los sistemas de archivos locales. Se pueden encontrar en el medio de instalación (DVD o CD ROM de instalación) o en línea en servidores llamados repositorios.</p>
+  <p>Recuerda siempre que las consultas RPM requieren el uso de la opción <kbd>-q</kbd> para paquetes instalados y <kbd>-qp</kbd> para archivos de paquetes no instalados. Hay muchos tipos diferentes de consultas que se pueden realizar, como se describe en la siguiente tabla:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Opción</th>
+        <th>Propósito</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><kbd>-a</kbd></td>
+        <td>Listar todos los paquetes instalados actualmente en el sistema</td>
+      </tr>
+      <tr>
+        <td><kbd>-c</kbd></td>
+        <td>Mostrar una lista de archivos de configuración que pertenecen al paquete</td>
+      </tr>
+      <tr>
+        <td><kbd>-d</kbd></td>
+        <td>Listar los archivos de documentación que pertenecen al paquete</td>
+      </tr>
+      <tr>
+        <td><kbd>-i</kbd></td>
+        <td>Mostrar la información del paquete</td>
+      </tr>
+      <tr>
+        <td><kbd>-K</kbd></td>
+        <td>Verificar la integridad del paquete</td>
+      </tr>
+      <tr>
+        <td><kbd>-l</kbd></td>
+        <td>Listar todos los archivos en el paquete</td>
+      </tr>
+      <tr>
+        <td><kbd>--provides</kbd></td>
+        <td>Listar las capacidades que proporciona este paquete</td>
+      </tr>
+      <tr>
+        <td><kbd>-R</kbd></td>
+        <td>Listar las capacidades que requiere este paquete</td>
+      </tr>
+      <tr>
+        <td><kbd>--scripts</kbd></td>
+        <td>Listar los scripts que se utilizan antes y después de la instalación del paquete</td>
+      </tr>
+      <tr>
+        <td><kbd>-s</kbd></td>
+        <td>Mostrar el estado de cada archivo del paquete como normal, no instalado o reemplazado</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3>Consulta de Scripts</h3>
+  <p>Es una buena idea consultar un paquete para ver los scripts que ejecutará antes de instalar un archivo RPM de una fuente de terceros. Debido a que se requieren privilegios de root por defecto para instalar o eliminar paquetes RPM del sistema, estos scripts se ejecutarán como root durante la instalación o eliminación de un paquete del sistema; esto es potencialmente peligroso, ya que los scripts ejecutados como root pueden realizar cualquier cambio en el sistema.</p>
+  <p>Antes de instalar el paquete x3270-x11, el administrador podría ver los scripts para asegurarse de que no son peligrosos ejecutando el siguiente comando:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qp --scripts x3270-x11-3.3.6-10.5.el6.i686.rpm
+postinstall scriptlet (using /bin/sh):
+cd /usr/share/x3270/fonts && /usr/bin/mkfontdir
+touch --no-create /usr/share/icons/hicolor
+if [ -x /usr/bin/gtk-update-icon-cache ]; then
+  gtk-update-icon-cache -q /usr/share/icons/hicolor
+fi
+postuninstall scriptlet (using /bin/sh):
+if [ "$1" = "0" ]; then
+  cd /usr/share/x3270/fonts && /usr/bin/mkfontdir
+fi
+touch --no-create /usr/share/icons/hicolor
+if [ -x /usr/bin/gtk-update-icon-cache ]; then
+  gtk-update-icon-cache -q /usr/share/icons/hicolor
+fi</code></pre>
+  <p>La salida de esta consulta muestra que hay un script postinstalación y un script postdesinstalación para este paquete. En este caso, estos scripts no son peligrosos, ya que están actualizando fuentes e iconos que el paquete puede usar.</p>
+  <h3>Consulta de la Integridad de un Paquete</h3>
+  <p>Si un administrador está preocupado por la seguridad del sistema, no solo debe consultar un paquete para ver sus scripts, sino también consultar la integridad de un paquete usando la opción <kbd>-K</kbd>. Para usar esta opción en un archivo .rpm, importa el archivo de clave pública que es distribuido por la misma organización que empaquetó y distribuyó el archivo .rpm.</p>
+  <p>Típicamente, las claves públicas para la distribución se incluyen automáticamente con el sistema. Por ejemplo, en una distribución derivada de Red Hat, los archivos de clave pública se almacenan en el directorio <kbd>/etc/pki/rpm-gpg</kbd>. Un administrador puede importar estas claves a la base de datos RPM con el comando:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm --import /etc/pki/rpm-gpg/*</code></pre>
+  <p>Una vez que se han importado las claves, se puede verificar la integridad de un paquete. Por ejemplo, para verificar la integridad del paquete x3270-x11, un administrador podría ejecutar el siguiente comando:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qpK x3270-x11-3.3.6-10.5.el6.i686.rpm
+x3270-x11-3.3-4.el7.x86_64.rpm: rsa sha1 (md5) pgp md5 OK</code></pre>
+  <p>Fíjate que la única salida que está en mayúsculas es <kbd>OK</kbd>, lo que significa que el paquete no está corrupto. La siguiente salida tiene varias siglas en mayúsculas junto con <kbd>NOT OK</kbd>, lo que indica un paquete corrupto:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qpK x3270-x11-3.3.6-10.5.el6.i686.rpm
+x3270-x11-3.3-4.el7.x86_64.rpm: rsa sha1 (MD5) PGP MD5 NOT OK</code></pre>
+  <h3>Consulta de Paquetes Instalados</h3>
+  <p>Existen varios métodos para determinar si un paquete está instalado. Si se conoce el nombre exacto del paquete, simplemente consulta el paquete por su nombre. Por ejemplo, para ver si el paquete bash está instalado, ejecuta:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -q bash
+bash-4.2.46-31.el7.src.rpm</code></pre>
+  <p>Si el paquete está instalado, la salida será como el nombre original del archivo RPM sin la extensión .rpm. Si el paquete no está instalado, la salida lo indicará:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -q pickle
+package pickle is not installed</code></pre>
+  <p>El carácter global <kbd>*</kbd> puede ser útil si no se conoce el nombre exacto del paquete. Por ejemplo, si sabes que el nombre del paquete contiene <kbd>python</kbd>, pero no estás seguro del resto, entonces ejecuta el siguiente comando:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qa *python*
+python-2.6.6-52.el6.x86_64
+python-urlgrabber-3.9.1-9.el6.noarch
+rpm-python-4.8.0-37.el6.x86_64
+python-libs-2.6.6-52.el6.x86_64
+python-pycurl-7.19.0-8.el6.x86_64
+python-iniparse-0.3.1-2.1.el6.noarch</code></pre>
+  <h3>Nota</h3>
+  <p>Para obtener una lista alfabética de todos los paquetes instalados, ejecuta el comando <kbd>rpm -qa | sort</kbd>. Para obtener una lista cronológica de todos los paquetes, ejecuta el comando <kbd>rpm -qa --last</kbd>.</p>
+</section>
+<hr>
+
+<section id="24-2-2">
+  <h2>24.2.2 Instalación de paquetes con rpm</h2>
+  <p>Una dependencia es un paquete de software (o una característica) que es necesario para que otro paquete se instale y funcione correctamente. Cuando un administrador usa el comando <kbd>rpm</kbd> para instalar un paquete de software .rpm, ese proceso fallará si las dependencias de ese paquete no están ya instaladas.</p>
+  <p>Por ejemplo, para instalar el paquete <kbd>x3270-x11-3.3.6-10.5.el6.i686.rpm</kbd>, ejecuta:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -i x3270-x11-3.3.6-10.5.el6.i686.rpm</code></pre>
+  <p>Si faltara alguna dependencia, el comando <kbd>rpm</kbd> fallaría y mostraría un mensaje de error como el siguiente:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -i x3270-x11-3.3.6-10.5.el6.i686.rpm
+error: Failed dependencies:
+	libicuuc.so.42 is needed by x3270-x11-3.3.6-10.5.el6.i686
+	x3270 = 3.3.6 is needed by x3270-x11-3.3.6-10.5.el6.i686</code></pre>
+  <p>Basado en la salida anterior, faltan un archivo de biblioteca u objeto compartido llamado <kbd>libicuuc.so.42</kbd> y el paquete <kbd>x3270</kbd> (versión 3.3.6). El archivo de biblioteca es un poco complicado ya que no está claro a qué paquete pertenece. Buscar en Internet usando el nombre del archivo de biblioteca revela que el paquete que falta necesario para instalar el archivo de biblioteca se llama <kbd>libicu</kbd>.</p>
+  <p>Es importante tener en cuenta que a veces un paquete y sus dependencias deben instalarse al mismo tiempo si existen dependencias circulares entre ellos. Una vez que se localizan los paquetes <kbd>x3270</kbd> y <kbd>libicu</kbd>, el administrador los instalaría junto con el paquete <kbd>x3270-x11</kbd> ejecutando un comando como el siguiente:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -i x3270-x11-3.3.6-10.5.el6.i686.rpm x3270-3.3.6-10.5.el6.i686.rpm libicu-4.2.1-9.1.el6_2.i686.rpm</code></pre>
+  <p>El sistema RPM utiliza una base de datos para rastrear las capacidades de cada paquete previamente instalado. Un archivo RPM contiene una lista de dependencias de paquetes. Antes de instalar un paquete RPM, el comando <kbd>rpm</kbd> compara esta información para determinar si se satisfacen las dependencias.</p>
+  <p>La mayoría de los administradores determinan las dependencias de los paquetes examinando la salida de una instalación fallida de un paquete RPM. Sin embargo, también es posible verificar los requisitos y las dependencias de un paquete por adelantado con la siguiente consulta rpm (se muestra una salida parcial):</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qpR x3270-x11-3.3.6-10.5.el6.i686.rpm
+/bin/sh
+/usr/bin/mkfontdir
+gtk2 >= 2.6
+libICE.so.6
+libicuuc.so.42
+libnsl.so.1
+libssl.so.10
+libutil.so.1
+x3270 = 3.3.6</code></pre>
+  <h3>Nota</h3>
+  <p>Para ver lo que proporciona cada paquete, realiza una consulta con la opción <kbd>--provides</kbd>. La salida del siguiente comando demuestra que este paquete proporciona el paquete <kbd>x3270</kbd> requerido con la versión igual a 3.3.6:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qp --provides x3270-3.3.6-10.5.el6.i686.rpm
+config(x3270) = 3.3.6-10.5.el6
+x3270 = 3.3.6-10.5.el6
+x3270(x86-32) = 3.3.6-10.5.el6</code></pre>
+  <p>Ocasionalmente, un paquete necesita ser reinstalado, quizás porque falta un archivo de ese paquete. Normalmente, el comando <kbd>rpm</kbd> se negará a instalar un paquete que ya está instalado, pero se puede forzar añadiendo la opción <kbd>--force</kbd>. Por ejemplo, para reinstalar el paquete <kbd>x3270</kbd>, ejecuta el siguiente comando:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm --force -i x3270-3.3.6-10.5.el6.i686.rpm</code></pre>
+</section>
+<hr>
+
+<section id="24-2-3">
+  <h2>24.2.3 Borrado de paquetes con rpm</h2>
+  <p>El comando <kbd>rpm</kbd> puede usarse para borrar (eliminar) paquetes del sistema con la opción <kbd>-e</kbd>. Sin embargo, pueden surgir problemas de dependencia. Si hubo problemas de dependencia cuando se instaló un grupo de paquetes, entonces también puede haber problemas de dependencia cuando se elimine ese grupo de paquetes.</p>
+  <p>Por ejemplo, si se intentara eliminar los paquetes <kbd>x3270</kbd> o <kbd>libicu</kbd> sin eliminar primero el paquete <kbd>x3270-x11</kbd>, se produciría un error:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -e x3270 libicu
+error: Failed dependencies:
+	x3270 = 3.3.6 is needed by (installed) x3270-x11-3.3.6-10.5.el6.i686
+        libicuuc.so.42 is needed by (installed) x3270-x11-3.3.6-10.5.el6.i686</code></pre>
+  <p>En otras palabras, el comando <kbd>rpm</kbd> no permitirá que se borre un paquete si es un requisito de otro paquete. Si el paquete <kbd>x3270-x11</kbd> se borrara primero, entonces los otros dos paquetes podrían borrarse.</p>
+  <p>En el caso de dependencias circulares, cuando los paquetes dependen entre sí, todos los paquetes se pueden eliminar con un solo comando <kbd>rpm</kbd> especificando todos los nombres de los paquetes como argumento:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -e x3270-x11 x3270 libicu</code></pre>
+</section>
+<hr>
+
+<section id="24-2-4">
+  <h2>24.2.4 Actualización de paquetes con rpm</h2>
+  <p>Para actualizar un paquete con una nueva versión o un lanzamiento más reciente, usa el comando <kbd>rpm</kbd> con la opción <kbd>-U</kbd> o <kbd>-F</kbd>. Como fue el caso al instalar o eliminar paquetes, pueden surgir problemas de dependencia al actualizar paquetes. La instalación de un paquete actualizado a menudo requiere la instalación de actualizaciones de los paquetes de los que depende.</p>
+  <p>La opción <kbd>-U</kbd> puede usarse con el comando <kbd>rpm</kbd> para instalar o actualizar un paquete:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -U x3270-4.3.6-10.5.el6.i686.rpm</code></pre>
+  <p>Por otro lado, al usar el comando <kbd>rpm</kbd> con la opción <kbd>-F</kbd>, el paquete solo se actualizará si el paquete ya está instalado; esto se llama "refrescar" el paquete:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -F x3270-4.3.6-10.5.el6.i686.rpm</code></pre>
+  <h3>Importante</h3>
+  <p>El paquete del kernel es tan crítico que cuando hay una nueva versión disponible, debe instalarse en lugar de actualizarse o "refrescarse". Los archivos del kernel están organizados para permitir que coexistan múltiples versiones en el sistema simultáneamente. De esta manera, si se instala un kernel actualizado en tu sistema pero no funciona, simplemente reinicia el sistema y selecciona el kernel anterior del menú del cargador de arranque.</p>
+</section>
+<hr>
+
+<section id="24-2-5">
+  <h2>24.2.5 Uso de rpm2cpio</h2>
+  <p>El comando <kbd>rpm2cpio</kbd> acepta un archivo .rpm como argumento (o lee datos en formato de paquete desde la entrada estándar) y genera un archivo cpio. Esta capacidad puede usarse para listar el contenido de un archivo .rpm o para extraer uno o más archivos del archivo .rpm original.</p>
+  <p>Por ejemplo, para listar el contenido del archivo <kbd>telnet-server-0.17-47.el6_3.1.i686.rpm</kbd>, ejecuta el siguiente comando. La salida muestra los archivos contenidos dentro del archivo .rpm y el número total de bloques de 512 KiB que esos archivos usarían si se extrajeran:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm2cpio telnet-server-0.17-47.el6_3.1.i686.rpm | cpio -t
+./etc/xinetd.d/telnet
+./usr/sbin/in.telnetd
+./usr/share/man/man5/issue.net.5.gz
+./usr/share/man/man8/in.telnetd.8.gz
+./usr/share/man/man8/telnetd.8.gz
+108 blocks</code></pre>
+  <p>Para copiar estos archivos del archivo .rpm, usa el siguiente comando para extraer estos archivos al directorio actual:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm2cpio telnet-server-0.17-47.el6_3.1.i686.rpm | cpio -imud</code></pre>
+  <p>Varias opciones para el comando <kbd>cpio</kbd> se enumeran en la siguiente tabla.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Opción</th>
+        <th>Propósito</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><kbd>-i</kbd></td>
+        <td>Extraer</td>
+      </tr>
+      <tr>
+        <td><kbd>-m</kbd></td>
+        <td>Conservar los tiempos de modificación originales de los archivos</td>
+      </tr>
+      <tr>
+        <td><kbd>-u</kbd></td>
+        <td>Reemplazar incondicionalmente cualquier archivo existente</td>
+      </tr>
+      <tr>
+        <td><kbd>-d</kbd></td>
+        <td>Crear cualquier directorio padre de los archivos contenidos en el archivo</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3>Nota</h3>
+  <p>Recuerda que el comando <kbd>cpio</kbd> es un comando de archivo que puede fusionar muchos archivos en un solo archivo.</p>
+  <p>El comando <kbd>cpio</kbd> se cubre con mayor detalle anteriormente en el curso.</p>
+  <h3>Considera esto</h3>
+  <p>¿Por qué usar el comando <kbd>rpm2cpio</kbd>? Considera una situación en la que un archivo de paquete clave se elimina accidentalmente del sistema. Reinstalar todo el paquete puede ser excesivo si solo se necesita un único archivo. Usando el comando <kbd>rpm2cpio</kbd>, el archivo que falta se puede extraer y copiar de nuevo al directorio apropiado.</p>
+</section>
+<hr>
+
+<section id="24-3">
+  <h2>24.3 Gestión de paquetes con yum</h2>
+  <p>Si bien un administrador puede gestionar software directamente con el comando <kbd>rpm</kbd>, existen otros comandos de nivel superior disponibles que facilitan significativamente la gestión del software. El comando <kbd>yum</kbd> puede localizar y descargar paquetes en Internet y resolver dependencias automáticamente.</p>
+  <p>Las dependencias ocurren cuando un paquete (P1) depende de otros paquetes (P2, P3, P4) para funcionar correctamente. P2, P3 y P4 pueden tener sus propias dependencias (P5, P6, P7, P8), y así sucesivamente. ¡Resolver estas dependencias en cascada manualmente puede ser una tarea desalentadora!</p>
+  <p>Las dependencias circulares a veces son posibles cuando dos paquetes se requieren mutuamente. Por ejemplo, <kbd>chicken.rpm</kbd> requiere <kbd>egg.rpm</kbd>, pero <kbd>egg.rpm</kbd> requiere <kbd>chicken.rpm</kbd>. Aunque es posible resolver problemas de dependencia manualmente con el comando <kbd>rpm</kbd>, se pueden resolver automáticamente con el comando <kbd>yum</kbd>.</p>
+  <p>El comando <kbd>yum</kbd> puede realizar algunas operaciones que el comando <kbd>rpm</kbd> no puede. La gran ventaja del comando <kbd>yum</kbd> es que se puede configurar para descargar paquetes automáticamente y resolver las dependencias de los paquetes. Además, el comando <kbd>yum</kbd> puede mostrar información de paquetes que ni siquiera están en el sistema accediendo a estos datos desde un servidor llamado repositorio.</p>
+  <p>Típicamente, el comando <kbd>yum</kbd> se configura editando el archivo <kbd>/etc/yum.conf</kbd> y los archivos que se encuentran en el directorio <kbd>/etc/yum.repos.d</kbd>. Estos archivos de configuración se utilizan para especificar servidores (los repositorios) en Internet donde el comando <kbd>yum</kbd> puede obtener los archivos RPM automáticamente. Si el sistema no tiene la red habilitada o no tiene acceso a Internet, entonces no podrá usar los comandos <kbd>yum</kbd> para gestionar paquetes. En esas situaciones, los comandos <kbd>rpm</kbd> pueden usarse para la gestión de paquetes.</p>
+  <p>Una consulta <kbd>rpm</kbd> que no se mencionó anteriormente es la opción <kbd>-f</kbd>:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qf /bin/bash
+bash-4.1.2-15.el6_4.x86_64</code></pre>
+  <p>Esta consulta se utiliza para determinar qué paquete posee (o proporciona) el archivo <kbd>/bin/bash</kbd>. Esta consulta solo tiene éxito si el paquete <kbd>bash</kbd> ya está instalado en el sistema. Desafortunadamente, esto no es útil cuando se intenta encontrar el propietario del paquete para un archivo y ese paquete no está instalado en tu sistema, como suele ser el caso cuando se intentan resolver problemas de dependencia. Por ejemplo, si el paquete <kbd>libicu</kbd> no está instalado, la siguiente consulta fallará:</p>
+  <pre><code>[sysadmin@localhost ~]$ rpm -qf /usr/lib/libicuuc.so.42
+error: file /usr/lib/libicuuc.so.42: No such file or directory</code></pre>
+  <p>Por otro lado, el comando <kbd>yum</kbd> puede usarse para determinar qué paquete posee el archivo porque el comando <kbd>yum</kbd> busca en la base de datos del/los servidor(es) del repositorio:</p>
+  <pre><code>[sysadmin@localhost ~]$ yum provides /usr/lib/libicuuc.so.42</code></pre>
+  <p>Aún mejor, ni siquiera necesitas saber el directorio en el que se supone que debe existir un archivo, porque se puede usar un patrón global:</p>
+  <pre><code>[sysadmin@localhost ~]$ yum provides "*/libicuuc.so.42"</code></pre>
+  <p>La otra ventaja distintiva de usar el comando <kbd>yum</kbd> sobre el comando <kbd>rpm</kbd> es la capacidad de buscar un paquete en los repositorios, basándose en el nombre o la descripción del paquete. Por ejemplo, el siguiente comando <kbd>yum</kbd> mostrará todos los paquetes (instalados o disponibles para instalar) que tienen la palabra <kbd>terminal</kbd> en la descripción:</p>
+  <pre><code>[sysadmin@localhost ~]$ yum search terminal
+Loaded plugins: fastestmirror, refresh-packagekit, security
+Loading mirror speeds from cached hostfile
+ * base: centosb6.centos.org
+ * extras: centosi5.centos.org
+ * updates: centosb6.centos.org
+============================ N/S Matched: terminal =============================
+gnome-terminal.i686 : Terminal emulator for GNOME
+nautilus-open-terminal.i686 : Nautilus extension for an open terminal shortcut
+kbd.i696 : Tools for configuring the console (keyboard, virtual terminals, etc.)
+minicom.i686 : A text-based modem control and terminal emulation program
+ncurses-base.i686 : Descriptions of common terminals
+ncurses-term.i686 : terminal descriptions
+openct.i686 : Middleware framework for smart card terminals
+perl-TermReadKey.i686 : A perl module for simple terminal control
+rdesktop.i686 : X client for remote desktop into Windows terminal Server
+screen.i686 : A screen manager that supports multiple logins on one terminal
+tn5250.i686 : 5250 Telnet protocol and terminal
+tsclient.i686 : Client for VNC and Windows terminal Server
+vte.i686 : A terminal emulator
+x3270.i686 : An X Window System based IBM 3278/3279 terminal emulator
+x3270-text.i686 : IBM 3278/3279 terminal emulator for text mode
+x3270-x11.i686 : IBM 3278/3279 terminal emulator for the X Window System
+xterm.i686 : terminal emulator for the X Window System</code></pre>
+</section>
+<hr>
+
+
+<section id="24-3-1">
+  <h2>24.3.1 Instalación de paquetes con yum</h2>
+  <p>La utilidad <kbd>yum</kbd> es el comando preferido para instalar paquetes, ya que resolverá los problemas de dependencia por ti. Por ejemplo, para instalar el paquete <kbd>x3270-x11</kbd>, un administrador podría ejecutar lo siguiente:</p>
+  <pre><code>[sysadmin@localhost ~]$ su -
+Password:
+[root@localhost ~]# yum install x3270-x11</code></pre>
+  <p>Después de una salida que muestra cómo está resolviendo las dependencias, la salida de este comando <kbd>yum</kbd se vería así:</p>
+  <pre><code>================================================================================
+ Package            Arch          Version                   Repository     Size
+================================================================================
+Installing:
+ x3270-x11          i686          3.3.6-10.5.el6            base          416 k
+Installing for dependencies:
+ libicu             i686          4.2.1-9.1.el6_2           base          5.0 M
+ x3270              i686          3.3.6-10.5.el6            base          136 k
+
+Transaction Summary
+================================================================================
+Install       3 Package(s)
+Total download size: 5.5 M
+Installed size: 20 M
+Is this ok [y/N]:</code></pre>
+  <p>En la solicitud <kbd>Is this ok [y/N]:</kbd>, si se escribe <kbd>y</kbd> seguido de la tecla <kbd>Enter</kbd>, se instalarán los tres paquetes. Como muestra la salida, se instalará el paquete solicitado <kbd>x3270-x11</kbd> y los paquetes de dependencias (<kbd>libicu</kbd> y <kbd>x3270</kbd>).</p>
+  <p>La solicitud <kbd>Is this ok [y/N]</kbd> puede omitirse añadiendo la opción <kbd>-y</kbd> al comando <kbd>yum</kbd>. El siguiente comando instalaría el <kbd>x3270-x11</kbd> y sus dependencias sin ninguna solicitud de confirmación:</p>
+  <pre><code>[root@localhost ~]# yum -y install x3270-x11</code></pre>
+  <p>El comando <kbd>yum</kbd> tiene la capacidad de instalar muchos paquetes a la vez. Lista múltiples nombres de paquetes con el comando <kbd>yum install</kbd>:</p>
+  <pre><code>[root@localhost ~]# yum install telnet telnet-server ftp vsftpd</code></pre>
+  <p>El comando anterior instalaría cuatro paquetes y cualquiera de sus dependencias.</p>
+  <p>También se pueden instalar varios paquetes utilizando grupos <kbd>yum</kbd>. Un grupo <kbd>yum</kbd> es una colección de paquetes que trabajan juntos para crear una gran pieza de software. Por ejemplo, el software GUI llamado Gnome no es solo un paquete, sino una colección de paquetes que trabajan juntos para proporcionar un entorno GUI.</p>
+  <p>Usa el comando <kbd>yum grouplist</kbd> para listar todos los grupos instalados en un sistema, así como los grupos disponibles:</p>
+  <pre><code>[root@localhost ~]# yum grouplist | head
+Loaded plugins: fastestmirror, refresh-packagekit, security
+Setting up Group Process
+Loading mirror speeds from cached hostfile
+ * base: centosb6.centos.org
+ * extras: centosd6.centos.org
+ * updates: centosk3.centos.org
+Installed Groups:
+   Additional Development
+   Base
+   Desktop</code></pre>
+  <p>Para ver detalles sobre un grupo específico, usa el comando <kbd>yum groupinfo</kbd>:</p>
+  <pre><code>[root@localhost ~]# yum groupinfo "Perl Support"
+Loaded plugins: fastestmirror, refresh-packagekit, security
+Setting up Group Process
+Loading mirror speeds from cached hostfile
+ * base: centosb6.centos.org
+ * extras: centosd6.centos.org
+ * updates: centosk3.centos.org
+
+Group: Perl Support
+ Description: Perl interfaces to common libraries and functionality.
+ Mandatory Packages:
+   perl
+ Default Packages:
+   perl-Crypt-SSLeay
+   perl-XML-Dumper
+   perl-XML-Grove
+   perl-XML-Twig
+   perl-core
+ Optional Packages:
+   perl-DBD-SQLite
+   perl-Date-Calc
+   perl-Date-Manip
+   perl-Frontier-RPC
+   perl-LDAP</code></pre>
+  <p>Usa el comando <kbd>yum groupinstall</kbd> para instalar un grupo de paquetes. Los nombres de grupo que tienen espacios deberán ir entre comillas:</p>
+  <pre><code>[root@localhost ~]# yum groupinstall "Office Suite and Productivity"</code></pre>
+  <h3>Considera esto</h3>
+  <p>Los únicos paquetes que se instalan con el comando <kbd>yum groupinstall</kbd> son los que aparecen como <kbd>Default</kbd> o <kbd>Mandatory</kbd> (consulta la salida del comando <kbd>yum groupinfo</kbd> en el ejemplo anterior). Usa el comando <kbd>yum install</kbd> para instalar cualquiera de los paquetes que aparecen en <kbd>Optional Packages</kbd>.</p>
+</section>
+<hr>
+
+<section id="24-3-2">
+  <h2>24.3.2 Eliminando Paquetes con yum</h2>
+  <p>Si tienes la opción como administrador, también deberías usar el comando <code>yum</code> para eliminar paquetes, ya que resolverá los problemas de dependencias por ti. Al eliminar un paquete que tiene otros paquetes que dependen de él, el comando <code>yum</code> ofrecerá eliminar también las dependencias.</p>
+  <p>Por ejemplo, si se intenta eliminar el paquete <code>libicu</code>, el comando <code>yum</code> ofrecerá eliminar también los paquetes <code>x3270</code> y <code>x3270-x11</code>. El comando <code>yum</code> soporta el uso del comando <code>remove</code> o <code>erase</code>:</p>
+  <pre><code>[root@localhost ~]# yum remove libicu
+[root@localhost ~]# yum erase libicu</code></pre>
+  <p>La salida de ambos comandos muestra que no solo eliminará el paquete solicitado, sino también los otros dos paquetes que dependen del paquete <code>libicu</code>:</p>
+  <pre><code>================================================================================
+ Package            Arch          Version                  Repository      Size
+================================================================================
+Removing:
+ libicu             i686          4.2.1-9.1.el6_2          @base           19 M
+Removing for dependencies:
+ x3270              i686          3.3.6-10.5.el6           @base          383 k
+ x3270-x11          i686          3.3.6-10.5.el6           @base          768 k
+
+Transaction Summary
+================================================================================
+Remove        3 Package(s)
+
+Installed size: 20 M
+Is this ok [y/N]:</code></pre>
+  <p>La acción anterior se puede confirmar escribiendo <kbd>y</kbd> y presionando la tecla <kbd>Enter</kbd>. No se recomienda el uso de la opción <code>-y</code> para borrar paquetes, para evitar la eliminación accidental de un paquete que es necesario.</p>
+  <p>Para eliminar un grupo completo de comandos, usa el comando <code>yum groupremove</code> seguido del nombre del grupo.</p>
+</section>
+<hr>
+
+<section id="24-3-3">
+  <h2>24.3.3 Actualizando Paquetes con yum</h2>
+  <p>El uso del comando <code>yum list updates</code> hará que el sistema se conecte a los repositorios en internet para identificar y listar las versiones o lanzamientos más recientes de los paquetes. Al usar el comando <code>yum update</code>, el sistema descargará y actualizará todos los paquetes posibles después de solicitar confirmación.</p>
+  <p>Para actualizar uno o más paquetes individualmente, se puede usar la siguiente sintaxis:</p>
+  <pre><code>yum update [PAQUETE]...</code></pre>
+  <p>Como se mencionó anteriormente con el comando <code>rpm</code>, los paquetes del kernel siempre deben instalarse y no actualizarse. Esto aplica al comando <code>rpm</code>, pero no al comando <code>yum</code>, porque <code>yum</code> es consciente de la naturaleza especial del paquete del kernel. Incluso si se usa el comando <code>yum update kernel</code>, el comando <code>yum</code> instalará un kernel actualizado, no lo actualizará.</p>
+</section>
+<hr>
+
+<section id="24-4">
+  <h2>24.4 Instalando Paquetes con DNF</h2>
+  <p>Dandified Yum, o DNF, es la próxima versión del comando <code>yum</code>. Esta herramienta de gestión de paquetes se introdujo en la distribución de Linux Fedora 18, patrocinada por Red Hat. DNF está diseñado para resolver los problemas de dependencias en la gestión de paquetes, también conocidos como problemas de "depsolve", que estaban presentes en <code>yum</code>. Debido al crecimiento en la creación y el uso de aplicaciones, la recuperación de aplicaciones se ha vuelto cada vez más compleja, lo que ha resultado en más problemas de dependencias. DNF incluye un solucionador de dependencias actualizado llamado solucionador de dependencias de satisfactibilidad (SAT) de última generación para abordar estos problemas de dependencias.</p>
+  <p>Otro beneficio de DNF sobre <code>yum</code> es una Interfaz de Programación de Aplicaciones (API) claramente documentada. La API es la interfaz que permite que las aplicaciones trabajen con otras aplicaciones. Los usuarios regulares generalmente no tendrán que interactuar a nivel de API al usar aplicaciones, ya que esto lo hacen los desarrolladores de las aplicaciones. Sin embargo, una API mal documentada puede resultar en un desarrollo o actualización lentos de las aplicaciones. DNF está diseñado con una API estricta para plugins y extensiones y, en su mayor parte, mantiene la compatibilidad de línea de comandos con <code>yum</code>.</p>
+
+  <h3>Considera Esto</h3>
+  <p>En la salida anterior de las instalaciones de paquetes, es posible que hayas notado los términos "plugins" y "extension":</p>
+  <pre><code>Loaded plugins:
+nautilus-open-terminal.i686 : Nautilus extension for an open terminal shortcut</code></pre>
+  <p>En términos generales, estos términos se refieren a módulos de software que añaden funcionalidad a una aplicación. Los términos "plugin" y "extension" no se usan de forma consistente en la informática. En el caso de DNF, un "plugin" se refiere a un software que proporciona funcionalidad adicional a DNF y modifica la propia instalación de DNF. Por lo tanto, cuando ejecutas utilidades de DNF, las capacidades de los plugins están disponibles. Esto es análogo a añadir nuevas opciones de línea de comandos a un comando.</p>
+  <p>Las "extensiones" son programas que importan la funcionalidad de DNF a través de las bibliotecas Python de DNF. No modifican la instalación de DNF. Esto es análogo a añadir un nuevo comando, en lugar de añadir opciones a un comando conocido.</p>
+
+  <p>Para empezar a usar DNF, el comando <code>dnf</code> se puede ejecutar usando la siguiente sintaxis:</p>
+  <pre><code>dnf [OPTIONS] &lt;COMMAND&gt; [&lt;ARGUMENTS&gt;...]</code></pre>
+  <p>De manera similar al comando <code>yum</code>, el comando <code>dnf</code> utiliza el comando <code>list</code> con el argumento <code>--available</code> para listar todos los paquetes disponibles en el sistema:</p>
+  <pre><code>[root@localhost ~]# dnf list --available
+Last metadata expiration check: 0:25:49 ago on Sat Jun 22 23:41:27 2019.
+Available Packages
+cowsay.noarch                    3.04-4.el7                     mnt_local_repo_</code></pre>
+  <p>La salida anterior indica que el paquete <code>cowsay.noarch</code> está disponible para su instalación. Para instalar el paquete <code>cowsay.noarch</code>, se puede usar la opción <code>install</code>:</p>
+  <pre><code>[root@localhost]# dnf install cowsay.noarch
+added from: file:///mnt/local_repo/             935 kB/s | 1.6 kB     00:00
+Dependencies resolved.
+================================================================================
+ Package        Arch           Version            Repository               Size
+================================================================================
+Installing:
+ cowsay         noarch         3.04-4.el7         mnt_local_repo_          42 k
+
+Transaction Summary
+================================================================================
+Install  1 Package
+
+Total size: 42 k
+Installed size: 77 k
+Is this ok [y/N]: y
+Downloading Packages:
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Installing       : cowsay-3.04-4.el7.noarch                               1/1
+  Verifying        : cowsay-3.04-4.el7.noarch                               1/1
+
+Installed:
+  cowsay-3.04-4.el7.noarch
+
+Complete!</code></pre>
+  <p>Para verificar que el paquete <code>cowsay.noarch</code> se instaló correctamente, lista los paquetes instalados recientemente usando el comando <code>list</code> con la opción <code>--installed</code>:</p>
+  <pre><code>[root@localhost ~]# dnf list --installed
+Installed Packages
+acl.x86_64                         2.2.51-14.el7                    @System
+
+audit-libs.x86_64                  2.8.4-4.el7                      @System
+
+basesystem.noarch                  10.0-7.el7.centos                @System
+
+bash.x86_64                        4.2.46-31.el7                    @System
+
+bind-license.noarch                32:9.9.4-73.el7_6                @System
+
+binutils.x86_64                    2.27-34.base.el7                 @System
+
+bzip2-libs.x86_64                  1.0.6-13.el7                     @System
+
+ca-certificates.noarch             2018.2.22-70.0.el7_5             @System
+
+centos-release.x86_64              7-6.1810.2.el7.centos            @System
+
+chkconfig.x86_64                   1.7.4-1.el7                      @System
+
+coreutils.x86_64                   8.22-23.el7                      @System
+
+cowsay.noarch                      3.04-4.el7                       @mnt_local_r
+epo_                                                                           cpio.x86_64                        2.11-27.el7                      @System
+
+cpp.x86_64                         4.8.5-36.el7_6.1                 @System
+Output Omitted...</code></pre>
+  <p>Basado en la salida anterior, el paquete <code>cowsay.noarch</code> ha sido instalado y el comando <code>cowsay</code> ahora se puede usar en el sistema:</p>
+  <pre><code>[root@localhost sysadmin]# exit
+exit
+[sysadmin@localhost ~]$ cowsay Learning Linux is easy!
+ _________________________
+&lt; Learning Linux is easy! &gt;
+ -------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+[sysadmin@localhost ~]$</code></pre>
+  <div align="center">
+    <img src="ch24_cowsay.png" alt="Ejemplo del comando cowsay" width="500" height="250" align="center">
+  </div>
+</section>
+<hr>
+
+<section id="24-5">
+  <h2>24.5 Gestión de Paquetes Debian</h2>
+  <p>El sistema de gestión de paquetes de Debian se basa en el formato utilizado para empaquetar los archivos de software para la distribución Debian; los nombres de estos archivos de paquete terminan con la extensión <code>.deb</code>. El sistema de gestión de paquetes de Debian es utilizado por muchas otras distribuciones, incluyendo Ubuntu y Mint Linux. Estos archivos <code>.deb</code> son archivos que contienen el software y la información para configurarlo para su instalación o eliminación.</p>
+  <p>Los paquetes <code>.deb</code> contienen archivos binarios compilados para ejecutarse en una arquitectura de computadora particular. En el sistema de gestión de paquetes de Debian, los paquetes fuente, que contienen el código fuente original, tienen la extensión <code>.dsc</code>.</p>
+  <p>Aunque los paquetes de software a menudo se instalan desde un CD-ROM o un DVD durante el proceso de instalación de una distribución derivada de Debian, los archivos de paquete también se instalan comúnmente descargándolos directamente de repositorios ubicados en servidores de internet. El archivo de configuración principal que se utiliza para localizar estos repositorios es el archivo <code>/etc/apt/sources.list</code>.</p>
+  <p>Antes de trabajar con paquetes, ejecuta el comando <code>apt-get update</code>. Esto asegurará que el sistema tenga una lista actualizada de los paquetes disponibles en los repositorios listados en el archivo <code>/etc/apt/sources.list</code>. Los archivos de paquetes Debian siguen una convención de nomenclatura que facilita la determinación del nombre del paquete, la versión, la edición y la arquitectura. Por ejemplo, el archivo <code>joe_3.7-2.3_i386.deb</code> utiliza este patrón genérico:</p>
+  <pre><code>nombre-paquete_version-edicion_arquitectura.deb</code></pre>
+
+  <h3>Nombre del Paquete</h3>
+  <pre><code>joe_3.7-2.3_i386.deb</code></pre>
+  <p>El nombre del paquete es la primera parte del nombre del archivo hasta el primer carácter de guion bajo <code>_</code>.</p>
+
+  <h3>Versión</h3>
+  <pre><code>joe_3.7-2.3_i386.deb</code></pre>
+  <p>La versión es la segunda parte del nombre del archivo. Comienza después del primer guion bajo y continúa hasta que se encuentra un carácter de guion <code>-</code>.</p>
+
+  <h3>Edición</h3>
+  <pre><code>joe_3.7-2.3_i386.deb</code></pre>
+  <p>La tercera parte del nombre del archivo es la edición. La edición la establece la organización que empaqueta y distribuye el archivo del paquete. La edición comienza después del guion que sigue a la versión y termina antes del carácter de guion bajo <code>_</code> antes de la arquitectura.</p>
+
+  <h3>Arquitectura</h3>
+  <pre><code>joe_3.7-2.3_i386.deb</code></pre>
+  <p>La parte final del nombre del archivo después de la edición, pero antes de <code>.deb</code>, es la arquitectura para la cual se compiló el paquete. Debian no solo soporta múltiples arquitecturas de PC, incluyendo <code>amd64</code>, <code>i386</code> e <code>ia64</code>, sino también muchas otras arquitecturas como <code>armel</code>, <code>armhf</code>, <code>mips</code>, <code>mipsel</code>, <code>powerpc</code>, <code>s390</code>, <code>s390x</code> y <code>sparc</code>. Para el paquete <code>joe_3.7-2.3_i386.deb</code>, la arquitectura <code>i386</code> indica que este paquete está construido para ejecutarse en un procesador compatible con Intel de 32 bits.</p>
+  <p>El comando <code>dpkg</code> es la herramienta más directa disponible para gestionar paquetes <code>.deb</code>. Se puede utilizar para instalar, eliminar y consultar información de paquetes, aunque otras herramientas de nivel superior como <code>synaptic</code> o Advanced Package Tool (APT) proporcionan capacidades más potentes para gestionar las dependencias entre paquetes. El comando <code>synaptic</code> es una interfaz gráfica de usuario que permite a un administrador instalar, eliminar y actualizar paquetes navegando por los menús. Algunos de los comandos que forman parte de APT se discuten más adelante en esta unidad.</p>
+  <div align="center">
+    <img src="ch24_dpkg_apt.png" alt="Relación entre dpkg y APT" width="600" height="300" align="center">
+  </div>
+</section>
+<hr>
+
+<section id="24-5-1">
+  <h2>24.5.1 Instalando Software con dpkg</h2>
+  <p>Para instalar un paquete de software en una distribución basada en Debian, utiliza la opción <code>-i</code> con el comando <code>dpkg</code>. Por ejemplo, para instalar el archivo <code>joe_3.7-2.3_i386.deb</code>, ejecuta:</p>
+  <pre><code>sysadmin@localhost:~$ dpkg -i joe_3.7-2.3_i386.deb</code></pre>
+  
+  <h3>Nota</h3>
+  <p>Los siguientes ejemplos representan un sistema diferente de la máquina virtual de este módulo. Es posible que los ejemplos no coincidan con la salida de nuestro entorno virtual.</p>
+  <p>Se proporciona práctica adicional para la gestión de paquetes Debian en el laboratorio.</p>
+
+  <p>Los paquetes Debian también pueden tener dependencias. Hay cuatro categorías de dependencias: <code>depends</code> (depende), <code>recommends</code> (recomienda), <code>suggests</code> (sugiere) y <code>enhances</code> (mejora). Solo la categoría <code>depends</code> refleja un paquete que debe instalarse para que se cumplan las dependencias requeridas.</p>
+  <p>Como herramienta de bajo nivel, <code>dpkg</code> no proporciona ninguna forma automática de resolver problemas de dependencias. Sin embargo, la herramienta APT <code>apt-get</code> sí tiene esta capacidad, como se discutirá más adelante en este capítulo.</p>
+  <div align="center">
+    <img src="ch24_dpkg_install.png" alt="Ilustración de la instalación de un paquete .deb con dpkg" width="500" height="250" align="center">
+  </div>
+</section>
+<hr>
+
+<section id="24-5-2">
+  <h2>24.5.2 Eliminando Software con dpkg</h2>
+  <p>Existen un par de formas en que un administrador puede eliminar un paquete, utilizando las opciones <code>-r</code> y <code>-P</code> del comando <code>dpkg</code>. La diferencia entre usar la opción <code>-r</code> y la opción <code>-P</code> es que la opción <code>-r</code> elimina el paquete y la opción <code>-P</code> purga el paquete. Cuando un paquete es eliminado, casi todos sus archivos son eliminados excepto sus archivos de configuración. Cuando un paquete es purgado, todos los archivos del paquete son eliminados, incluyendo los archivos de configuración.</p>
+  <p>La idea detrás de eliminar un paquete, pero no eliminar sus archivos de configuración, es que los archivos de configuración pueden ser usados nuevamente en el futuro si el paquete se reinstala.</p>
+  <p>Considera un escenario en el que el paquete <code>joe</code> se instala para probar el editor de texto que proporciona el paquete. Después de probarlo, el administrador ha decidido que no le gusta ese editor y nunca lo volvería a instalar. Dado que el plan es nunca volver a instalar el paquete en el futuro, el paquete podría ser purgado del sistema por el administrador ejecutando el comando <code>dpkg -P joe</code>.</p>
+  <div align="center">
+    <img src="ch24_dpkg_remove_purge.png" alt="Diferencia entre eliminar y purgar con dpkg" width="600" height="300" align="center">
+  </div>
+</section>
+<hr>
+
+<section id="24-5-3">
+  <h2>24.5.3 Listando Paquetes con dpkg</h2>
+  <p>El comando <code>dpkg</code> puede recuperar una lista de los paquetes instalados en el sistema o listar los archivos que contiene un paquete. Por ejemplo, para ver todos los paquetes actualmente instalados en un sistema, ejecuta el comando <code>dpkg -l</code>:</p>
+  <pre><code>sysadmin@localhost:~$ dpkg -l
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version      Architecture Description
++++-==============-============-============-=================================
+ii  adduser        3.113+nmu3ub all          add and remove users and groups
+ii  apt            1.0.1ubuntu2 amd64        command-line package manager
+ii  apt-file       2.5.2ubuntu1 all          search for files within Debian pa
+ii  apt-utils      1.0.1ubuntu2 amd64        package management related utilit
+ii  apt-xapian-ind 0.45ubuntu4  all          maintenance and search tools for
+...</code></pre>
+  <p>La salida del comando <code>dpkg -l</code> contiene cinco piezas de información:</p>
+  <p>Las dos primeras piezas de esta información están representadas por un código de dos letras:</p>
+  <ul>
+    <li>La primera letra refleja el estado deseado del paquete, que puede ser <code>i</code> para instalado, <code>u</code> para desconocido, <code>r</code> para eliminar o <code>h</code> para retener.</li>
+    <li>La segunda letra representa el estado real del paquete, donde <code>i</code> significa instalado y <code>n</code> significa no instalado.</li>
+  </ul>
+  <p>Los códigos de dos letras más comunes son <code>ii</code> para completamente instalado y <code>un</code> para no instalado.</p>
+  <p>Las columnas restantes muestran el nombre del paquete, la versión (combinada con la edición), la arquitectura y la descripción del paquete si está disponible.</p>
+  <p>El comando <code>dpkg -l PATRON-NOMBRE-PAQUETE</code> también se puede usar para listar paquetes basándose en un patrón global (glob pattern). Por ejemplo, para ver todos los paquetes que podrían contener "perl" en el nombre del paquete, usa el comando <code>dpkg -l "*perl*"</code>.</p>
+  <pre><code>sysadmin@localhost:~$ dpkg -l "*perl*"
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name           Version      Architecture Description
++++-==============-============-============-=================================
+un  dh-make-perl   &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libalien-wxwid &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libansicolor-p &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libanyevent-pe &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libarchive-tar &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libattribute-h &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libautodie-per &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libcommon-sens &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libcompress-ra &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libcompress-ra &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libcompress-zl &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libcpan-meta-p &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libcpan-meta-r &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libcpan-meta-y &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libdigest-md5- &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libdigest-perl &lt;none&gt;       &lt;none&gt;       (no description available)
+un  libdigest-sha- &lt;none&gt;       &lt;none&gt;       (no description available)
+Output Omitted...</code></pre>
+  <p>Usar la opción <code>-L</code> con <code>dpkg</code> listará los archivos que contiene un paquete. Por ejemplo, para ver los archivos que forman parte del paquete llamado <code>perl</code>, ejecuta el comando <code>dpkg -L perl</code>.</p>
+  <pre><code>sysadmin@localhost:~$ dpkg -L perl
+/.
+/etc
+/etc/perl
+/etc/perl/CPAN
+/etc/perl/Net
+/etc/perl/Net/libnet.cfg
+/usr
+/usr/bin
+/usr/bin/corelist
+/usr/bin/cpan
+/usr/bin/enc2xs
+/usr/bin/encguess
+/usr/bin/h2ph
+/usr/bin/h2xs
+/usr/bin/instmodsh
+/usr/bin/json_pp
+/usr/bin/libnetcfg
+/usr/bin/perlbug
+/usr/bin/perldoc
+Output Omitted...</code></pre>
+  <p>Por cierto, si conoces la ruta de un archivo, es posible determinar qué paquete fue el responsable de proporcionar ese archivo usando la opción <code>-S</code> con el comando <code>dpkg</code>. Por ejemplo, para descubrir el paquete que proporcionó el archivo <code>/usr/bin/perldoc</code>, ejecuta el comando <code>dpkg -S /usr/bin/perldoc</code>.</p>
+  <pre><code>sysadmin@localhost:~$ dpkg -S /usr/bin/perldoc
+perl: /usr/bin/perldoc</code></pre>
+  <p>Al usar el comando <code>dpkg</code> con la opción <code>-s</code> y un nombre de paquete, se mostrará la siguiente información del paquete:</p>
+  <ul>
+    <li>Estado (incluyendo si el paquete está instalado)</li>
+    <li>Tamaño</li>
+    <li>Organización que mantiene el paquete</li>
+    <li>Dependencias</li>
+    <li>Descripción</li>
+  </ul>
+  <p>Intenta ejecutar <code>dpkg -s perl</code> en la terminal por ti mismo. Cabe señalar que todas las salidas de ejemplo presentadas anteriormente se acortaron por brevedad. Siéntete libre de probar cualquiera de estos ejemplos en la terminal también, para ver sus salidas completas.</p>
+  <div align="center">
+    <img src="ch24_dpkg_listing.png" alt="Ejemplos de listado de paquetes con dpkg" width="600" height="400" align="center">
+  </div>
+</section>
+<hr>
+
+<section id="24-5-4">
+  <h2>24.5.4 Configurando Paquetes con dpkg-reconfigure</h2>
+  <p>Como parte del proceso de instalación de un paquete, el sistema de gestión de paquetes de Debian también configurará ese paquete. Si el paquete necesita ser reconfigurado en algún momento posterior, ejecuta el comando <code>dpkg-reconfigure</code>. Para ejecutar el comando <code>dpkg-reconfigure</code>, se puede usar la siguiente sintaxis:</p>
+  <pre><code>dpkg-reconfigure [OPCIONES...] PAQUETES...</code></pre>
+  <p>Un buen ejemplo del uso del comando <code>dpkg-reconfigure</code> es con el paquete <code>tzdata</code>. Cuando este paquete se configura, el administrador establece la información de la zona horaria para la ubicación actual de la computadora. Si un sistema se mueve a otra ubicación, particularmente a una zona horaria diferente, entonces este paquete debe reconfigurarse ejecutando el comando <code>dpkg-reconfigure tzdata</code>.</p>
+
+  <h3>Nota</h3>
+  <p>El siguiente ejemplo representa un sistema diferente de la máquina virtual de este módulo. El ejemplo puede no coincidir con la salida de nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# dpkg-reconfigure tzdata
+Configure tzdata window shows menu of geographic areas representing timezones to choose from.</code></pre>
+  <div align="center">
+    <img src="ch24_dpkg_reconfigure_tzdata.png" alt="Ventana de configuración de tzdata" width="500" height="400" align="center">
+  </div>
+</section>
+<hr>
+
+<section id="24-5-5">
+  <h2>24.5.5 Buscando Paquetes con apt-cache</h2>
+  <p>Si el sistema tiene los repositorios apropiados configurados en el archivo <code>/etc/apt/sources.list</code> y el administrador ya ha actualizado la información en caché sobre los paquetes disponibles ejecutando el comando <code>apt-get update</code>, entonces cualquier usuario puede buscar paquetes utilizando el comando <code>apt-cache search</code> con la siguiente sintaxis:</p>
+  <pre><code>apt-cache search PALABRA_CLAVE</code></pre>
+  <p>La palabra clave utilizada debe coincidir con parte del nombre o la descripción del paquete a localizar. Se pueden usar múltiples palabras clave para refinar aún más la búsqueda; por ejemplo, el comando <code>apt-cache search web server</code> proporcionaría mejores resultados que el comando <code>apt-cache search web</code> o <code>apt-cache search server</code>.</p>
+  <pre><code>sysadmin@localhost:~$ apt-cache search medusa
+medusa - fast, parallel, modular, login brute-forcer for network services
+python-medusa - Framework for implementing asynchronous servers
+python-medusa-doc - Framework for implementing asynchronous servers</code></pre>
+  <p>El comando <code>apt-cache</code> también puede buscar paquetes de una manera diferente. Para averiguar qué dependencias tiene un paquete, el comando <code>apt-cache depends PAQUETE</code> listará los paquetes requeridos por el nombre del paquete. Por ejemplo, para determinar las dependencias del paquete <code>apache2</code>, ejecuta el comando <code>apt-cache depends apache2</code>.</p>
+  <pre><code>sysadmin@localhost:~$ apt-cache depends apache2
+apache2
+  PreDepends: dpkg
+  Depends: lsb-base
+  Depends: procps
+  Depends: perl
+  Depends: mime-support
+  Depends: apache2-bin
+  Depends: apache2-utils
+  Depends: apache2-data
+  Depends: &lt;perl:any&gt;
+    perl
+  Conflicts: &lt;apache2.2-bin&gt;
+  Conflicts: &lt;apache2.2-common&gt;
+  Recommends: ssl-cert
+  Suggests: &lt;www-browser&gt;
+    dillo
+    edbrowse
+    hv3
+    lynx
+    chromium-browser
+    elinks
+ epiphany-browser
+    falkon
+    firefox
+    konqueror
+    links
+    links2
+    netrik
+    sugar-browse-activity
+    surf
+    w3m
+    wslu
+    xemacs21-mule
+    xemacs21-mule-canna-wnn
+    xemacs21-nomule
+  Suggests: apache2-doc
+ |Suggests: apache2-suexec-pristine
+  Suggests: apache2-suexec-custom
+  Suggests: ufw
+  Replaces: &lt;apache2.2-bin&gt;
+  Replaces: &lt;apache2.2-common&gt;</code></pre>
+  <p>El comando <code>apt-cache show PAQUETE</code> también puede mostrar el estado de un paquete con información similar a la salida del comando <code>dpkg -s PAQUETE</code>, pero el comando <code>apt-cache</code> muestra información más detallada, incluyendo sumas de verificación que podrían usarse para verificar el paquete original.</p>
+  <div align="center">
+    <img src="ch24_a.png" alt="Ejemplos de apt-cache search, depends y show" width="600" height="400" align="center">
+  </div>
+</section>
+<hr>
+<section id="24-5-5">
+  <h2>24.5.5 Buscando paquetes con apt-cache</h2>
+  <p>Si el sistema tiene los repositorios apropiados configurados en el archivo <code>/etc/apt/sources.list</code> y el administrador ya ha actualizado la información en caché sobre los paquetes disponibles ejecutando el comando <code>apt-get update</code>, entonces cualquier usuario puede buscar paquetes utilizando el comando <code>apt-cache search</code> con la siguiente sintaxis:</p>
+  <pre><code>apt-cache search PALABRA_CLAVE</code></pre>
+  <p>La palabra clave utilizada debe coincidir con parte del nombre o la descripción del paquete que se desea localizar. Se pueden usar múltiples palabras clave para refinar aún más la búsqueda; por ejemplo, el comando <code>apt-cache search web server</code> proporcionaría mejores resultados que <code>apt-cache search web</code> o <code>apt-cache search server</code>.</p>
+  <pre><code>sysadmin@localhost:~$ apt-cache search medusa
+medusa - fuerza bruta rápida, paralela y modular para servicios de red
+python-medusa - Framework para implementar servidores asíncronos
+python-medusa-doc - Framework para implementar servidores asíncronos</code></pre>
+  <p>El comando <code>apt-cache</code> también puede buscar paquetes de otra manera. Para averiguar qué dependencias tiene un paquete, el comando <code>apt-cache depends PAQUETE</code> listará los paquetes requeridos por el nombre del paquete. Por ejemplo, para determinar las dependencias del paquete <code>apache2</code>, se ejecuta el comando <code>apt-cache depends apache2</code>.</p>
+  <pre><code>sysadmin@localhost:~$ apt-cache depends apache2
+apache2
+  PreDepends: dpkg
+  Depends: lsb-base
+  Depends: procps
+  Depends: perl
+  Depends: mime-support
+  Depends: apache2-bin
+  Depends: apache2-utils
+  Depends: apache2-data
+  Depends: &lt;perl:any&gt;
+    perl
+  Conflicts: &lt;apache2.2-bin&gt;
+  Conflicts: &lt;apache2.2-common&gt;
+  Recommends: ssl-cert
+  Suggests: &lt;www-browser&gt;
+    dillo
+    edbrowse
+    hv3
+    lynx
+    chromium-browser
+    elinks
+    epiphany-browser
+    falkon
+    firefox
+    konqueror
+    links
+    links2
+    netrik
+    sugar-browse-activity
+    surf
+    w3m
+    wslu
+    xemacs21-mule
+    xemacs21-mule-canna-wnn
+    xemacs21-nomule
+  Suggests: apache2-doc
+ |Suggests: apache2-suexec-pristine
+  Suggests: apache2-suexec-custom
+  Suggests: ufw
+  Replaces: &lt;apache2.2-bin&gt;
+  Replaces: &lt;apache2.2-common&gt;</code></pre>
+  <p>El comando <code>apt-cache show PAQUETE</code> también puede mostrar el estado de un paquete con información similar a la salida del comando <code>dpkg -s PAQUETE</code>, pero el comando <code>apt-cache</code> muestra información más detallada, incluyendo sumas de verificación que pueden usarse para verificar el paquete original.</p>
+</section>
+<hr>
+
+<section id="24-5-6">
+  <h2>24.5.6 Instalación/Actualización de paquetes con apt-get</h2>
+  <p>Después de buscar un paquete, puede que desees instalar ese paquete y sus dependencias requeridas. Usar el comando <code>apt-get install PAQUETE</code> descargará y solicitará al administrador instalar ese paquete junto con sus dependencias. Por ejemplo, para instalar el paquete <code>apache2</code> y sus dependencias, ejecuta el comando <code>apt-get install apache2</code> con privilegios administrativos:</p>
+  <h4>Nota</h4>
+  <p>El comando <code>sudo</code> requiere la contraseña de root <strong>netlab123</strong> en nuestro entorno virtual.</p>
+  <h4>Importante</h4>
+  <p>Nuestro entorno virtual no está configurado para descargar el siguiente paquete. En el mensaje <em>¿Desea continuar?</em>, escribe <kbd>n</kbd> para cancelar la instalación.</p>
+  <pre><code>sysadmin@localhost:~$ sudo apt-get install apache2
+[sudo] password for sysadmin:
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following additional packages will be installed:
+  apache2-bin apache2-data apache2-utils libapr1 libaprutil1
+  libaprutil1-dbd-sqlite3 libaprutil1-ldap libasn1-8-heimdal
+  libgssapi3-heimdal libhcrypto4-heimdal libheimbase1-heimdal
+  libheimntlm0-heimdal libhx509-5-heimdal libkrb5-26-heimdal libldap-2.4-2
+  libldap-common liblua5.2-0 libnghttp2-14 libroken18-heimdal libsasl2-2
+  libsasl2-modules libsasl2-modules-db libwind0-heimdal ssl-cert
+Suggested packages:
+  www-browser apache2-doc apache2-suexec-pristine | apache2-suexec-custom
+  libsasl2-modules-gssapi-mit | libsasl2-modules-gssapi-heimdal
+  libsasl2-modules-ldap libsasl2-modules-otp libsasl2-modules-sql
+  openssl-blacklist
+The following NEW packages will be installed:
+  apache2 apache2-bin apache2-data apache2-utils libapr1 libaprutil1
+  libaprutil1-dbd-sqlite3 libaprutil1-ldap libasn1-8-heimdal
+  libgssapi3-heimdal libhcrypto4-heimdal libheimbase1-heimdal
+  libheimntlm0-heimdal libhx509-5-heimdal libkrb5-26-heimdal libldap-2.4-2
+  libldap-common liblua5.2-0 libnghttp2-14 libroken18-heimdal libsasl2-2
+  libsasl2-modules libsasl2-modules-db libwind0-heimdal ssl-cert
+0 upgraded, 25 newly installed, 0 to remove and 28 not upgraded.
+Need to get 2896 kB of archives.
+After this operation, 11.2 MB of additional disk space will be used.
+Do you want to continue? [Y/n]n</code></pre>
+  <p>El comando <code>apt-get install PAQUETE</code> también puede actualizar un paquete si ya está instalado y hay una versión más reciente disponible. Si el paquete no está en el sistema, se instalará; si ya está presente, se actualizará. Para solo actualizar, ejecuta el comando <code>apt-get --only-upgrade install PAQUETE</code>.</p>
+  <pre><code>sysadmin@localhost:~$ sudo apt-get --only-upgrade install apache2</code></pre>
+  <p>Para actualizar todos los paquetes del sistema, se ejecutan dos comandos. Primero, el comando <code>apt-get update</code> para actualizar la caché de todos los paquetes disponibles. Segundo, ejecuta el comando <code>apt-get upgrade</code>; todos los paquetes y dependencias serán actualizados.</p>
+</section>
+<hr>
+
+<section id="24-5-7">
+  <h2>24.5.7 Eliminación/Purga de paquetes con apt-get</h2>
+  <p>Así como el comando <code>dpkg</code> puede eliminar o purgar un paquete, el comando <code>apt-get</code> también lo permite. Recuerda que la diferencia entre ambos es que <strong>purge</strong> elimina todos los archivos del paquete, mientras que <strong>remove</strong> elimina todo excepto los archivos de configuración del paquete.</p>
+  <p>Un administrador puede ejecutar el comando <code>apt-get remove PAQUETE</code> para eliminar un paquete o el comando <code>apt-get purge PAQUETE</code> para purgar completamente un paquete del sistema. Por ejemplo, para purgar completamente el servidor web, ejecuta el comando <code>apt-get purge apache2</code>.</p>
+  <pre><code>sysadmin@localhost:~$ sudo apt-get purge apache2</code></pre>
+</section>
+<hr>
+
+<section id="24-6">
+  <h2>24.6 Verificación de archivos con sumas de verificación (Checksums)</h2>
+  <p>Existen innumerables archivos disponibles en internet. Desde archivos ISO de instalación y programas de aplicación, hasta utilidades que ayudan a gestionar usuarios y sistemas, el mundo del software de código abierto ofrece una selección casi infinita de código útil y ejecutables.</p>
+  <p>Desde temprano se reconoció que verificar la integridad de los archivos era fundamental para usuarios, administradores y programadores que deseaban transferir datos a través de redes informáticas. Los sistemas conectados por módems y líneas telefónicas sufrían errores de transmisión frecuentes. Amenazas más recientes incluyen a hackers que intentan reemplazar software legítimo con versiones maliciosas.</p>
+  <p>Una <strong>suma de verificación</strong> (checksum) es un pequeño fragmento de datos complementarios que se utiliza para verificar la integridad de un archivo (por ejemplo, F1). El creador del archivo genera una suma de verificación aplicando un algoritmo de hash criptográfico al contenido del archivo. La suma resultante (C1) es irreversible y altamente única. El creador puede compartir con confianza el archivo (F1) y la suma de verificación (C1) con otros. Los destinatarios que obtienen una copia del archivo (F2) pueden verificar su integridad repitiendo el mismo algoritmo de hash sobre la copia (F2), produciendo una nueva suma de verificación (C2). Si ambas sumas coinciden (C2 = C1), el destinatario puede estar seguro de que su copia del archivo es idéntica al original (F2 = F1). Si las sumas no coinciden, el archivo copiado (F2) está corrupto y no es confiable.</p>
+  <h4>Considere esto</h4>
+  <p>Una suma de verificación verifica la integridad del archivo descargado, pero no verifica la autenticidad del remitente. Si confías en un archivo y una suma de verificación recibidos de un actor malicioso, aún puedes recibir malware o datos manipulados, incluso si el proceso de validación de la suma de verificación es exitoso. Para resolver este problema, normalmente se añade algún tipo de autenticación con clave pública al proceso de intercambio de archivos para verificar también la autenticidad del remitente.</p>
+</section>
+<hr>
+
+<section id="24-6-1">
+  <h2>24.6.1 md5sum</h2>
+  <p>El comando <code>md5sum</code>, basado en el algoritmo MD5 (message-digest 5), crea un hash de 128 bits utilizando el archivo original.</p>
+  <p>Se puede usar la siguiente sintaxis para crear una suma de verificación con el comando <code>md5sum</code>:</p>
+  <pre><code>md5sum [OPCIONES]... [ARCHIVO]...</code></pre>
+  <p>Crea un archivo en el directorio <code>/tmp</code>, genera el hash usando el comando <code>md5sum</code> y visualiza el resultado:</p>
+  <pre><code>[sysadmin@localhost]$ touch anyfile.txt
+[sysadmin@localhost]$ md5sum anyfile.txt &gt; anyfile.md5
+[sysadmin@localhost]$ ls
+anaconda-post.log  anyfile.md5  anyfile.txt  ks-script-mbvg2Y  yum.log
+[sysadmin@localhost]$ cat anyfile.md5
+d41d8cd98f00b204e9800998ecf8427e  anyfile.txt</code></pre>
+  <p>En la salida anterior, la suma de verificación generada aparece en el archivo <code>anyfile.md5</code>:</p>
+  <pre><code>d41d8cd98f00b204e9800998ecf8427e</code></pre>
+  <p>Como puedes ver en la salida del siguiente comando, esta es la misma secuencia numérica que aparece si ejecutas <code>md5sum</code> con el archivo <code>anyfile.txt</code> como argumento:</p>
+  <pre><code>[sysadmin@localhost]$ md5sum anyfile.txt
+d41d8cd98f00b204e9800998ecf8427e  anyfile.txt</code></pre>
+  <p>El comando <code>md5sum</code> también puede usarse para autenticar archivos con la opción <code>-c</code>. Esta opción se utiliza para verificar la integridad del archivo comparando la suma de verificación calculada con el archivo <code>.md5</code> previamente generado.</p>
+  <pre><code>[sysadmin@localhost]$ md5sum -c anyfile.md5
+anyfile.txt: OK</code></pre>
+  <h4>Advertencia</h4>
+  <p>El algoritmo utilizado por MD5 ya no se considera seguro y no debe usarse para archivos que puedan haber sido manipulados intencionalmente. Aun así, puede utilizarse para verificar archivos conocidos en situaciones donde la seguridad no sea una preocupación.</p>
+</section>
+<hr>
+
+<section id="24-6-2">
+  <h2>24.6.2 sha256sum</h2>
+  <p>El comando <code>sha256sum</code> crea una suma de verificación de 256 bits que puede utilizarse para verificar un archivo. Este comando usa una sintaxis similar a la del comando <code>md5sum</code>:</p>
+  <pre><code>sha256sum [OPCIONES]... [ARCHIVO]...</code></pre>
+  <p>Usa el comando <code>sha256sum</code> para crear la suma de verificación del archivo <code>anyfile.txt</code>:</p>
+  <pre><code>[sysadmin@localhost]$ sha256sum anyfile.txt &gt; anyfile.sha256
+[sysadmin@localhost]$ cat anyfile.sha256
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  anyfile.txt</code></pre>
+  <p>Similar al comando <code>md5sum</code>, el comando <code>sha256sum</code> puede utilizarse con la opción <code>-c</code> para verificar la integridad del archivo:</p>
+  <pre><code>[sysadmin@localhost]$ sha256sum -c anyfile.sha256
+anyfile.txt: OK</code></pre>
+</section>
+<hr>
+
+<section id="24-6-3">
+  <h2>24.6.3 sha512sum</h2>
+  <p>El comando <code>sha512sum</code> crea una suma de verificación aún más segura de 512 bits para verificar archivos, utilizando una sintaxis familiar:</p>
+  <pre><code>sha512sum [OPCIONES]... [ARCHIVO]...</code></pre>
+  <p>Usa el comando <code>sha512sum</code> para crear una suma de verificación de 512 bits para el archivo <code>anyfile.txt</code>:</p>
+  <pre><code>[sysadmin@localhost]$ sha512sum anyfile.txt &gt; anyfile.sha512
+[sysadmin@localhost]$ cat anyfile.sha512
+cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0
+ff8318d2877eec2f63b931bd47417a81a538327af927da3e  anyfile.txt</code></pre>
+  <p>Al igual que con los comandos <code>md5sum</code> y <code>sha256sum</code>, se puede usar la opción <code>-c</code> para verificar la integridad del archivo:</p>
+  <pre><code>[sysadmin@localhost]$ sha512sum -c anyfile.sha512
+anyfile.txt: OK</code></pre>
+</section>
+<hr>
+
+<section id="24-7">
+  <h2>24.7 Gestión de paquetes en SUSE</h2>
+  <p>Varias distribuciones utilizan el motor de gestión de paquetes ZYpp/libzypp, que se ejecuta principalmente en openSUSE, SUSE Linux Enterprise y Ark. Libzypp es el resultado de la fusión entre los motores de gestión de software Red Carpet de Ximian y YaST de SUSE. Libzypp fue diseñado para funcionar como el esquema de gestión de paquetes de software para los productos SUSE, así como para la fallida y ahora casi inactiva suite Zenworks Linux Management de Novell.</p>
+  <p>Lo que el sistema APT y los paquetes <code>.deb</code> son en el lado de Debian/Ubuntu, Libzypp y <code>zypper</code> lo son en el lado RPM de la gestión de paquetes en la plataforma SUSE. La necesidad de consultar, instalar, eliminar y actualizar paquetes de software es universal, así como la capacidad crítica de satisfacer las dependencias de software durante estas acciones.</p>
+  <p>La tecnología subyacente de resolución de dependencias es clave para poder realizar tareas de gestión de paquetes en sistemas que pueden contener desde cientos hasta miles de paquetes individuales, todos con muchas dependencias entre sí.</p>
+  <p>Por ejemplo, la biblioteca <code>libc</code> en un sistema Linux es una dependencia para casi todos los demás paquetes que se instalan posteriormente. Si <code>libc</code> está ausente o tiene una versión incorrecta, podría ser catastrófico para todo el sistema.</p>
+  <p>Cuando se instala un sistema, los paquetes de software deben instalarse en un orden exacto que garantice que todas las dependencias estén resueltas. Esto ya es difícil durante la instalación. Actualizar cientos de paquetes es especialmente desafiante en un sistema en funcionamiento que forma parte crítica de la infraestructura de una empresa.</p>
+  <p>Mientras que ZYpp/libzypp es el motor de gestión de paquetes en segundo plano, encargado de satisfacer las dependencias entre paquetes, la mayoría de los operadores del sistema interactuarán principalmente con la herramienta de línea de comandos <code>zypper</code>.</p>
+  <p>Una parte importante de la gestión de software es el concepto de <strong>repositorios</strong>, que son esencialmente un recurso compartido en red o un directorio local que proporciona una ubicación para buscar software para instalar y actualizar. Los repositorios vienen en varias variedades:</p>
+  <ul>
+    <li><strong>Repositorios oficiales y soportados</strong>, como los canales de suscripción que proporciona el SCC (SUSE Customer Center) para quienes tienen suscripciones de soporte.</li>
+    <li><strong>Repositorios de terceros</strong>, como el repositorio Packman para la comunidad openSUSE, donde se puede encontrar mucho software que no forma parte de las distribuciones oficiales de openSUSE o SUSE Linux Enterprise.</li>
+    <li><strong>Repositorios locales o espejos sincronizados</strong>, que una organización utiliza para mantener una copia local del software que puede ser usada por sus sistemas internos o públicos. La ventaja de esta tercera variedad es que reduce el número de hosts que consultan y sincronizan desde los repositorios oficiales, lo cual es útil porque las distribuciones con suscripción recomiendan altamente tener un servidor espejo o de sincronización.</li>
+  </ul>
+  <p>La relación entre la herramienta de línea de comandos <code>zypper</code> y el comando <code>rpm</code> es aproximadamente análoga a la relación entre la herramienta <code>apt-get</code> y el comando <code>dpkg</code>. El comando <code>zypper</code> se utiliza para consultar, instalar, eliminar, actualizar, gestionar repositorios y más; y depende de las capacidades del comando <code>rpm</code> para realizar la mayoría de estas tareas.</p>
+  <p>Por ejemplo, un operador del sistema podría instalar un paquete con el comando <code>rpm</code>, pero si tiene varias dependencias, el operador debe determinar qué paquetes adicionales se necesitan y luego instalarlos en el orden correcto para tener éxito.</p>
+  <p>Usar <code>zypper</code> para instalar el mismo paquete es mucho más fácil, ya que se encargará de leer las dependencias del paquete deseado, consultar la base de datos de paquetes instalados, y si no se encuentran, determinar de qué repositorio configurado se pueden obtener. Luego, el comando <code>zypper</code> informará al operador del sistema qué se necesita para instalar el paquete deseado correctamente.</p>
+  <p>La sintaxis utilizada para los ejemplos del comando <code>zypper</code> en este curso es la siguiente:</p>
+  <pre><code>zypper [--OPCIONES-GLOBALES] COMANDO [--OPCIONES-DEL-COMANDO] [ARGUMENTOS-DEL-COMANDO]</code></pre>
+  <p>Para aprender más sobre la sintaxis y uso del comando <code>zypper</code>, usa el comando <code>zypper help</code>:</p>
+  <pre><code>localhost:~ # zypper help</code></pre>
+  <h4>Nota</h4>
+  <p>El comando <code>zypper</code> no está instalado en el entorno virtual proporcionado en este capítulo. Los siguientes ejemplos representan un sistema diferente al de la máquina virtual de este capítulo. Por lo tanto, los ejemplos en las siguientes secciones pueden no coincidir con la salida en nuestro entorno virtual.</p>
+  <p>Se proporciona práctica adicional para el comando <code>zypper</code> en el laboratorio.</p>
+</section>
+<hr>
+
+<section id="24-7-1">
+  <h2>24.7.1 Búsqueda de paquetes con zypper</h2>
+  <p>Antes de que un operador del sistema realice cualquier acción importante con el comando <code>zypper</code>, es fundamental actualizar la información que <code>zypper</code> tiene sobre los repositorios desde los cuales se consultará e instalará software. El comando <code>ref</code> se puede usar para actualizar los repositorios:</p>
+  <pre><code>sysadmin@localhost:~&gt; su -
+Password:
+localhost:~ # zypper ref
+Repository 'sle-module-basesystem' is up to date.
+Repository 'sle-module-desktop-applications' is up to date.
+Repository 'sle-module-development-tools' is up to date.
+Repository 'Non-OSS' is up to date.
+Repository 'SLES15-15-0' is up to date.
+Repository 'SLES' is up to date.
+Repository 'sle-module-server-applications' is up to date.
+All repositories have been refreshed.</code></pre>
+  <p>Para encontrar un paquete para instalar, usa el comando <code>search</code> (<code>se</code>) para consultar los repositorios configurados en el sistema:</p>
+  <pre><code>zypper se PAQUETE</code></pre>
+  <p>Por ejemplo, para buscar el paquete <code>gvim</code>, usa el siguiente comando:</p>
+  <pre><code>localhost:~ # zypper se gvim
+Loading repository data...
+Reading installed packages...
+
+S | Name | Summary      | Type
+--+------+--------------+--------
+  | gvim | A GUI for Vi | package</code></pre>
+  <p>El ejemplo busca la versión gráfica del comando <code>vim</code>, <code>gvim</code>, y muestra varias piezas de información útil sobre el paquete. La primera columna, <strong>S</strong>, es la columna de estado, y según la salida anterior, este paquete no está instalado — si lo estuviera, habría una <code>i</code> en esa columna.</p>
+  <p>El resto de la línea es bastante fácil de entender; se muestra el <strong>Nombre</strong>, un <strong>Resumen</strong> y el <strong>Tipo</strong> de resultado.</p>
+</section>
+<hr>
+
+<section id="24-7-2">
+  <h2>24.7.2 Instalación de paquetes con zypper</h2>
+  <p>El comando <code>zypper</code> puede utilizarse con el subcomando <code>install</code> (<code>in</code>) para instalar paquetes.</p>
+  <pre><code>zypper in PAQUETE</code></pre>
+  <p>Para instalar el paquete <code>gvim</code>, incluyendo cualquier dependencia necesaria, usa el siguiente comando:</p>
+  <pre><code>localhost:~ # zypper in gvim
+Loading repository data...
+Reading installed packages...
+Resolving package dependencies...
+
+The following NEW package is going to be installed:
+  gvim
+
+1 new package to install.
+Overall download size: 1.6 MiB. Already cached: 0 B. After the operation, additional 3.2 MiB will be used.
+Continue? [y/n/...? shows all options] (y): y
+Retrieving package gvim-8.0.1568-3.20.x86_64                              (1/1),   1.6 MiB (  3.2 MiB unpacked)
+Checking for file conflicts: ........................................[done]
+(1/1) Installing: gvim-8.0.1568-3.20.x86_64 .........................[done]</code></pre>
+  <p>Ahora que el paquete <code>gvim</code> está instalado, si ejecutas nuevamente el comando <code>zypper se gvim</code>, verás una <code>i</code> en la columna de estado para indicar que <code>gvim</code> está instalado:</p>
+  <pre><code>localhost:~ # zypper se gvim
+Loading repository data...
+Reading installed packages...
+
+S | Name | Summary      | Type
+--+------+--------------+--------
+i | gvim | A GUI for Vi | package</code></pre>
+  <p>Si por alguna razón el paquete está instalado pero no funciona o está dañado, es importante saber cómo reinstalarlo para intentar solucionar el problema.</p>
+  <p>Para reinstalar (y forzar la sobrescritura de) el paquete <code>gvim</code> como usuario root, usa el siguiente comando:</p>
+  <pre><code>localhost:~ # zypper in -f gvim
+Loading repository data...
+Reading installed packages...
+Forcing installation of 'gvim-8.0.1568-3.20.x86_64' from repository 'sle-module-desktop-applications'.
+Resolving package dependencies...
+
+The following package is going to be reinstalled:
+  gvim
+
+1 package to reinstall.
+Overall download size: 1.6 MiB. Already cached: 0 B. No additional space will be used or freed after the operation.
+Continue? [y/n/...? shows all options] (y): y
+Retrieving package gvim-8.0.1568-3.20.x86_64                              (1/1),   1.6 MiB (  3.2 MiB unpacked)
+Checking for file conflicts:..........................................[done]
+(1/1) Installing: gvim-8.0.1568-3.20.x86_64...........................[done]</code></pre>
+</section>
+<hr>
+
+<section id="24-7-3">
+  <h2>24.7.3 Gestión de repositorios con zypper</h2>
+  <p>Cualquier sistema Linux requerirá actualizaciones, parches y correcciones de forma regular. Con todos los nuevos paquetes, actualizaciones de paquetes existentes, correcciones de seguridad y parches, mantener un sistema Linux actualizado puede ser mucho trabajo, a menos que se utilice una solución de resolución de dependencias como APT o ZyPP/Libzypp.</p>
+  <p>El comando <code>zypper</code> interactúa frecuentemente con los repositorios de software, que son colecciones agrupadas de software para distintos propósitos.</p>
+  <p>Para consultar los repositorios de software en un sistema, usa el comando <code>zypper</code> con la opción <code>list repositories</code> (<code>lr</code>):</p>
+  <pre><code>localhost:~ # zypper lr
+Repository priorities in effect: (See 'zypper lr -P' for details)
+      99 (default priority) :  6 repositories
+     100 (lowered priority) :  1 repository
+
+# | Alias                            | Name                            |Enabled | GPG Check | Refresh
+--+----------------------------------+---------------------------------+--------+-----------+--------
+1 | Basesystem-Module_15-0           | sle-module-basesystem           | Yes    | (r ) Yes  | No
+2 | Desktop-Applications-Module_15-0 | sle-module-desktop-applications | Yes    | (r ) Yes  | No
+3 | Development-Tools-Module_15-0    | sle-module-development-tools    | Yes    | (r ) Yes  | No
+4 | Non-OSS                          | Non-OSS                         | Yes    | (r ) Yes  | No
+5 | SLES15-15-0                      | SLES15-15-0                     | Yes    | (r ) Yes  | No
+6 | SLES15_15-0                      | SLES                            | Yes    | (r ) Yes  | No
+7 | Server-Applications-Module_15-0  | sle-module-server-applications  | Yes    | (r ) Yes  | No</code></pre>
+  <p>Para añadir un repositorio desde el cual instalar software adicional, primero encuentra la URL del repositorio y luego usa la opción <code>add repository</code> (<code>-ar</code>):</p>
+  <pre><code>localhost:~ # zypper ar -f http://packman.inode.at/suse/openSUSE_Leap_15.1/ packman
+Adding repository 'packman'.............................................[done]
+Repository 'packman' successfully added
+
+URI         : http://packman.inode.at/suse/openSUSE_Leap_15.1/
+Enabled     : Yes
+GPG Check   : Yes
+Autorefresh : Yes
+Priority    : 99 (default priority)
+
+Repository priorities in effect: (See 'zypper lr -P' for details)
+      99 (default priority) :  7 repositories
+     100 (lowered priority) :  1 repository</code></pre>
+  <p>Observa que se requiere tanto una URI/URL como un alias (packman) para que el comando funcione correctamente.</p>
+  <p>En este momento, se debe ejecutar nuevamente el comando <code>zypper ref</code> para actualizar el sistema con los metadatos más recientes de todos los repositorios, lo que solicitará confiar en la clave del repositorio:</p>
+  <pre><code>localhost:~ # zypper ref
+Repository 'packman' is up to date.
+All repositories have been refreshed.</code></pre>
+  <p>Cuando la consulta al nuevo repositorio es exitosa, el sistema puede actualizarse o realizar operaciones de software:</p>
+  <pre><code>localhost:~ # zypper list-updates -t package
+retrieving repository 'packman' metadata -------------------------------------------------------------------[|]
+
+New repository or package signing key received:
+
+  Repository:       packman
+  Key Name:         PackMan Project (signing key) &lt;packman@links2linux.de&gt;
+  Key Fingerprint:  F8875B88 0D518B6B 8C530D13 45A1D067 1ABD1AFB
+  Key Created:      Mon Sep 15 16:18:00 2014
+  Key Expires:      Thu Sep 12 16:17:21 2024
+  Rpm Name:         gpg-pubkey-1abd1afb-54176598
+
+Do you want to reject the key, trust temporarily, or trust always? [r/t/a/? shows all options] (r): a
+Retrieving repository 'packman' metadata ........................[done]
+Building repository 'packman' cache..............................[done]
+Loading repository data...
+Reading installed packages...
+No updates found.</code></pre>
+</section>
+<hr>
+
+<section id="24-7-4">
+  <h2>24.7.4 Actualización de paquetes con zypper</h2>
+  <p>El comando <code>zypper</code> también puede utilizarse para actualizar los paquetes en un repositorio.</p>
+  <pre><code>zypper list-updates PAQUETE</code></pre>
+  <p>Para ver un listado de todos los paquetes disponibles para actualizar desde tus repositorios, usa el comando <code>list-updates</code>:</p>
+  <pre><code>localhost:~ # zypper list-updates -t gvim
+Loading repository data...
+Reading installed packages...
+No updates found.</code></pre>
+  <p>Para realizar una actualización del sistema (lo que localizará todas las actualizaciones en los repositorios configurados y resolverá las dependencias), usa el comando <code>update</code>:</p>
+  <pre><code>localhost:~ # zypper update
+Loading repository data...
+Reading installed packages...
+No updates found.</code></pre>
+  <p>Dependiendo del sistema y de cuándo fue instalado, puede que no haya actualizaciones disponibles. Si las hay, se mostrarán y se preguntará al usuario si desea descargarlas e instalarlas. Existen varias opciones para actualizar el sistema de forma no interactiva, y la documentación es excelente.</p>
+</section>
+<hr>
+
+
+
 
   
 

@@ -53,21 +53,108 @@
     </ul>
   </nav> 
 
-  <section id="1X-1">
-    <h2>16.1 Introducción</h2>
-    <p>El arranque (<em>booting</em>) es el proceso de llevar el sistema desde un estado apagado hasta un sistema operativo en ejecución. Es muy importante comprender este proceso para poder solucionar problemas de arranque cuando ocurran y para modificar los estados del sistema llamados <em>runlevels</em> o, en dispositivos con systemd, <em>targets</em>.</p>
+  <section id="25-1">
+  <h2>25.1 Introducción</h2>
+  <p>Las bibliotecas compartidas, también conocidas como objetos compartidos o bibliotecas del sistema, son archivos que incluyen la extensión <code>.so</code> como parte de su nombre. Al colocar código que es utilizado por muchos programas en archivos de biblioteca que pueden compartirse, cada archivo de programa puede ser más pequeño, los programas pueden usar una base de código más consistente y se consume menos espacio en disco en general.</p>
+  <p>Cuando se ejecuta un programa, el enlazador dinámico <code>/lib/ld-linux.so</code> buscará y cargará las bibliotecas compartidas necesarias para el programa, preparará el programa para ejecutarse y luego lo iniciará. Los binarios más antiguos en formato <code>a.out</code> son enlazados y cargados por el programa <code>/lib/ld.so</code>. Ambos programas buscarán las bibliotecas en el directorio <code>/lib</code>, el directorio <code>/usr/lib</code>, los directorios listados en la variable de entorno <code>LD_LIBRARY_PATH</code> y en el archivo de caché <code>/etc/ld.so.cache</code>.</p>
+  <p>Diagrama: Rectángulo etiquetado como "Bibliotecas compartidas" que contiene <code>/lib</code>, <code>/usr/lib</code>, <code>LD_LIBRARY_PATH</code>, <code>/etc/ld.so.cache</code>; dos flechas apuntando hacia abajo a dos rectángulos (izquierda: "Enlazador dinámico /lib/ld-linux.so" con flecha hacia un cuadrado etiquetado "Programa", derecha: "/lib/ld.so" con flecha hacia un cuadrado etiquetado "Programa (*a.out)").</p>
+  <div align="center">
+    <img src="ch25_a.png" alt="" width="500" height="400" align="center">
+    
+  </div>
+  <p>La gestión de bibliotecas compartidas puede formar parte de la administración del software de un sistema, especialmente si esas bibliotecas se colocan en ubicaciones inusuales dentro del sistema de archivos. Los archivos de biblioteca que se encuentran en los directorios <code>/lib</code> o <code>/usr/lib</code> normalmente están configurados para ser encontrados automáticamente por los programas que los necesitan, pero colocar archivos de biblioteca en otras ubicaciones, como el directorio <code>/usr/local/lib</code>, puede requerir configurar el sistema para que pueda localizar las bibliotecas compartidas cuando se necesiten.</p>
+</section>
+<hr>
 
-    <p>El proceso de arranque ocurre en cuatro etapas principales, algunas de las cuales pueden ser modificadas por los administradores, mientras que en otras basta con estar al tanto de las acciones que tienen lugar:</p>
+<section id="25-2">
+  <h2>25.2 Archivo /etc/ld.so.conf</h2>
+  <p>El archivo <code>/etc/ld.so.conf</code> se utiliza para configurar qué directorios se buscan para encontrar archivos de bibliotecas mediante el comando <code>ldconfig</code> durante el proceso de arranque o cuando lo ejecuta el administrador. El comando <code>ldconfig</code> crea enlaces y almacena en caché las bibliotecas compartidas más recientes que son requeridas por los programas instalados en el sistema. El archivo <code>/etc/ld.so.conf</code> contiene el siguiente contenido:</p>
+  <pre><code>include ld.so.conf.d/*conf</code></pre>
+  <p>En lugar de usar un único archivo para contener la lista de todos los directorios a buscar, el directorio <code>/etc/ld.so.conf.d</code> contiene archivos <code>*.conf</code>, que especifican los directorios de bibliotecas. Este enfoque modular permite que los paquetes que se instalen puedan añadir su propio archivo <code>.conf</code> al directorio <code>/etc/ld.so.conf.d</code>. Esto, a su vez, permite que las nuevas bibliotecas se encuentren fácilmente. También permite que esos paquetes simplemente eliminen su archivo <code>.conf</code> de ese directorio cuando se desinstalen. Estas acciones se realizan en los scripts <code>postinstall</code> y <code>postuninstall</code>.</p>
+  <p>Como ejemplo de un paquete que utiliza bibliotecas compartidas, considera el paquete <code>mysql-libs</code>. Este paquete instala un archivo <code>/etc/ld.so.conf.d/mysql-i386</code>, que contiene lo siguiente:</p>
+  <pre><code>/usr/lib/mysql</code></pre>
+  <p>Aunque el paquete <code>mysql-libs</code> demuestra cómo se pueden especificar bibliotecas compartidas en un archivo <code>.conf</code> ubicado en el directorio <code>/etc/ld.so.conf.d</code>, observa que el administrador no tiene que hacer ningún trabajo adicional más allá de instalar o eliminar el paquete <code>mysql-libs</code>. Un administrador no debería necesitar gestionar manualmente las bibliotecas compartidas para software que ya está empaquetado.</p>
+</section>
+<hr>
 
-    <ul>
-      <li><strong>Etapa de firmware</strong></li>
-      <li><strong>Gestor de arranque (Bootloader)</strong></li>
-      <li><strong>Etapa del kernel</strong></li>
-      <li><strong>Etapa Init</strong></li>
-    </ul>
-  </section>
+<section id="25-3">
+  <h2>25.3 Añadir archivos de biblioteca manualmente</h2>
+  <p>Si un administrador está compilando software desde el código fuente o utilizando software que no está empaquetado, se debe crear manualmente un archivo <code>.conf</code>. Por ejemplo, el administrador puede haber descargado e instalado software que no está empaquetado en un archivo <code>.rpm</code> o <code>.deb</code>, y luego instalarlo en directorios bajo la estructura <code>/usr/local</code>, con sus archivos de biblioteca ubicados en <code>/usr/local/lib</code>. Para que estos archivos de biblioteca puedan cargarse, se debe crear un archivo <code>/etc/ld.so.conf.d/local.conf</code> con el siguiente contenido:</p>
+  <pre><code>/usr/local/lib</code></pre>
+  <p>Después de añadir o eliminar archivos en el directorio <code>/etc/ld.so.conf.d</code>, el administrador debe ejecutar el comando <code>ldconfig</code> para actualizar el archivo de caché <code>/etc/ld.so.cache</code>.</p>
+  <p>Una vez actualizado el archivo <code>/etc/ld.so.cache</code>, el comando <code>ldconfig</code> puede utilizarse para mostrar información útil sobre las bibliotecas del sistema.</p>
+  <p>Para mostrar el nombre y la ruta de todas las bibliotecas que se han añadido a la caché, usa el comando <code>ldconfig</code> con la opción <code>-p</code>:</p>
+  <pre><code>sysadmin@localhost:~$ ldconfig -p | head -n 20
+799 libs found in cache `/etc/ld.so.cache'
+    libzypp.so.1702 (libc6,x86-64) => /usr/lib64/libzypp.so.1702
+    libzio.so.1 (libc6,x86-64) => /usr/lib64/libzio.so.1
+    libz.so.1 (libc6,x86-64) => /lib64/libz.so.1
+    liby2util.so.5 (libc6,x86-64) => /usr/lib64/liby2util.so.5
+    liby2.so.4 (libc6,x86-64) => /usr/lib64/liby2.so.4
+    libyui.so.8 (libc6,x86-64) => /usr/lib64/libyui.so.8
+    libyelp.so.0 (libc6,x86-64) => /usr/lib64/libyelp.so.0
+    libycpvalues.so.6 (libc6,x86-64) => /usr/lib64/libycpvalues.so.6
+    libycp.so.5 (libc6,x86-64) => /usr/lib64/libycp.so.5
+    libyaml-0.so.2 (libc6,x86-64) => /usr/lib64/libyaml-0.so.2
+    libx86emu.so.1 (libc6,x86-64) => /usr/lib64/libx86emu.so.1
+    libxtables.so.12 (libc6,x86-64) => /usr/lib64/libxtables.so.12
+    libxslt.so.1 (libc6,x86-64) => /usr/lib64/libxslt.so.1
+    libxshmfence.so.1 (libc6,x86-64) => /usr/lib64/libxshmfence.so.1
+    libxml2.so.2 (libc6,x86-64) => /usr/lib64/libxml2.so.2
+    libxml-security-c.so.17 (libc6,x86-64) => /usr/lib64/libxml-security-c.so.17
+    libxklavier.so.16 (libc6,x86-64) => /usr/lib64/libxklavier.so.16
+    libxkbfile.so.1 (libc6,x86-64) => /usr/lib64/libxkbfile.so.1
+    libxkbcommon.so.0 (libc6,x86-64) => /usr/lib64/libxkbcommon.so.0</code></pre>
+  <p>La salida anterior muestra cuántas bibliotecas están configuradas en la caché, y también muestra los nombres de las bibliotecas y las rutas donde fueron encontradas al añadirse a la caché. Debido al gran número de bibliotecas que tiene instalado un sistema Linux típico, los ejemplos se limitan usando el comando <code>head</code>.</p>
+  <p>Para mostrar la lista de directorios de bibliotecas que están configurados, así como su contenido, se puede usar la opción <code>-v</code>:</p>
+  <pre><code>sysadmin@localhost:~$ ldconfig -v | head -n 20
+/usr/local/lib64:
+/usr/local/lib:
+/usr/lib64/graphviz:
+    libgvplugin_neato_layout.so.6 -> libgvplugin_neato_layout.so.6.0.0
+    libgvplugin_dot_layout.so.6 -> libgvplugin_dot_layout.so.6.0.0
+    libgvplugin_core.so.6 -> libgvplugin_core.so.6.0.0
+/lib:
+/lib64:
+    libmultipath.so.0 -> libmultipath.so.0
+    libmpathpersist.so.0 -> libmpathpersist.so.0
+    libmpathcmd.so.0 -> libmpathcmd.so.0
+    libpamc.so.0 -> libpamc.so.0.82.1
+    libpam_misc.so.0 -> libpam_misc.so.0.82.1
+    libpam.so.0 -> libpam.so.0.84.2
+    libreadline.so.7 -> libreadline.so.7.0
+    libhistory.so.7 -> libhistory.so.7.0
+    libtirpc.so.3 -> libtirpc.so.3.0.0
+    libtinfow.so.6 -> libtinfow.so.6.1
+    libtinfo.so.6 -> libtinfo.so.6.1
+    libticw.so.6 -> libticw.so.6.1</code></pre>
+  <p>El comando <code>ldconfig</code> tiene varias otras opciones, que pueden consultarse ejecutando el comando <code>man ldconfig</code>:</p>
+  <pre><code>sysadmin@localhost:~$ man ldconfig</code></pre>
+</section>
+<hr>
 
-  
+<section id="25-4">
+  <h2>25.4 LD_LIBRARY_PATH</h2>
+  <p>Los usuarios sin acceso administrativo al sistema también pueden configurar directorios que serán buscados al establecer la variable de entorno <code>LD_LIBRARY_PATH</code> con la lista de directorios de bibliotecas. Por ejemplo, si el usuario <code>jose</code> instaló un programa en el directorio <code>/home/jose/app</code> con los archivos de biblioteca para esa aplicación en <code>/home/jose/app/lib</code>, entonces ese usuario podría ejecutar:</p>
+  <pre><code>sysadmin@localhost:~$ export LD_LIBRARY_PATH=/home/jose/app/lib</code></pre>
+  <p>Una vez que se ha ejecutado esa línea, los archivos de biblioteca ubicados en el directorio <code>/home/jose/app/lib</code> podrán ser encontrados y utilizados por el sistema.</p>
+</section>
+<hr>
+
+<section id="25-5">
+  <h2>25.5 Comando ldd</h2>
+  <p>Para verificar o visualizar los archivos de biblioteca asociados a un programa, se utiliza el comando <code>ldd</code>. Por ejemplo, para ver las bibliotecas que usa el ejecutable <code>/bin/bash</code>, ejecuta el comando <code>ldd /bin/bash</code>. La salida de este comando sería similar a la siguiente:</p>
+  <pre><code>sysadmin@localhost:~$ ldd /bin/bash
+        linux-vdso.so.1 =>  (0x00007fffe7ffe000)
+        libtinfo.so.5 => /lib/x86_64-linux-gnu/libtinfo.so.5 (0x00007f280231e000)
+        libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f280211a000)
+        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2801d53000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f280254d000)</code></pre>
+  <p>Si hay un problema con un archivo de biblioteca que no se puede cargar, entonces la línea correspondiente en la salida puede indicar <strong>not found</strong> (no encontrado). Por ejemplo, si los archivos de biblioteca del paquete <code>mysql-libs</code> no están correctamente configurados, al ejecutar el comando <code>ldd /usr/bin/mysql</code> puede mostrarse el siguiente error:</p>
+  <pre><code>sysadmin@localhost:~$ ldd /usr/bin/mysql
+ldd: /usr/bin/mysql: No such file or directory</code></pre>
+</section>
+<hr>
 
   <hr>
   <div class="volver">
