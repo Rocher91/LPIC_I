@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Capítulo 1X</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 2rem;
+      max-width: 2000px;
+      margin: auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    p {
+      line-height: 1.6;
+      color: #444;
+    }
+    .volver {
+      display: block;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .volver a {
+      color: #0077cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .volver a:hover {
+      color: #005999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Capítulo 1X</h1>
+
+  <nav>
+    <ul>
+      <li><a href="#1X-1">15.1 Introducción</a></li>
+      <li><a href="#1X-2">15.2</a></li>
+      <li><a href="#1X-3">15.3</a></li>
+      <li><a href="#1X-4">15.4</a></li>
+      <li><a href="#1X-5">15.5</a></li>
+      <li><a href="#1X-6">15.6</a></li>
+      <li><a href="#1X-7">15.7</a></li>
+      <li><a href="#1X-8">15.8</a></li>
+      <li><a href="#1X-9">15.9</a></li>
+      <li><a href="#1X-10">15.10</a></li>
+    </ul>
+  </nav> 
+
+  <section id="22-1">
+  <h2>22.1 Introducción</h2>
+  <p>Los sistemas de archivos deben ser mantenidos para asegurar que continúen funcionando correctamente y que el sistema pueda seguir ejecutándose. Esta sección trata sobre la administración de sistemas de archivos, así como su mantenimiento y ajuste.</p>
+  <p>Para mantener la integridad de un sistema de archivos, es vital monitorearlo y seguir los procedimientos adecuados en la gestión del sistema. En circunstancias normales, los sistemas de archivos funcionarán correctamente sin necesidad de intervención, pero en caso de que surja un problema, es importante saber cómo descubrir el origen del problema y cómo solucionarlo.</p>
+  </section>
+  <hr>
+
+  <section id="22-2">
+  <h2>22.2 Problemas del sistema de archivos</h2>
+  <p>Antes de discutir las utilidades del sistema de archivos en profundidad, es importante abordar las causas más comunes de daño al sistema de archivos. Por ejemplo, una de las formas más sencillas de dañar un sistema de archivos es apagar el sistema incorrectamente. Nunca se debe simplemente accionar el interruptor de un protector de sobretensiones o desconectar el enchufe de su fuente de alimentación, a menos que el sistema no responda a todos los demás intentos de apagarlo correctamente. En muchos casos, presionar el botón de encendido una sola vez hará que muchos sistemas se apaguen de forma segura (esto depende de la configuración de hardware y BIOS de la computadora).</p>
+  <p>Cuando se utiliza un entorno de escritorio gráfico, puede haber un icono disponible para iniciar el proceso de apagado. Por ejemplo, dentro del Entorno de Escritorio Gnome, haga clic en el menú Sistema y luego elija Apagar; se mostrará un diálogo similar al siguiente:</p>
+  <p>Ventana emergente con mensaje de advertencia: ¿Apagar este sistema ahora?</p>
+  <p>También hay algunos comandos disponibles para apagar el sistema Linux desde la línea de comandos. Por ejemplo, los siguientes comandos init y comandos de usuario están disponibles.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Comando Init</th>
+        <th>Propósito</th>
+        <th>Comando de Usuario</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>init 0</code></td>
+        <td>Apagar el sistema</td>
+        <td><code>halt</code></td>
+      </tr>
+      <tr>
+        <td><code>init 6</code></td>
+        <td>Reiniciar el sistema</td>
+        <td><code>reboot</code></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Tenga en cuenta que los comandos <code>init</code> requieren privilegios de root, mientras que los comandos de usuario no los requieren si el usuario ha iniciado sesión localmente y no hay otros usuarios conectados al sistema. Además, se recomienda discreción al usar el comando <code>init</code>, ya que es brusco y puede causar consecuencias no deseadas. En algunos casos, se considera más apropiado usar los comandos <code>shutdown -h</code>, <code>shutdown -r</code>, <code>poweroff</code> o incluso <code>reboot</code>, muchos de los cuales son enlaces entre sí.</p>
+  <p><strong>Nota</strong></p>
+  <p>Las distribuciones de Linux que han reemplazado el demonio SysVinit tradicional con <code>systemd</code> usan el comando <code>systemctl</code> para afectar el estado del sistema y los servicios en ejecución. Para reiniciar un sistema usando <code>systemd</code>, ejecute el comando <code>systemctl reboot</code>. Para apagar un sistema usando <code>systemd</code>, ejecute el comando <code>systemctl poweroff</code>.</p>
+</section>
+<hr>
+
+<section id="22-3">
+  <h2>22.3 Monitoreo de la información del disco</h2>
+  <p>Dos estadísticas relacionadas con el almacenamiento que deben ser monitoreadas de cerca para asegurar que un sistema continúe funcionando correctamente son el espacio libre de bloques de datos y los inodos libres. El comando <code>df</code> puede ayudar a monitorear ambos números importantes.</p>
+  <p>El espacio de bloques de datos se utiliza para almacenar el contenido de un archivo (los datos del archivo). Si el espacio de bloques de datos se agota dentro de un sistema de archivos, no será posible añadir ningún contenido nuevo a archivos nuevos o existentes.</p>
+  <p>Por defecto, el comando <code>df</code> sin ninguna opción o argumento mostrará el uso de los sistemas de archivos utilizando un tamaño de bloque de datos de 1K (1024 bytes):</p>
+  <pre><code>sysadmin@localhost:~$ df
+Filesystem     1K-blocks       	Used	Available Use%  Mounted on
+overlay       3711914792   119199908  3404137348    4%  /
+tmpfs         	66007320           0  	66007320    0%  /dev
+tmpfs         	66007320           0  	66007320    0%  /sys/fs/cgroup
+/dev/sda2     3711914792   119199908  3404137348    4%  /etc/hosts
+shm                65536           0       65536    0%  /dev/shm</code></pre>
+  <p>Cuando se ejecuta con la opción <code>-h</code>, la salida del comando <code>df</code> se muestra en unidades legibles por humanos, como MiB y GiB:</p>
+  <pre><code>sysadmin@localhost:~$ df  -h
+Filesystem    	Size  Used Avail Use% Mounted on
+overlay       	3.5T  114G  3.2T   4% /
+tmpfs            63G     0   63G   0% /dev
+tmpfs            63G     0   63G   0% /sys/fs/cgroup
+/dev/sda2       3.5T  114G  3.2T   4% /etc/hosts
+shm              64M  	 0   64M   0% /dev/shm</code></pre>
+  <h3>Considere esto</h3>
+  <p>Las opciones adicionales proporcionarán información aún más interesante y útil. Intente añadir un <code>-T</code> al comando <code>df</code> para ver el tipo de sistema de archivos añadido como una columna a la salida:</p>
+  <pre><code>sysadmin@localhost:~$ df -hT
+Filesystem 	Type     Size  Used Avail Use% Mounted on
+overlay    	overlay  3.5T  114G  3.2T   4% /
+tmpfs      	tmpfs 	  63G     0   63G   0% /dev
+tmpfs      	tmpfs 	  63G     0   63G   0% /sys/fs/cgroup
+/dev/sda2  	ext4     3.5T  114G  3.2T   4% /etc/hosts
+shm        	tmpfs 	  64M     0   64M   0% /dev/shm</code></pre>
+  <p>Cada archivo creado en un sistema de archivos se le asigna un identificador único por el sistema de archivos. Este identificador se conoce como inodo y hay un número fijo de ellos disponibles cuando se usa ext2/ext3/ext4. En otras palabras, si un sistema de archivos tiene solo 10,000 inodos, solo se pueden almacenar 10,000 archivos en ese sistema de archivos.</p>
+  <p>Los inodos son importantes porque para crear un archivo, se necesita un inodo para almacenar los metadatos (información como permisos, marcas de tiempo, etc.) sobre ese archivo. De hecho, el inodo almacena todo sobre el archivo excepto su nombre y su contenido.</p>
+  <h3>Considere esto</h3>
+  <p>Los inodos están limitados a una cantidad fija en la creación del sistema de archivos en la familia de sistemas de archivos ext2/ext3/ext4, pero en muchos otros sistemas de archivos, los inodos se generan según sea necesario; ejemplos incluyen JFS y XFS.</p>
+  <p>Para determinar cuántos archivos se han creado y cuántos inodos todavía están disponibles para un sistema de archivos, use la opción <code>-i</code> con el comando <code>df</code>:</p>
+  <pre><code>sysadmin@localhost:~$ df -i
+Filesystem    	Inodes     IUsed     IFree IUse% Mounted on
+overlay    	235708416 502951 235205465    1% /
+tmpfs       	16501830      19  16501811    1% /dev
+tmpfs       	16501830      14  16501816    1% /sys/fs/cgroup
+/dev/sda2  	235708416 502951 235205465    1% /etc/hosts
+shm         	16501830       1  16501829    1% /dev/shm</code></pre>
+  <p>El número de inodos se determina cuando se crea el sistema de archivos. La técnica predeterminada es usar una relación que depende de cuántos bloques de datos contiene el sistema de archivos, por lo que los sistemas de archivos más grandes contendrán más inodos. Las opciones que se pueden usar para afectar esta relación se discutirán más adelante.</p>
+  <p>Asegúrese de ver la salida del comando <code>df</code> cuidadosamente para encontrar sistemas de archivos que se estén quedando con poco espacio de bloques de datos o inodos. Si un sistema de archivos se está quedando sin espacio, tome medidas como mover algunos archivos a otro sistema de archivos con más recursos o eliminar archivos que no sean necesarios.</p>
+</section>
+<hr>
+
+<section id="22-4">
+  <h2>22.4 El comando du</h2>
+  <p>Considere un escenario en el que un sistema de archivos parece estar quedándose sin bloques de datos libres. Investigue la cantidad de espacio en disco libre o bloques de disco utilizando una herramienta como el comando <code>df</code>. Uno de los siguientes pasos lógicos para abordar esta preocupación sería averiguar qué directorio o subdirectorio dentro de ese sistema de archivos podría estar utilizando la mayor cantidad de bloques de datos. El comando de uso de directorio <code>du</code> informará el tamaño de los archivos y directorios; esto puede ser útil para encontrar los más grandes:</p>
+  <p>La salida predeterminada del comando <code>du</code> muestra solo dos columnas de información: el tamaño del archivo y el nombre de la ruta para el archivo. El comando <code>du</code> es automáticamente recursivo, por lo que normalmente procesará no solo el directorio actual sino también todos sus subdirectorios.</p>
+  <p>Una forma efectiva de encontrar los archivos más grandes dentro de los directorios especificados es canalizar la salida al comando <code>sort</code> con la opción <code>-n</code>, para que la salida se ordene de menor a mayor. Por ejemplo, la ejecución del comando <code>du | sort -n</code> en el directorio personal de un usuario daría como resultado una salida como la siguiente, colocando los archivos más grandes en la parte inferior de la salida:</p>
+  <pre><code>sysadmin@localhost:~$ du  | sort  -n  | tail  -10
+4   	./Pictures
+4   	./Public
+4   	./Templates
+4   	./Videos
+8   	./Documents/School/Art
+8   	./Documents/School/Engineering
+8   	./Documents/School/Math
+28  	./Documents/School
+1128	./Documents
+1180	.</code></pre>
+  <p><strong>Advertencia</strong></p>
+  <p>Tenga en cuenta que es probable que se produzcan errores si el comando <code>du</code> se ejecuta fuera del directorio personal de un usuario regular o de los directorios <code>/tmp</code> y <code>/var/tmp</code>.</p>
+  <p>Dos opciones que se utilizan a menudo con el comando <code>du</code> son la opción <code>-h</code> (legible por humanos) y la opción <code>-s</code> (resumen) para mostrar solo un resumen de todo el directorio. Por ejemplo, la ejecución del comando a continuación mostraría un resumen legible por humanos de cuánto espacio es utilizado por los directorios <code>/bin</code> y <code>/usr/bin</code>.</p>
+  <pre><code>sysadmin@localhost:~$ du -sh /bin /user/bin
+6.6M	/bin
+38M 	/usr/bin</code></pre>
+  <p>Un par de otras opciones del comando <code>du</code> que pueden ser útiles incluyen las opciones <code>--max-depth</code> y <code>--exclude</code>.</p>
+  <p>Para limitar la profundidad de la recursividad del comando <code>du</code>, proporcione un argumento numérico a la opción <code>--max-depth</code> para indicar cuántos directorios de profundidad se deben mostrar.</p>
+  <pre><code>sysadmin@localhost:~$ du Documents
+8       Documents/School/Math
+8       Documents/School/Engineering
+8       Documents/School/Art
+28      Documents/School
+4       Documents/Work
+1128    Documents
+sysadmin@localhost:~$ du --max-depth=1 Documents
+28      Documents/School
+4       Documents/Work
+1128    Documents</code></pre>
+  <p>Si hay archivos o directorios que no deben incluirse, use una o más opciones <code>--exclude</code>. También se pueden usar caracteres comodín para formar el patrón que será utilizado por la opción <code>--exclude</code>.</p>
+  <pre><code>sysadmin@localhost:~$ du --exclude=School Documents
+4       Documents/Work
+1100    Documents</code></pre>
+  <p>Como ejemplo del uso de ambas opciones, analice la salida del comando <code>du</code> en el siguiente ejemplo. Para determinar el tamaño de cada directorio que es un hijo directo del directorio <code>/usr</code>, se utiliza la opción <code>--max-depth=1</code>.</p>
+  <p>El siguiente comando se ejecutará como un usuario regular, lo que significa que el acceso al directorio <code>/usr/lib/audit</code> resultará en un error ya que los usuarios regulares no tienen acceso a este directorio. La opción <code>--exclude=/usr/lib/audit</code> evita este error.</p>
+  <pre><code>sysadmin@localhost:~$ du -h --max-depth=1 --exclude=/usr/lib/audit
+4.0K	./Public
+4.0K	./Downloads
+4.0K	./Pictures
+4.0K	./Videos
+4.0K	./Templates
+4.0K	./Desktop
+4.0K	./Music
+1.2M	./Documents
+4.0K	./.cache
+1.2M	.</code></pre>
+</section>
+<hr>
+
+<section id="22-5">
+  <h2>22.5 El comando tune2fs</h2>
+  <p>El comando <code>tune2fs</code> puede ver y cambiar algunas de las configuraciones para sistemas de archivos ext2, ext3 y ext4. Generalmente, este comando se considera seguro, pero para evitar riesgos, se debe realizar una copia de seguridad del sistema de archivos antes de usar el comando.</p>
+  <p>El comando <code>tune2fs</code> tiene varias opciones. A continuación se presentan algunos ejemplos de opciones comunes que se pueden usar en un sistema de archivos.</p>
+  <p>Por defecto, cada sistema de archivos tendrá una verificación completa del sistema durante el proceso de arranque cada 180 días o después de 30 montajes, lo que ocurra primero. Desafortunadamente, esto ralentiza el proceso de arranque, especialmente si todos los sistemas de archivos se verifican durante un solo arranque. La verificación automática del sistema de archivos se puede deshabilitar ejecutando lo siguiente:</p>
+  <p>Los siguientes ejemplos pueden no coincidir con la salida en nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# tune2fs -c0 -i0 /dev/sdb1</code></pre>
+  <p>En el ejemplo anterior, la opción <code>-c</code> cambiará el número máximo de veces que un sistema de archivos puede ser montado antes de que se requiera una verificación completa del sistema de archivos. El valor predeterminado de 30 veces se ha deshabilitado estableciendo el valor en 0. La opción <code>-i</code> cambiará el intervalo de tiempo máximo entre el momento en que un sistema de archivos se ve obligado a tener una verificación completa del sistema de archivos. Este valor predeterminado de 180 días se ha deshabilitado estableciendo el intervalo en 0.</p>
+  <p>Para que las opciones de montaje <code>acl</code> y <code>user_xattr</code> se apliquen automáticamente cada vez que se monte un sistema de archivos, ejecute el siguiente comando:</p>
+  <pre><code>root@localhost:~# tune2fs -o acl,user_xattr /dev/sdb1</code></pre>
+  <p>La opción <code>-o</code> en el comando anterior especifica las opciones de montaje predeterminadas. Por defecto, las distribuciones derivadas de Red Hat especifican que las opciones <code>acl</code> y <code>user_xattr</code> se añaden a los sistemas de archivos creados durante la instalación. Tenga en cuenta que al aplicar múltiples opciones, deben estar separadas por comas.</p>
+  <p>Finalmente, para verificar que los cambios se hayan guardado, liste la información del superbloque para el sistema de archivos usando la opción <code>-l</code>:</p>
+  <pre><code>root@localhost:~# tune2fs -l /dev/sdb1</code></pre>
+  <p>En resumen, la siguiente es una tabla de opciones disponibles para <code>tune2fs</code> para ajustar un sistema de archivos ext2, ext3 o ext4:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Opción</th>
+        <th>Efecto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>-l</code></td>
+        <td>Lista la información del superbloque para un sistema de archivos.</td>
+      </tr>
+      <tr>
+        <td><code>-c</code></td>
+        <td>Cambia el número máximo de veces que un sistema de archivos puede ser montado antes de que se requiera una verificación completa del sistema de archivos. El valor predeterminado es normalmente 30 veces. Esto se puede deshabilitar estableciendo el valor en 0.</td>
+      </tr>
+      <tr>
+        <td><code>-i</code></td>
+        <td>Cambia el intervalo de tiempo máximo entre el momento en que un sistema de archivos se ve obligado a tener una verificación completa del sistema de archivos. El valor predeterminado es 180, lo que significa 180 días. Esto se puede deshabilitar estableciendo el intervalo en 0.</td>
+      </tr>
+      <tr>
+        <td><code>-j</code></td>
+        <td>Crea un archivo de diario para un sistema de archivos ext2, permitiendo que se monte como un sistema de archivos ext3 o ext2.</td>
+      </tr>
+      <tr>
+        <td><code>-m</code></td>
+        <td>Especifica el porcentaje de espacio a reservar para el usuario root o procesos privilegiados. El valor predeterminado del 5% es a menudo innecesariamente grande para sistemas de archivos grandes.</td>
+      </tr>
+      <tr>
+        <td><code>-o</code></td>
+        <td>Especifica las opciones de montaje predeterminadas. Por defecto, las distribuciones derivadas de Red Hat especifican que las opciones <code>acl</code> y <code>user_xattr</code> se añaden a los sistemas de archivos creados durante la instalación. Al aplicar múltiples opciones, deben estar separadas por comas.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3>Considere esto</h3>
+  <p>Hay configuraciones del sistema de archivos que el comando <code>tune2fs</code> no puede cambiar y que deben establecerse en el momento de la creación del sistema de archivos. Para los sistemas de archivos ext2, ext3 y ext4, la siguiente tabla enumera las opciones del comando <code>mke2fs</code> que no se pueden cambiar después de la creación del sistema de archivos:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Opción</th>
+        <th>Efecto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>-b</code></td>
+        <td>Permite especificar el tamaño del bloque. Los tamaños de bloque válidos son 1024, 2048 o 4096 bytes (algunos sistemas permiten un tamaño de bloque de 8192). Si se utiliza un tamaño de bloque "incorrecto", el sistema de archivos puede quedarse sin bloques de datos antes de quedarse sin inodos. Si el tamaño promedio de los archivos es menor a 4 KiB, puede ser beneficioso usar un tamaño de bloque más pequeño, más cercano al tamaño promedio de los archivos.</td>
+      </tr>
+      <tr>
+        <td><code>-I</code></td>
+        <td>Permite especificar el tamaño de un inodo. Por defecto, <code>mke2fs</code> creará un inodo de 128 bytes. Si el sistema usa SELinux o SambaV4, puede ser beneficioso establecer este tamaño en 256 bytes para permitir espacio para atributos extendidos que usan SELinux y SambaV4.</td>
+      </tr>
+      <tr>
+        <td><code>-i</code></td>
+        <td>Permite especificar una relación bytes/inodo. Para evitar quedarse sin bloques de datos mientras aún se tienen inodos, o viceversa, establezca una relación que sea cercana al tamaño promedio del archivo. Como cada archivo requiere al menos un inodo para almacenar su meta-información, este es un valor crítico.</td>
+      </tr>
+      <tr>
+        <td><code>-N</code></td>
+        <td>Si se desconoce el tamaño promedio del archivo, pero se conoce el número de archivos requeridos, use esta opción para especificar exactamente cuántos inodos crear.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<hr>
+
+
+
+  
+
+  <hr>
+  <div class="volver">
+    <a href="../index.html">← Volver al índice</a>
+  </div>
+
+</body>
+</html>

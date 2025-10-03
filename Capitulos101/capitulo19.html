@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Capítulo 1X</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 2rem;
+      max-width: 2000px;
+      margin: auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    p {
+      line-height: 1.6;
+      color: #444;
+    }
+    .volver {
+      display: block;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .volver a {
+      color: #0077cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .volver a:hover {
+      color: #005999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Capítulo 1X</h1>
+
+  <nav>
+    <ul>
+      <li><a href="#1X-1">15.1 Introducción</a></li>
+      <li><a href="#1X-2">15.2</a></li>
+      <li><a href="#1X-3">15.3</a></li>
+      <li><a href="#1X-4">15.4</a></li>
+      <li><a href="#1X-5">15.5</a></li>
+      <li><a href="#1X-6">15.6</a></li>
+      <li><a href="#1X-7">15.7</a></li>
+      <li><a href="#1X-8">15.8</a></li>
+      <li><a href="#1X-9">15.9</a></li>
+      <li><a href="#1X-10">15.10</a></li>
+    </ul>
+  </nav> 
+
+  <section id="19-1">
+  <h2>19.1 Introducción</h2>
+  <p>Un esquema de particionamiento de disco bien pensado es vital para optimizar el uso de los recursos del sistema. Si bien es técnicamente posible realizar cambios en las particiones después de la instalación, esto puede ser un desafío y requerir tiempo de inactividad del sistema. Por lo tanto, es importante considerar cómo se utilizará el sistema antes de comenzar a crear particiones.</p>
+
+  <p>Hay muchos componentes a tener en cuenta al crear una estrategia de particionamiento. El objetivo de este capítulo es proporcionar una comprensión sólida de estos componentes, términos clave y conceptos importantes relacionados con las particiones.</p>
+  </section>
+  <hr>
+
+  <section id="19-2">
+  <h2>19.2 Comprendiendo el Particionamiento</h2>
+  <p>Para muchas personas nuevas en Linux, el concepto de particionamiento puede ser ajeno porque los sistemas operativos de escritorio como Microsoft Windows y Mac OS X normalmente no exponen a los usuarios a esquemas de particionamiento complejos. Antes de aprender a particionar, es importante comprender qué es el particionamiento y el propósito detrás de él, así como la terminología relacionada con el particionamiento.</p>
+
+  <p>El particionamiento es necesario para utilizar de manera óptima el espacio que proporcionan los discos duros. Un disco duro nuevo es como un edificio completamente vacío, sin paredes ni pisos internos. Tal como está, un edificio así no sería útil, pero poblar el edificio con paredes y pisos proporcionaría la estructura necesaria para utilizarlo.</p>
+
+  <p>Hay tres pasos en el proceso de creación y uso de particiones:</p>
+
+  <ol>
+    <li>Dividir el disco duro en particiones.</li>
+    <li>Crear y formatear sistemas de archivos dentro de las particiones.</li>
+    <li>Montar el sistema de archivos en el árbol de directorios.</li>
+  </ol>
+
+  <p>Este capítulo se centrará en definir particiones, sistemas de archivos y montaje. Los siguientes capítulos se centrarán en los pasos para realizar estas tareas en un sistema Linux.</p>
+  </section>
+  <hr>
+
+  <section id="19-2-1">
+  <h2>19.2.1 Comprendiendo las Particiones</h2>
+  <p>Considera una situación en la que un funcionario escolar necesita organizar una biblioteca en una universidad. Esta biblioteca atenderá las necesidades de tres grupos diferentes de estudiantes: estudiantes de derecho, estudiantes de ingeniería y estudiantes de educación general. El administrador determina que sería beneficioso separar los libros de la biblioteca en tres ubicaciones físicas basadas en estos grupos, pero solo hay un edificio físico disponible. Una solución sería colocar todos los libros de derecho en el primer piso, todos los libros de ingeniería en el segundo piso y todos los demás libros en el tercer piso.</p>
+
+  <p>Este es el concepto de particionamiento. El disco duro es un contenedor de almacenamiento capaz de almacenar todos los archivos del sistema. Sin embargo, hay beneficios al dividir este gran contenedor en contenedores más pequeños.</p>
+
+  <p>Dentro del edificio de la biblioteca, la separación sería fácil de ver, ya que podría hacerse por piso o construyendo paredes entre secciones del edificio. Con un disco duro, es importante primero comprender cómo se construye físicamente. Considera el siguiente gráfico:</p>
+
+  <div align="center">
+    <img src="ch19_a.png" alt="" width="500" height="400" align="center">
+    
+  </div>
+
+  <p>Una unidad de disco duro (HDD) típica consta de múltiples platos, que almacenan datos en forma magnética. Los cabezales pueden leer y escribir en ambos lados de cada plato. Los platos están conectados al eje y giran a la misma velocidad. El brazo se mueve hacia adelante y hacia atrás, permitiendo que cada cabezal lea o escriba en la misma ubicación en cada plato simultáneamente.</p>
+
+  <p>Una rotación completa alrededor de un lado de un plato se llama pista. La misma pista en ambos lados de todos los platos forma un cilindro:</p>
+
+  <div align="center">
+     <img src="ch19_b.png" alt="" width="500" height="400" align="center">
+  </div>
+
+  <p>Un disco duro típico puede tener miles de cilindros. Se pueden asignar múltiples cilindros consecutivos a una partición. Por ejemplo, considera el siguiente gráfico:</p>
+
+  <div align="center">
+     <img src="ch19_c.png" alt="" width="500" height="400" align="center">
+  </div>
+
+  <p>La primera partición sería del cilindro 1 al cilindro 544. La segunda partición sería del cilindro 545 al cilindro 1040. La última partición sería del cilindro 1041 al 1600.</p>
+
+  <p>La creación de estas particiones se logra mediante una herramienta de particionamiento, como la utilidad <code>fdisk</code> que se cubrirá en un capítulo posterior.</p>
+
+  <p>En resumen, un disco duro se divide en particiones asignando cilindros consecutivos a particiones específicas. Cada partición tendrá entonces un sistema de archivos formateado para que el sistema operativo pueda organizar archivos y directorios.</p>
+  </section>
+  <hr>
+
+  <section id="19-2-2">
+  <h2>19.2.2 Nomenclatura de Particiones</h2>
+  <p>Para distinguir una partición de otra, a cada partición se le da un nombre único. Recuerda que todo en Linux se trata como un archivo, por lo que los nombres de los dispositivos, como unidades y particiones, se almacenan en el directorio <code>/dev</code>.</p>
+
+  <p>Hay dos tipos diferentes de interfaces de unidades:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Tipo de Dispositivo</th>
+        <th>Nombre</th>
+        <th>Ejemplo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Unidades que comienzan con <code>sd</code> son SATA (Serial ATA), SCSI (Small Computer System Interface) o unidades USB.</td>
+        <td><code>/dev/sd*</code></td>
+        <td><code>/dev/sda</code><br><code>/dev/sdb</code></td>
+      </tr>
+      <tr>
+        <td>Unidades que comienzan con <code>hd</code> son PATA (Parallel ATA), también conocidas como unidades IDE (Integrated Drive Electronics).</td>
+        <td><code>/dev/hd*</code></td>
+        <td><code>/dev/hda</code><br><code>/dev/hdb</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Las particiones reciben nombres basados en la unidad en la que residen. Se añade un número al final del nombre de la unidad para distinguir una partición de otra. Por ejemplo, las particiones ubicadas en la unidad <code>sda</code> se llamarían <code>sda1</code>, <code>sda2</code>, etc. Las particiones ubicadas en la unidad <code>sdb</code> serían <code>sdb1</code>, <code>sdb2</code>, etc. La siguiente salida muestra los archivos de dispositivo para un disco duro SATA con nueve particiones:</p>
+
+  <pre><code>sysadmin@localhost:~$ cd /dev
+sysadmin@localhost:/dev$ ls sd*
+sda  sda1  sda2  sda3  sda4  sda6  sda7  sda9</code></pre>
+
+  <p>De manera similar, las particiones en la unidad <code>hda</code> serían <code>hda1</code>, <code>hda2</code>, etc., mientras que las particiones en <code>hdb</code> serían <code>hdb1</code>, <code>hdb2</code>, etc.</p>
+
+  <div class="note">
+    <p><strong>Nota:</strong> No es crítico que comprendas la diferencia entre SATA, IDE, etc. Sin embargo, sí es crítico que comprendas que los archivos utilizados para referirse a los discos duros se almacenan en el directorio <code>/dev</code> y comienzan con <code>sd</code> o <code>hd</code>.</p>
+  </div>
+  </section>
+  <hr>
+
+  <section id="19-2-3">
+  <h2>19.2.3 Limitaciones de Particiones</h2>
+  <p>Históricamente, el número de particiones que un sistema puede tener está limitado por el <strong>Master Boot Record (MBR)</strong>. Recuerda que el MBR generalmente está contenido dentro del primer sector o 512 bytes del disco y contiene un programa gestor de arranque, así como la tabla de particiones. La tabla de particiones contiene la definición de cada partición en el disco duro, incluyendo el cilindro de inicio, el cilindro final y el tamaño.</p>
+
+  <div class="note">
+    <p><strong>Nota:</strong> Los gestores de arranque se cubren con mayor detalle al principio del curso.</p>
+  </div>
+
+  <p>Los discos tradicionales que utilizan particionamiento MBR pueden tener un máximo de cuatro particiones primarias. Por ejemplo, en una unidad SATA tradicional, se pueden crear cuatro particiones con nombres de dispositivo <code>/dev/sdb1</code>, <code>/dev/sdb2</code>, <code>/dev/sdb3</code> y <code>/dev/sdb4</code>:</p>
+
+  <div align="center">
+    
+     <img src="ch19_d.png" alt="" width="500" height="400" align="center">
+  </div>
+
+  <p>Para sistemas operativos que no son Linux, rara vez se necesitan múltiples particiones, por lo que el máximo de solo cuatro particiones por unidad no es una limitación grave. Sin embargo, en servidores Linux, a menudo son necesarias más de cuatro particiones. Como resultado, el hardware moderno permite al administrador hacer de una de las cuatro particiones una <strong>partición extendida</strong>. Una partición extendida actúa como un contenedor para particiones adicionales llamadas <strong>particiones lógicas</strong>. Considera lo siguiente:</p>
+
+  <div align="center">
+    <img src="ch19_d2.png" alt="" width="500" height="400" align="center">
+  </div>
+  <p>La partición <code>/dev/sda4</code> es una partición extendida. Lo único que se coloca en esta partición extendida son particiones adicionales, particiones lógicas. En este ejemplo, <code>/dev/sda5</code>, <code>/dev/sda6</code>, <code>/dev/sda7</code>, <code>/dev/sda8</code> y <code>/dev/sda9</code> son particiones lógicas. Al permitir que <code>/dev/sda4</code> sea una partición extendida, son posibles más de cuatro particiones en este disco duro. Dependiendo del tipo de disco duro y la configuración del kernel, Linux puede acceder a un máximo de 15 o 63 particiones en total cuando se utilizan particiones extendidas.</p>
+
+  <p>Las particiones se utilizan típicamente para almacenar sistemas de archivos. Sin embargo, para las particiones extendidas, nunca se coloca un sistema de archivos directamente en la partición, sino en cada partición lógica dentro de la partición extendida. La colocación accidental de un sistema de archivos directamente en una partición extendida puede resultar en una pérdida completa de datos de cada partición lógica contenida dentro. La computación en la nube moderna puede agregar complejidad al particionamiento, ya que algunos sistemas de archivos ahora pueden abarcar múltiples centros de datos conectados.</p>
+
+  <p>Hasta ahora, solo hemos discutido el particionamiento MBR; sin embargo, algunos discos duros utilizan otro tipo de particionamiento llamado <strong>Tabla de Particiones GUID (GPT)</strong>. Un identificador único global (GUID) es un número de 128 bits universalmente único utilizado para identificar información en un sistema informático. Este esquema de particionamiento fue diseñado para reemplazar el particionamiento MBR tradicional en uso desde que se introdujo PC DOS 2.0 en 1983 y está disponible en sistemas que soportan la <strong>Interfaz de Firmware Extensible Unificada (UEFI)</strong>.</p>
+
+  <p>GPT soporta discos muy grandes, de hasta 9 ZB de tamaño. Las particiones extendidas y lógicas no se utilizan con GPT; en su lugar, todas las particiones son iguales, y GPT soporta un máximo de 128 particiones por disco. La creación de particiones GPT se logra utilizando una herramienta de particionamiento llamada <code>gdisk</code>, que es similar a la utilidad <code>fdisk</code> que se utiliza para las particiones MBR.</p>
+
+  <p>Además de las tablas de particiones MBR y GPT, existen otros métodos para dividir el disco, incluyendo etiquetas de Unix de Berkeley Software Distribution (BSD), mapas de particiones de Apple y otros. Además, existen herramientas para usar particiones de maneras más flexibles y dinámicas, como la Gestión de Volumen Lógico (LVM).</p>
+
+  <div class="note">
+    <p><strong>Nota:</strong> Recuerda que UEFI es un reemplazo del estándar BIOS tradicional que especifica la partición de arranque. Casi todos los sistemas construidos después de 2010 soportan UEFI y se ha convertido en el estándar de facto, ya que las unidades de más de 2TB son ahora comunes. Los sistemas que utilizan UEFI, usan la especificación Extensible Firmware Interface (EFI) que fue lanzada originalmente por Intel en 1998 para superar las limitaciones de las particiones de arranque de BIOS. La EFI, también llamada EFI System Partition (ESP), es la partición que almacena el gestor de arranque para un sistema operativo.</p>
+  </div>
+  </section>
+  <hr>
+
+  <section id="19-2-4">
+  <h2>19.2.4 Sistema de Archivos</h2>
+  <p>A continuación, examinaremos el concepto y el propósito del sistema de archivos en relación con el particionamiento. Para colocar archivos y directorios en una partición, es necesario crear un sistema de archivos. Esto se logra formateando la partición. Un sistema de archivos proporciona al sistema operativo una forma de organizar los archivos y directorios. Además, un sistema de archivos almacena información sobre los archivos, como los permisos de los archivos, el propietario de los archivos y el tipo de archivo.</p>
+
+  <p>Una analogía que puede ayudar a comprender los sistemas de archivos es considerar el ejemplo de la biblioteca mencionado anteriormente. Una biblioteca tiene miles de libros (piensa en archivos) que necesitan ser organizados de una manera que facilite la búsqueda de un libro específico. Para hacer esto, los libros se organizan en categorías (piensa en directorios). Sin embargo, simplemente poner libros en directorios no es suficiente, ya que una sola categoría puede contener cientos o incluso miles de libros.</p>
+
+  <p>Para organizar mejor todos los libros de la biblioteca, se utiliza un sistema como el Sistema Decimal Dewey. Este sistema proporcionaba un catálogo central de fichas, normalmente ubicadas en un archivador en la parte delantera de una sección, donde las personas podían determinar la ubicación exacta de un libro específico. Incluidos en el catálogo hay metadatos sobre cada libro, como la fecha de publicación, el autor, el editor, etc. Un componente clave de estos metadatos es un número de identificación único para cada libro.</p>
+
+  <p>Un sistema de archivos realiza las mismas funciones del Sistema Decimal Dewey para archivos y directorios. Cada archivo tendrá una entrada en la base de datos del sistema de archivos, similar a un catálogo de biblioteca, aunque la base de datos a menudo se denomina tabla.</p>
+
+  <p>Los metadatos sobre el archivo estarán contenidos en esta entrada, lo que incluye atributos de archivo como propiedad, marcas de tiempo, ubicaciones de bloques de datos y todo sobre el archivo excepto su contenido. La entrada también incluye un número de identificación único para el archivo, llamado número de inodo y punteros (o enlaces) que informan al sistema operativo de la ubicación en el sistema de archivos (dónde en el disco duro) se almacenan los datos del archivo.</p>
+
+  <p>Ten en cuenta que hay más de una forma de organizar libros en una biblioteca. Por ejemplo, además del Sistema Decimal Dewey, existe un sistema llamado sistema de Clasificación de la Biblioteca del Congreso que realiza la misma función que el Sistema Decimal Dewey pero utiliza una técnica diferente. Lo mismo ocurre con los sistemas de archivos disponibles para Linux; hay más de un tipo disponible, y cada uno utiliza una técnica diferente. Algunos de los tipos de sistemas de archivos más comunes incluyen:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Tipo</th>
+        <th>Nombre</th>
+        <th>Ventajas</th>
+        <th>Desventajas</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>ext2</code></td>
+        <td>Segundo Sistema de Archivos Extendido</td>
+        <td>Funciona bien con sistemas de archivos de discos pequeños y de estado sólido.</td>
+        <td>No tiene capacidad de diario (journaling), lo que lo hace susceptible a la pérdida de datos en caso de pérdida de energía.</td>
+      </tr>
+      <tr>
+        <td><code>ext3</code></td>
+        <td>Tercer Sistema de Archivos Extendido</td>
+        <td>Se puede actualizar desde un sistema de archivos ext2 existente sin pérdida de datos. Este sistema de archivos realiza un diario, lo que permite la recuperación de datos después de una caída.</td>
+        <td>Escribe más en disco que ext2 debido al diario, lo que lo hace más lento. No soporta sistemas de archivos muy grandes.</td>
+      </tr>
+      <tr>
+        <td><code>ext4</code></td>
+        <td>Cuarto Sistema de Archivos Extendido</td>
+        <td>Soporte para volúmenes de disco y tamaños de archivo muy grandes. Puede operar con o sin diario. Compatible con versiones anteriores de ext3 y ext2.</td>
+        <td>No es una gran mejora sobre ext3. No hay creación dinámica de inodos.</td>
+      </tr>
+      <tr>
+        <td><code>xfs</code></td>
+        <td>Sistema de Archivos Extents</td>
+        <td>Funciona de manera muy eficiente con archivos grandes. Compatible con el sistema operativo IRIX de SGI. Anunciado como el sistema de archivos predeterminado para RHEL 7.</td>
+        <td>El sistema de archivos no se puede reducir.</td>
+      </tr>
+      <tr>
+        <td><code>vfat</code></td>
+        <td>Tabla de Asignación de Archivos</td>
+        <td>Compatible con casi todos los sistemas operativos. Comúnmente utilizado para medios extraíbles.</td>
+        <td>No puede soportar discos o archivos muy grandes. Reclamaciones de propiedad intelectual de Microsoft.</td>
+      </tr>
+      <tr>
+        <td><code>iso</code></td>
+        <td>ISO 9660</td>
+        <td>El estándar de la Organización Internacional de Normalización para medios de disco óptico compatible con casi todos los sistemas operativos.</td>
+        <td>Múltiples niveles y extensiones complican la compatibilidad. No diseñado para medios reescribibles.</td>
+      </tr>
+      <tr>
+        <td><code>udf</code></td>
+        <td>Formato de Disco Universal</td>
+        <td>Diseñado para reemplazar ISO 9660 y adoptado como formato estándar para DVD por el Consorcio de DVD.</td>
+        <td>El soporte de escritura está limitado a la revisión 2.01 del estándar.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Esta es solo una lista parcial de los tipos de sistemas de archivos disponibles en Linux y solo un breve resumen de las diferencias entre ellos. Una descripción completa de las diferencias sería mucho más compleja y excedería el alcance de este curso y del examen LPIC.</p>
+
+  <div class="consider-this">
+    <h3>Considera esto</h3>
+    <p>Una de las características mencionadas en la tabla anterior es el <strong>journaling</strong> (diario). Si bien una discusión completa sobre los diarios excede el alcance de este curso, lo siguiente describe los conceptos básicos de los diarios de sistemas de archivos.</p>
+
+    <p>A medida que se modifican los archivos, los metadatos no se almacenan inicialmente en el disco duro, sino en la memoria. Esto acelera el sistema de archivos, ya que escribir estos cambios en el disco duro para cada cambio de archivo resultaría en una gran cantidad de escrituras en el disco duro.</p>
+
+    <p>En intervalos específicos, estos metadatos se escriben en el disco duro en grandes bloques; este proceso se llama <strong>sincronización</strong>. Normalmente esto no presenta problemas, pero si el sistema fallara o perdiera energía antes de que ocurriera una sincronización, todos esos metadatos se perderían.</p>
+
+    <p>Un programa de recuperación del sistema de archivos, como el comando <code>fsck</code>, a menudo puede resolver estos problemas, pero esto puede llevar bastante tiempo para sistemas de archivos grandes.</p>
+
+    <p>Un sistema de archivos con diario mejora la recuperación del sistema de archivos. Por cada cambio realizado en un archivo, se almacena una entrada de diario en el disco duro. Si bien esto aumenta las escrituras del sistema de archivos, una entrada de diario tiene mucho menos impacto en el rendimiento del disco duro que escribir los metadatos directamente en el disco duro para cada cambio de archivo.</p>
+
+    <p>En pocas palabras, un sistema de archivos con diario ayuda a recuperar sistemas de archivos corruptos al tiempo que permite reducir las escrituras en el disco duro.</p>
+  </div>
+  </section>
+  <hr>
+
+  <section id="19-2-5">
+  <h2>19.2.5 Componentes del sistema de archivos de Linux</h2>
+  <p>Cuando se habla de Linux, el término "sistema de archivos" a menudo se refiere a la familia de sistemas de archivos ext2/ext3/ext4. Aunque existen diferencias entre estos sistemas de archivos, son lo suficientemente similares en lo que respecta a los componentes principales del sistema de archivos.</p>
+  <p>Una discusión completa de los componentes del sistema de archivos está más allá del alcance de este curso, y también presenta un objetivo algo cambiante con la virtualización y la computación en la nube ganando prominencia. Sin embargo, dado que Linux aún opera mediante la comunicación del kernel con recursos externos, todos los administradores de sistemas deben estar familiarizados con los componentes clave del sistema de archivos que se describen a continuación:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Componente</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Superbloque</td>
+        <td>Al comienzo del sistema de archivos hay un área llamada superbloque. Esta área se utiliza para almacenar información importante sobre el sistema de archivos, incluyendo el tamaño del sistema de archivos, el tipo de sistema de archivos y qué bloques de datos (donde se almacenan los datos de los archivos) están disponibles. El superbloque es un componente clave del sistema de archivos; un superbloque corrupto haría que el sistema de archivos fuera inaccesible.</td>
+      </tr>
+      <tr>
+        <td>Bloque de Grupo</td>
+        <td>El sistema de archivos se divide en secciones más pequeñas llamadas grupos. El bloque de grupo sirve para contener datos sobre el grupo. Cada bloque de grupo también contiene una copia de seguridad del superbloque.</td>
+      </tr>
+      <tr>
+        <td>Tabla de Inodos</td>
+        <td>A cada archivo se le asigna un número de inodo único para el sistema de archivos. Este número de inodo está asociado con una tabla que almacena los metadatos del archivo.</td>
+      </tr>
+    </tbody>
+  </table>
+  </section>
+  <hr>
+
+  <section id="19-2-6">
+  <h2>19.2.6 Sistemas de Archivos Físicos vs. Virtuales</h2>
+  <p>Hasta ahora, la discusión sobre los sistemas de archivos se ha centrado en los sistemas de archivos físicos. Un sistema de archivos físico es la estructura de base de datos instalada en una partición para organizar archivos y directorios.</p>
+  <p>Supongamos que un sistema operativo consta de cinco particiones. Para poder acceder a estas particiones fácilmente, sus sistemas de archivos deben fusionarse en una estructura virtual.</p>
+  <p>En Microsoft Windows, esto se logra asignando letras de unidad a cada partición. La primera partición se suele denominar unidad C: (lo cual es un nombre deficiente, ya que en realidad es una partición, no una unidad completa). Los sistemas Microsoft Windows más recientes pueden venir con múltiples particiones, lo que resulta en particiones como D:, E: y F:. Tenga en cuenta que A: y B: se usaban anteriormente para unidades de disquete y no se suelen usar para particiones de disco duro.</p>
+  <p>Para entender esto mejor, considere el siguiente diagrama del componente de Administración de Discos de la herramienta de Administración de Equipos de Microsoft:</p>
+  <div align="center">
+    <img src="ch19_e.png" alt="Ventana de administración de equipos que muestra los discos duros Disk 0 y Disk 1." width="500" height="400" align="center">
+  </div>
+  <p>Para este sistema, hay dos discos duros llamados Disco 0 y Disco 1. El Disco 0 tiene cinco particiones: tres ocultas, una asignada C: y otra asignada D:. El Disco 1 tiene dos particiones, una asignada E: y otra asignada F:. Tenga en cuenta que la herramienta también indica que el tipo de sistema de archivos instalado en estas particiones es NTFS.</p>
+  <p>En Linux, no hay letras de unidad. En su lugar, a cada partición se le asigna un nombre de archivo de dispositivo como se mencionó anteriormente:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Tipos de Dispositivos</th>
+        <th>Nombre de Partición</th>
+        <th>Ejemplo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>SATA, SCSI, USB</td>
+        <td><code>/dev/sda*</code></td>
+        <td><code>/dev/sda1</code><br><code>/dev/sda2</code></td>
+      </tr>
+      <tr>
+        <td>PATA/IDE</td>
+        <td><code>/dev/hda*</code></td>
+        <td><code>/dev/hda1</code><br><code>/dev/hda2</code></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Los usuarios no acceden a los archivos almacenados en estas particiones usando directamente estos nombres de archivo de dispositivo. Después de todo, no es conveniente recordar qué archivos se encuentran en <code>/dev/sda1</code> versus qué archivos se almacenan en <code>/dev/sda2</code>. En su lugar, estos archivos de dispositivo se fusionan en la estructura de directorios montando el sistema de archivos de la partición bajo un árbol de directorios. Para entender lo que esto significa, considere primero el siguiente diagrama:</p>
+  <div align="center">
+    <img src="ch19_f.png" alt="" width="500" height="400" align="center">
+  </div>
+  <p>Desde el punto de vista de un usuario normal, todos los directorios en el gráfico anterior parecen ser de un solo disco duro. Sin embargo, estos directorios podrían representar una colección de sistemas de archivos separados fusionados en una única estructura de directorios, lo que se denomina sistema de archivos virtual. Considere el siguiente diagrama:</p>
+  <div align="center">
+    <img src="ch19_g.png" alt="" width="500" height="400" align="center">
+  </div>
+  <p>Como se demuestra en el gráfico anterior, todos los archivos bajo el directorio <code>/home</code> se almacenan realmente en el sistema de archivos que está en la partición <code>/dev/sda3</code>. Todos los archivos bajo el directorio <code>/var</code> se almacenan en el sistema de archivos que está en la partición <code>/dev/sda2</code>. Esto convierte a <code>/home</code> y <code>/var</code> en directorios de punto de montaje. El directorio <code>/</code> también es un directorio de punto de montaje, probablemente para el sistema de archivos en la partición <code>/dev/sda1</code>.</p>
+  <p>El proceso de colocar un sistema de archivos bajo un punto de montaje se llama montaje. Esto se logra ya sea automáticamente al arrancar o manualmente con el comando <code>mount</code>.</p>
+  <p><strong>Nota</strong></p>
+  <p>El montaje se cubre con mayor detalle más adelante en el curso.</p>
+  <p>Los conceptos del sistema de archivos virtual pueden ser un poco difíciles de comprender al principio, así que considere esto. Si el administrador desmontara el sistema de archivos <code>/dev/sda3</code> del ejemplo anterior, entonces el sistema de archivos virtual se vería así:</p>
+  <div align="center">
+    <img src="ch19_h.png" alt="" width="500" height="400" align="center">
+  </div>
+  <p>Observe que ahora no hay nada bajo el directorio <code>/home</code>. Esto es normal porque un directorio de punto de montaje debe estar vacío, ya que cualquier cosa contenida originalmente en un directorio de punto de montaje será reemplazada por el contenido del sistema de archivos de la partición montada y, por lo tanto, será inaccesible. Si el sistema de archivos <code>/dev/sda3</code> se monta bajo el directorio <code>/home</code>, entonces los directorios <code>bob</code> y <code>sue</code> estarían nuevamente disponibles. Otra forma de pensarlo:</p>
+  <div align="center">
+    <img src="ch19_i.png" alt="" width="500" height="400" align="center">  
+  </div>
+  </section>
+  <hr>
+
+  <section id="19-3">
+  <h2>19.3 ¿Por qué crear particiones?</h2>
+  <p>Entonces, ¿por qué crear particiones? Para empezar, al menos una partición debe ser creada. Independientemente del sistema operativo, ya sea Linux, Microsoft Windows o Mac OSX, al menos una partición debe ser creada porque los sistemas de archivos se almacenan dentro de las particiones, no en discos duros completos.</p>
+  <p>Existen varias razones por las que un administrador elegirá crear múltiples particiones al instalar un sistema operativo Linux:</p>
+
+  <h3>Soporte para múltiples sistemas operativos</h3>
+  <p>Algunos sistemas pueden contener Linux, así como sistemas operativos Microsoft Windows; estos se llaman sistemas de arranque dual (dual boot). Debido a que los sistemas de archivos que se usan con Microsoft Windows son diferentes a los de Linux, esto requiere múltiples particiones.</p>
+
+  <h3>Directorios de inicio</h3>
+  <p>Una partición separada para los directorios de inicio de los usuarios es común y, por lo general, ofrece muchas ventajas, que incluyen:</p>
+  <ul>
+    <li>Es más fácil hacer una copia de seguridad o restaurar un sistema de archivos completo que administrar el directorio de inicio de cada usuario. Recuerde que cada partición tiene un sistema de archivos separado.</li>
+    <li>Cuando los directorios de inicio están separados del sistema de archivos raíz, las actualizaciones del sistema operativo se pueden realizar de manera mucho más segura y eficiente.</li>
+    <li>Los sistemas de archivos pueden tener características habilitadas, como las cuotas de disco. Una cuota de disco permite al administrador limitar la cantidad de espacio que un usuario utiliza en un sistema de archivos. Poder crear una cuota de disco para los directorios de inicio que no afecte al resto del sistema operativo puede ser una ventaja.</li>
+  </ul>
+
+  <h3>Directorios comunes de escritura</h3>
+  <p>Algunos directorios, como los directorios <code>/tmp</code> y <code>/var/tmp</code>, son de escritura global (world writable). Esto significa que cualquier usuario puede almacenar archivos en estos directorios sin limitaciones, por defecto. Desafortunadamente, eso puede causar problemas si estos directorios no se colocan en sistemas de archivos separados.</p>
+  <p>Si los directorios <code>/tmp</code> y <code>/var/tmp</code> no son puntos de montaje, entonces los archivos colocados en estos directorios irán a la misma partición que el sistema de archivos <code>/</code>. Si un usuario crea un archivo muy grande, podría terminar llenando todo el sistema de archivos <code>/</code>. Esto haría que el sistema operativo fuera inutilizable por todos los demás usuarios (excepto el usuario root para quien se reserva algo de espacio).</p>
+  <p>Separar los directorios <code>/tmp</code> y <code>/var/tmp</code> permite al administrador habilitar cuotas de disco para limitar la cantidad de espacio que cada usuario puede utilizar en esos directorios. Incluso si no se implementan cuotas, tener directorios en una partición separada significa que si un usuario normal llena la(s) partición(es) donde se encuentran <code>/tmp</code> o <code>/var/tmp</code>, el sistema de archivos raíz u otros sistemas de archivos críticos no se verán afectados.</p>
+  <p><strong>Considere esto</strong></p>
+  <p>Los directorios <code>/tmp</code> y <code>/var/tmp</code> deben ser de escritura global para todos los usuarios, para que el sistema operativo funcione correctamente.</p>
+
+  <h3>Seguridad</h3>
+  <p>El uso de particiones separadas puede mejorar la seguridad. Dado que cada partición tiene inodos y bloques de datos separados, la corrupción de una sola partición se contendrá en su punto de montaje dentro del sistema de archivos virtual. Por lo tanto, distribuir archivos en múltiples particiones es más seguro que tener una sola partición que contenga todo bajo el directorio raíz.</p>
+  <p>A veces, una colección de archivos, quizás bases de datos antiguas, necesita ser almacenada pero no debe ser modificada. Al colocarlos en un sistema de archivos separado, esa partición puede montarse como de solo lectura para evitar cualquier alteración.</p>
+
+  <h3>Actividad intensa</h3>
+  <p>Si la falta de espacio es una preocupación debido a la intensa actividad dentro de un directorio, puede ser deseable montarlo en una partición separada. Este suele ser el caso de directorios como <code>/var/log</code>, donde el sistema añade datos de archivos de registro de forma regular.</p>
+  <p>Cuando los procesos del sistema (a diferencia de los usuarios normales) escriben en el disco, las cuotas no suelen utilizarse para limitar el espacio. En su lugar, este tipo de directorios se montan en sistemas de archivos separados para que, si se llenan, no llenen el sistema de archivos raíz <code>/</code>. Si bien esto puede ser malo porque no se generan archivos de registro, es mejor que llenar el sistema de archivos raíz <code>/</code> y hacer que el sistema operativo sea inutilizable para los usuarios normales.</p>
+  <p>Otro tipo de partición que es útil para hacer más eficientes las tareas del sistema es el espacio de intercambio (swap space). Para describir el concepto de espacio de intercambio, utilizaremos otra analogía de una biblioteca física. En una biblioteca, siempre entran libros nuevos y salen los viejos. Estos libros suelen guardarse en un almacén o sótano, todavía organizados pero separados de los estantes principales. Si se transfiere un libro, se saca de este almacén y se envía a otra biblioteca donde se utilizará. En un sistema de archivos de computadora, esta área se llama espacio de intercambio. Esta es una ubicación en la unidad física donde se almacenan los datos mientras los programas los utilizan. Emula la memoria de acceso aleatorio (RAM) y libera la memoria física real para otras tareas de procesamiento. Esto permite que el sistema operativo proporcione información rápidamente en los archivos sin tener que leerla y escribirla en las áreas de almacenamiento principal. Cuando el usuario termina con estos datos, se escriben en el área apropiada de la unidad y el espacio de intercambio se libera para la siguiente tarea. El espacio de intercambio en un sistema operativo puede tomar la forma de una partición dedicada (partición de intercambio), un archivo (archivo de intercambio) o ambos.</p>
+  </section>
+  <hr>
+
+  <section id="19-4">
+  <h2>19.4 Diseño de Particiones</h2>
+  <p>Existen algunos requisitos en la forma en que las particiones se asignarán a los directorios donde se montan. Estos requisitos están documentados en lo que se conoce como el Estándar de Jerarquía del Sistema de Archivos (FHS, por sus siglas en inglés). La siguiente tabla resume los requisitos del FHS y proporciona algunas otras sugerencias:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Directorio</th>
+        <th>Propósito</th>
+        <th>Tamaño Sugerido</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>/</code></td>
+        <td>El sistema de archivos raíz contiene los archivos esenciales para el funcionamiento del sistema. Debe contener los siguientes directorios o enlaces simbólicos: bin, boot, dev, etc, lib, media, mnt, opt, sbin, srv, tmp, usr y var.</td>
+        <td>500 MiB-50 GiB+<br>Depende de lo que se monte por separado</td>
+      </tr>
+      <tr>
+        <td><code>/boot</code></td>
+        <td>El directorio <code>/boot</code> contiene el kernel de Linux y los archivos del cargador de arranque.</td>
+        <td>500 MiB-2 GB</td>
+      </tr>
+      <tr>
+        <td><code>/home</code></td>
+        <td>El directorio <code>/home</code> es donde normalmente se crean los directorios de inicio de los usuarios.</td>
+        <td>500 MiB+ por usuario</td>
+      </tr>
+      <tr>
+        <td><code>/tmp</code></td>
+        <td>El directorio <code>/tmp</code> se utiliza para crear archivos temporales para el sistema y los usuarios. Si este directorio es demasiado pequeño, puede impedir que las aplicaciones funcionen correctamente.</td>
+        <td>Mínimo de 5 GB +<br>500 MiB+ por usuario conectado activamente</td>
+      </tr>
+      <tr>
+        <td><code>/opt</code></td>
+        <td>El directorio <code>/opt</code> es donde a menudo se instala software de terceros. Algunos ejemplos incluyen Google Chrome y Google Earth.</td>
+        <td>100 MiB+<br>Depende de cuántos paquetes estén instalados</td>
+      </tr>
+      <tr>
+        <td><code>swap</code></td>
+        <td>Swap es memoria virtual que no se monta en un directorio. Esta memoria virtual se utiliza cuando la memoria real del sistema es baja. En sistemas con grandes cantidades de memoria, swap es menos importante.</td>
+        <td>Hasta 2 veces la memoria física del sistema</td>
+      </tr>
+      <tr>
+        <td><code>/usr</code></td>
+        <td>El directorio <code>/usr</code> contiene la mayor parte de los archivos del sistema operativo, incluyendo la mayoría de los comandos y el software del sistema.</td>
+        <td>2 GiB-10 GiB+</td>
+      </tr>
+      <tr>
+        <td><code>/usr/local</code></td>
+        <td>Este directorio se utiliza para software instalado localmente que no debe actualizarse con el sistema operativo.</td>
+        <td>100 MiB+<br>El tamaño depende de las necesidades locales</td>
+      </tr>
+      <tr>
+        <td><code>/var</code></td>
+        <td>Existen muchos directorios que pueden tener una actividad intensa bajo <code>/var</code> para servicios como correo, ftp, http e impresión.</td>
+        <td>100 MiB+<br>Dependiendo del volumen de actividad</td>
+      </tr>
+      <tr>
+        <td><code>/boot/efi</code></td>
+        <td>El directorio <code>/boot/efi</code> contiene el kernel de Linux y los archivos del cargador de arranque. Normalmente lo configura automáticamente el instalador.</td>
+        <td>100 MB-250 MB</td>
+      </tr>
+    </tbody>
+  </table>
+  </section>
+  <hr>
+
+
+
+  <hr>
+  <div class="volver">
+    <a href="../index.html">← Volver al índice</a>
+  </div>
+
+</body>
+</html>

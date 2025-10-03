@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Capítulo 1X</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 2rem;
+      max-width: 2000px;
+      margin: auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    p {
+      line-height: 1.6;
+      color: #444;
+    }
+    .volver {
+      display: block;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .volver a {
+      color: #0077cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .volver a:hover {
+      color: #005999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Capítulo 1X</h1>
+
+  <nav>
+    <ul>
+      <li><a href="#1X-1">15.1 Introducción</a></li>
+      <li><a href="#1X-2">15.2</a></li>
+      <li><a href="#1X-3">15.3</a></li>
+      <li><a href="#1X-4">15.4</a></li>
+      <li><a href="#1X-5">15.5</a></li>
+      <li><a href="#1X-6">15.6</a></li>
+      <li><a href="#1X-7">15.7</a></li>
+      <li><a href="#1X-8">15.8</a></li>
+      <li><a href="#1X-9">15.9</a></li>
+      <li><a href="#1X-10">15.10</a></li>
+    </ul>
+  </nav> 
+
+  <section id="20-1">
+  <h2>20.1 Introducción</h2>
+  <p>La creación de particiones se puede realizar durante el proceso de instalación o en cualquier momento una vez finalizada la instalación. Normalmente, a los usuarios les resulta más fácil crear las particiones durante la instalación porque la mayoría de los programas de instalación proporcionan un programa basado en GUI, mientras que la técnica para crear particiones después de la instalación suele ser un programa basado en CLI.</p>
+  <p>Además, el programa de instalación creará automáticamente un sistema de archivos para la nueva partición y lo configurará para que se monte automáticamente durante el proceso de arranque. Al crear una partición después de la instalación, estos pasos deben ser ejecutados manualmente por el administrador.</p>
+  <p>Sin embargo, hay algunos casos en los que el administrador del sistema puede querer crear particiones después de la instalación. Por ejemplo, el administrador del sistema puede no tener acceso a todos los recursos durante la instalación. Esto podría ocurrir cuando se añade un segundo disco duro al sistema en una fecha posterior.</p>
+  <p>El programa de instalación, aunque más fácil, tampoco ofrece tanta flexibilidad en la forma en que se crea la partición o el sistema de archivos. Los comandos basados en CLI que se pueden usar después de la instalación son mucho más potentes y flexibles, lo que proporciona otro beneficio al esperar hasta después de la instalación para crear particiones adicionales.</p>
+  <p>Es importante tener en cuenta que algunas particiones deben crearse durante el proceso de instalación para proporcionar una ubicación donde instalar los archivos del sistema operativo. Como resultado, las particiones posteriores a la instalación se crean típicamente para funciones no críticas para el sistema, como un lugar para almacenar software adicional o para almacenar una base de datos grande.</p>
+  </section>
+  <hr>
+
+  <section id="20-2">
+  <h2>20.2 Creación de Particiones Durante la Instalación</h2>
+  <p>El proceso de instalación puede variar bastante de una distribución a otra. En los ejemplos proporcionados, las capturas de pantalla son del programa instalador de CentOS 6.5 llamado Anaconda.</p>
+  <p>Un paso del proceso de instalación pregunta esencialmente: ¿Cuánto espacio del disco duro debe usarse para instalar el sistema operativo?</p>
+  <div align="center">
+    <img src="ch20_a.png" alt="Ventana de selección del tipo de instalación. Las opciones incluyen: Usar todo el espacio, Reemplazar sistemas Linux existentes, Reducir sistema actual, Usar espacio libre, Crear diseño personalizado (esta opción está seleccionada)." width="700" height="700" align="center">
+  </div>
+  <p>Al elegir una de estas opciones, se debe tener en cuenta lo siguiente:</p>
+  <ul>
+    <li><strong>Usar todo el espacio:</strong> Use esta opción cuando no sea necesario guardar ningún dato del disco duro existente. Esta opción eliminará todos los rastros de cualquier dato anterior del disco duro, incluidas las instalaciones anteriores de otros sistemas operativos.</li>
+    <li><strong>Reemplazar sistemas Linux existentes:</strong> Use esta opción cuando el sistema sea un sistema de arranque dual, típicamente un sistema con un sistema operativo Linux y un sistema operativo Microsoft Windows. Tenga en cuenta que todos los sistemas operativos Linux serán reemplazados por esta nueva instalación. Sin embargo, el sistema operativo Microsoft Windows no debería verse afectado.</li>
+    <li><strong>Reducir sistema actual:</strong> Esta opción se usaría para recuperar espacio en el disco duro de un sistema operativo Linux existente. El espacio recuperado podría usarse luego para instalar un segundo sistema operativo Linux para un sistema de arranque dual. Este es un método de instalación avanzado, y todos los datos del sistema operativo Linux existente deben ser respaldados antes de usar este método.</li>
+    <li><strong>Usar espacio libre:</strong> Esta opción asume que un sistema operativo anterior (Microsoft Windows o Linux) ya ha sido instalado y aún hay espacio sin particionar disponible en el disco duro. Este suele ser el caso al crear un sistema de arranque dual, ya que Microsoft Windows debe instalarse primero sin usar todo el espacio del disco duro. El espacio restante es utilizado por el instalador de Linux para instalar el sistema operativo Linux.</li>
+    <li><strong>Crear diseño personalizado:</strong> Esta opción se utiliza para instalaciones avanzadas. El administrador tiene la oportunidad de eliminar particiones existentes y crear nuevas particiones para satisfacer las necesidades de la instalación personalizada.</li>
+  </ul>
+  <p>Si se elige la opción "Crear diseño personalizado", el instalador de la distribución proporcionará una herramienta gráfica para crear particiones, como la siguiente:</p>
+  <div align="center">
+    <img src="ch20_b.png" alt="Ventana de Añadir Partición. El Punto de Montaje es /, el Tipo de Sistema de Archivos es ext4, las Unidades Permitidas son sad, el Tamaño (MB) es 1000, las Opciones de Tamaño Adicional son Llenar todo el espacio hasta 1200 MB." width="700" height="700" align="center">
+  </div>
+  <p>Componentes de este gráfico:</p>
+  <ul>
+    <li><strong>Punto de Montaje:</strong> El directorio donde se montará el sistema de archivos para esta partición.</li>
+    <li><strong>Tipo de Sistema de Archivos:</strong> El tipo de sistema de archivos a colocar en esta partición. Los tipos exactos que estarán disponibles durante la instalación dependerán del sistema operativo Linux específico que se esté instalando.</li>
+    <li><strong>Unidades Permitidas:</strong> Esta área proporciona una lista de los discos duros disponibles. Si solo hay un disco duro presente, estará en gris. Si hay varios discos duros presentes, la persona que realiza la instalación puede elegir en qué disco duro colocar esta partición.</li>
+    <li><strong>Tamaño (MB):</strong> El tamaño en megabytes de la partición. Tenga en cuenta que esto se relaciona con el siguiente campo.</li>
+    <li><strong>Opciones de Tamaño Adicional:</strong>
+      <ul>
+        <li><strong>Tamaño Fijo:</strong> La partición tendrá el tamaño especificado por el campo Tamaño (MB).</li>
+        <li><strong>Llenar todo el espacio hasta (MB):</strong> La partición tendrá al menos el tamaño especificado por el campo Tamaño MB, pero puede ser tan grande como este campo. Por ejemplo, si el campo Tamaño (MB) es 500 y el campo Llenar todo el espacio hasta (MB) es 800, entonces el tamaño de la partición estará entre 500 MB y 800 MB. Esto es útil cuando la persona que realiza la instalación crea particiones y queda espacio extra. El instalador tomará automáticamente este espacio extra y lo asignará a las particiones que utilizan este campo.</li>
+        <li><strong>Llenar al tamaño máximo permitido:</strong> La partición tendrá al menos el tamaño especificado por el campo Tamaño (MB). Cualquier espacio adicional sin particionar se asignará a esta partición. Si varias particiones tienen esta opción, el espacio sin particionar se divide equitativamente entre estas particiones.</li>
+      </ul>
+    </li>
+  </ul>
+  <p>Para comprender mejor los campos de Opciones de Tamaño Adicional, considere los siguientes escenarios:</p>
+
+  <h3>Escenario #1</h3>
+  <p>Disco Duro: 2400 MB</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Punto de Montaje</th>
+        <th>Tamaño</th>
+        <th>Tamaño Adicional</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>/</code></td>
+        <td>1000 MB</td>
+        <td>Tamaño Fijo</td>
+      </tr>
+      <tr>
+        <td><code>/var</code></td>
+        <td>500 MB</td>
+        <td>Tamaño Fijo</td>
+      </tr>
+      <tr>
+        <td><code>/home</code></td>
+        <td>200 MB</td>
+        <td>Tamaño Fijo</td>
+      </tr>
+    </tbody>
+  </table>
+  <div align="center">
+    <img src="ch20_c.png" alt="Tres ventanas de Añadir Partición una al lado de la otra. En la primera ventana (de izquierda a derecha); / es 1000MB, en la segunda ventana /var es 500 MB y en la tercera ventana /home es 200 MB." width="1500" height="500" align="center">
+  </div>
+  <p><strong>Resultado:</strong></p>
+  <ul>
+    <li><code>/</code> es 1000 MB</li>
+    <li><code>/var</code> es 500 MB</li>
+    <li><code>/home</code> es 200 MB</li>
+    <li>700 MB de espacio sin usar</li>
+  </ul>
+
+  <h3>Escenario #2</h3>
+  <p>Disco Duro: 2400 MB</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Punto de Montaje</th>
+        <th>Tamaño</th>
+        <th>Tamaño Adicional</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>/</code></td>
+        <td>1000 MB</td>
+        <td>Llenar todo el espacio hasta 1200 MB</td>
+      </tr>
+      <tr>
+        <td><code>/var</code></td>
+        <td>500 MB</td>
+        <td>Tamaño Fijo</td>
+      </tr>
+      <tr>
+        <td><code>/home</code></td>
+        <td>200 MB</td>
+        <td>Tamaño Fijo</td>
+      </tr>
+    </tbody>
+  </table>
+  <div align="center">
+    <img src="ch20_d.png" alt="Tres ventanas de Añadir Partición una al lado de la otra. En la primera ventana (de izquierda a derecha); / es 1200MB, en la segunda ventana /var es 500 MB y en la tercera ventana /home es 200 MB." width="1500" height="500" align="center">
+  </div>
+  <p><strong>Resultado:</strong></p>
+  <ul>
+    <li><code>/</code> es 1200 MB</li>
+    <li><code>/var</code> es 500 MB</li>
+    <li><code>/home</code> es 200 MB</li>
+    <li>500 MB de espacio sin usar</li>
+  </ul>
+
+  <h3>Escenario #3</h3>
+  <p>Disco Duro: 2400 MB</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Punto de Montaje</th>
+        <th>Tamaño</th>
+        <th>Tamaño Adicional</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>/</code></td>
+        <td>1000 MB</td>
+        <td>Llenar todo el espacio hasta 1200 MB</td>
+      </tr>
+      <tr>
+        <td><code>/var</code></td>
+        <td>500 MB</td>
+        <td>Llenar al tamaño máximo permitido</td>
+      </tr>
+      <tr>
+        <td><code>/home</code></td>
+        <td>200 MB</td>
+        <td>Llenar al tamaño máximo permitido</td>
+      </tr>
+    </tbody>
+  </table>
+  <div align="center">
+    <img src="ch20_e.png" alt="Tres ventanas de Añadir Partición una al lado de la otra. En la primera ventana (de izquierda a derecha); / es 1200MB, en la segunda ventana /var es 750 MB y en la tercera ventana /home es 450 MB." width="1500" height="500" align="center">
+  </div>
+  <p><strong>Resultado:</strong></p>
+  <ul>
+    <li><code>/</code> es 1200 MB</li>
+    <li><code>/var</code> es 750 MB</li>
+    <li><code>/home</code> es 450 MB</li>
+  </ul>
+
+  <h3>Considere esto</h3>
+  <p>Para arrancar tanto en Windows como en Linux, el administrador del sistema debe instalar primero Windows y luego Linux. Esto es necesario porque el cargador de arranque (el programa que arranca el sistema) para Windows no puede arrancar Linux, pero el cargador de arranque para Linux sí puede arrancar Windows.</p>
+  <p>Los sistemas de consumo que se compran en una tienda ya tendrán Windows instalado, pero estará utilizando todo el disco. En el Panel de control de Windows, en la carpeta Herramientas administrativas, busque la herramienta Administración de equipos, que se puede utilizar para administrar particiones dentro del sistema operativo Windows. Si Windows está utilizando todo el disco, use esta herramienta para reducir la partición que Windows está utilizando, para dejar espacio para una instalación de Linux.</p>
+  <p>Muchas distribuciones de Linux también consultarán al usuario durante la instalación sobre un esquema de disco de Windows existente y permitirán la reducción de la partición de Windows para dejar espacio para las particiones de Linux.</p>
+  </section>
+  <hr>
+
+  <section id="20-3">
+  <h2>20.3 Creación de Particiones Después de la Instalación</h2>
+  <p>Originalmente, los discos duros se llamaban discos fijos porque no eran extraíbles. Casualmente, la herramienta de línea de comandos más común para editar las tablas de particiones en los discos se llama <code>fdisk</code>. Este comando se puede usar para crear, modificar y listar las particiones en un disco duro.</p>
+  <p>Uno de los beneficios de la herramienta <code>fdisk</code> es que es muy indulgente; si se comete un error al usar la herramienta, simplemente salga del programa y nada se cambiará en el sistema. Solo cuando los cambios se escriben (guardan) antes de salir, el programa actualizará la tabla de particiones.</p>
+  <p>El programa <code>fdisk</code> se puede usar de dos maneras: interactiva y no interactiva. El modo interactivo se usa para modificar las particiones y el modo no interactivo se usa para listar las particiones. En cualquier modo, el programa <code>fdisk</code> requiere privilegios de root para ejecutarse.</p>
+  <p>Un par de opciones pueden afectar la salida del programa cuando se trabaja con él en cualquiera de los modos. La opción <code>-u</code> (unidades) listará las ubicaciones de inicio y fin de cada partición en sectores en lugar de cilindros. Dado que Linux particiona técnicamente por sector, puede ser beneficioso usar esta opción. Si se usan cilindros, la utilidad <code>fdisk</code> traducirá a sectores, por lo que usar la opción <code>-u</code> solo es realmente necesario para el ajuste fino de los tamaños de las particiones y para evitar ver el siguiente mensaje de error, resaltado a continuación:</p>
+  <pre><code>root@localhost:~# fdisk -l /dev/sda
+Disk /dev/sda: 11.3 GB, 11261706240 bytes
+255 heads, 63 sectors/track, 1369 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000ee7d2
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *           1          64      512000   83  Linux
+Partition 1 does not end on cylinder boundary.
+/dev/sda2              64        1306     9972736   Linux LVM
+/dev/sda3           1306        1319     102400   82  Linux swap / Solaris
+Partition 3 does not end on cylinder boundary.</code></pre>
+  <h3>Considere esto</h3>
+  <p>En casi todas las distribuciones de Linux, la salida predeterminada de <code>fdisk</code> se muestra en cilindros. Una excepción es Ubuntu, que muestra la salida en sectores de forma predeterminada. Para mostrar la salida en cilindros, use la opción <code>-u=cylinders</code>.</p>
+  <p>Al usar la utilidad <code>fdisk</code>, aparecerá una advertencia por defecto:</p>
+  <pre><code>Warning
+DOS-compatible mode is deprecated. It's strongly recommended to switch off the mode and change the display units to sectors.</code></pre>
+  <p>La opción <code>-c</code> deshabilita la advertencia sobre problemas de compatibilidad con el sistema operativo MS-DOS. Aunque es muy poco probable que la compatibilidad con este sistema operativo sea un problema, ya que DOS no ha estado disponible como producto durante casi veinte años, se emitirá una advertencia si no se usa la opción <code>-c</code>.</p>
+  </section>
+  <hr>
+
+  <section id="20-3-1">
+  <h2>20.3.1 Visualización de Particiones</h2>
+  <p>Para usar <code>fdisk</code> en su modo no interactivo, añada la opción <code>-l</code>. Para demostrarlo, el siguiente comando mostrará una lista de todas las particiones de todos los dispositivos de disco duro:</p>
+  <pre><code>root@localhost:~# fdisk -cul
+Disk /dev/sda: 21.5 GB, 21474836480 bytes
+255 heads, 63 sectors/track, 2610 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000571a2
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *           1        2481    19921920   83  Linux
+/dev/sda2            2481        2611     1046529    5  Extended
+/dev/sda5            2481        2611     1046528   82  Linux swap / Solaris</code></pre>
+  <p>No es fundamental que entienda toda la salida de este comando. Lo siguiente describe los componentes clave de la salida que un administrador de sistemas debe comprender para administrar particiones de manera efectiva:</p>
+
+  <h3>Información del Dispositivo</h3>
+  <pre><code>Disk /dev/sda: 10.7 GB, 10737418240 bytes</code></pre>
+  <p>El nombre del dispositivo y el tamaño del dispositivo en bytes.</p>
+
+  <h3>Columnas</h3>
+  <pre><code>   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *           1        2481    19921920   83  Linux
+/dev/sda2            2481        2611     1046529    5  Extended
+/dev/sda5            2481        2611     1046528   82  Linux swap / Solaris</code></pre>
+  <ul>
+    <li><strong>Device:</strong> La partición específica que describe la fila. Por ejemplo, <code>/dev/sda1</code> es la primera partición en el primer disco duro SATA.</li>
+    <li><strong>Start:</strong> El sector de inicio de la partición.</li>
+    <li><strong>End:</strong> El sector final de la partición.</li>
+    <li><strong>Blocks:</strong> El tamaño de la partición en bloques.</li>
+    <li><strong>Id:</strong> Un identificador que se usa para indicarle al kernel qué tipo de sistema de archivos debe colocarse en esta partición. Por ejemplo, el valor <code>83</code> indica que esta partición debe tener un tipo de sistema de archivos <code>ext2</code>, <code>ext3</code> o <code>ext4</code>.</li>
+    <li><strong>System:</strong> Un nombre legible por humanos que indica el tipo de sistema de archivos al que se refiere la columna Id. Por ejemplo, <code>83</code> es un sistema de archivos Linux.</li>
+  </ul>
+  <p>Para ver las particiones de un disco duro específico, añada la ruta del disco como argumento al comando anterior.</p>
+  <p><strong>Nota</strong></p>
+  <p>El ejemplo siguiente puede no coincidir con la salida de nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# fdisk -c=dos -u=sectors -l /dev/sdb
+Disk /dev/sdb: 505 MB, 505413632 bytes
+5 heads, 52 sectors/track, 3796 cylinders, total 987136 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x7f08b2c3
+
+   Device Boot  	Start     	End  	Blocks   Id  System
+/dev/sdb1        	2552  	987135  	492292	6  FAT16</code></pre>
+  <p><strong>Nota</strong></p>
+  <p>La tabla de particiones descrita anteriormente se almacena permanentemente en el MBR. Cuando se arranca el sistema, se crea una copia en la memoria. Esta copia es utilizada por el kernel para varias tareas del sistema. El kernel no puede mirar directamente un sistema de archivos para determinar de qué tipo es. Por lo tanto, la tabla de particiones almacena esta información para beneficio del kernel. Cuando se crea la partición, es responsabilidad del administrador del sistema indicar qué tipo de sistema de archivos se colocará en esa partición, proporcionando el tipo de partición.</p>
+  <p>Los comandos utilizados para crear los sistemas de archivos se cubren con mayor detalle más adelante en el capítulo.</p>
+
+  <h3>Considere esto</h3>
+  <p>La opción de modo no interactivo también se puede usar para guardar información de particiones antes de usar el modo interactivo. Se pueden cometer errores al particionar un disco usando <code>fdisk</code> en modo interactivo. Un consejo útil es crear primero una copia de la salida del comando <code>fdisk -l</code> y enviar esa salida a un archivo en el disco. Cualquiera que haya cometido un error al particionar un disco y necesite consultar la configuración anterior apreciará tener una copia exacta de los cilindros y sistemas de archivos a los que referirse.</p>
+  <pre><code>root@localhost:~# fdisk -l /dev/sda > mydisklayout.txt</code></pre>
+  </section>
+  <hr>
+
+  <section id="20-3-2">
+  <h2>20.3.2 Modo Interactivo de fdisk</h2>
+  <p>En el modo interactivo, un administrador de sistemas puede usar el comando <code>fdisk</code> para crear y modificar particiones. Para ingresar al modo interactivo, no use la opción <code>-l</code>, pero sí use las opciones <code>-c</code> y <code>-u</code>. Se requiere la ruta del disco a editar. Por ejemplo, para editar las particiones para el primer disco duro SATA <code>/dev/sda</code>, ejecute el siguiente comando para mostrar un indicador:</p>
+  <p><strong>Nota</strong></p>
+  <p>Los siguientes ejemplos pueden no coincidir con la salida de nuestro entorno virtual.</p>
+  <pre><code>root@localhost:~# fdisk -cu /dev/sda
+Command (m for help):</code></pre>
+  <p>El comando <code>m</code> mostrará un menú o pantalla de ayuda:</p>
+  <pre><code>Command (m for help): m
+
+Command action
+   a   toggle a bootable flag
+   b   edit bsd disklabel
+   c   toggle the dos compatibility flag
+   d   delete a partition
+   l   list known partition types
+   m   print this menu
+   n   add a new partition
+   o   create a new empty DOS partition table
+   p   print the partition table
+   q   quit without saving changes
+   s   create a new empty Sun disklabel
+   t   change a partition's system id
+   u   change display/entry units
+   v   verify the partition table
+   w   write table to disk and exit
+   x   extra functionality (experts only)</code></pre>
+  <p>Antes de crear cualquier partición, es una buena idea imprimir la tabla de particiones eligiendo la acción del comando <code>p</code>. Tenga en cuenta que esto no envía realmente la salida a una impresora, sino a la pantalla. La salida se parecerá mucho a la salida del comando <code>fdisk -l</code>.</p>
+  <pre><code>Command (m for help): p
+
+Disk /dev/sda: 11.3 GB, 11261706240 bytes
+255 heads, 63 sectors/track, 1369 cylinders, total 21995520 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000ee7d2
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     1026047      512000   83  Linux
+/dev/sda2         1026048    20971519     9972736   8e  Linux LVM</code></pre>
+  <p>Tenga en cuenta que, según la salida del comando anterior, hay espacio sin particionar en el dispositivo <code>/dev/sda</code>. El sector final de la última partición <code>/dev/sda2</code> es 20971519, y el dispositivo <code>/dev/sda</code> tiene un total de 21995520 sectores. Esto significa que hay 1024001 sectores que no han sido particionados. Dado que un sector es de 512 bytes, 1024001 sectores son aproximadamente 500 MB.</p>
+  </section>
+  <hr>
+
+  <section id="20-3-3">
+  <h2>20.3.3 Creación de Particiones</h2>
+  <p>Para crear una nueva partición, se debe elegir la acción del comando <code>n</code>:</p>
+  <pre><code>Command (m for help): n</code></pre>
+  <p>Este comando le pedirá al administrador del sistema que responda varias preguntas, como se describe a continuación.</p>
+
+  <h3>Tipo de Partición</h3>
+  <pre><code>Command Action
+   e   extended
+   p   primary partition (1-4)</code></pre>
+  <p>Las opciones disponibles para responder a esta pregunta variarán, dependiendo de las particiones que ya existan:</p>
+  <ul>
+    <li>Si no se ha creado ninguna partición extendida, las opciones serán <code>e</code> para una partición extendida o <code>p</code> para una partición primaria.</li>
+    <li>Si se ha creado la partición extendida, la utilidad <code>fdisk</code> creará automáticamente una partición lógica dentro del espacio libre de la partición extendida.</li>
+  </ul>
+  <p>Recuerde que solo puede haber cuatro particiones primarias o tres particiones primarias con una extendida. Si ya existen tres particiones primarias, tenga mucho cuidado; aunque no hay nada de malo en hacer de la cuarta partición una partición primaria, esto resultará en la imposibilidad de crear particiones adicionales. Además, si la cuarta partición no utiliza el espacio libre restante en el disco duro, ese espacio se desperdiciará.</p>
+  <p>La mejor opción es crear una partición extendida si ya hay tres particiones primarias. Para esta partición extendida, asigne todos los sectores libres restantes. Luego, se pueden crear particiones lógicas dentro de la partición extendida.</p>
+
+  <h3>Número de Partición</h3>
+  <pre><code>Partition number (1-4): 3</code></pre>
+  <p>Al crear una partición primaria, la utilidad <code>fdisk</code> le pedirá un número de partición. Una vez más, es útil mostrar la tabla de particiones para identificar cuál fue el último número de partición y un valor numérico uno mayor. Por ejemplo, si el último número de partición fue 2, la siguiente partición debe numerarse como 3.</p>
+  <p>Al crear particiones lógicas, la utilidad <code>fdisk</code> no le pedirá un número de partición y asignará un número por defecto.</p>
+
+  <h3>Sector de Inicio</h3>
+  <pre><code>First sector (20971520-21995519, default 20971520):</code></pre>
+  <p>La siguiente pregunta es dónde iniciar la nueva partición. Asignar este primer sector debería ser extremadamente fácil porque la utilidad <code>fdisk</code> sabe qué sector es el siguiente disponible. Presionar la tecla Enter acepta este valor.</p>
+  <pre><code>First sector (20971520-21995519, default 20971520):
+Using default value 20971520</code></pre>
+  <p>Es posible escribir el número de sector, pero generalmente no se recomienda, ya que puede crear rangos de sectores inutilizables.</p>
+
+  <h3>Tamaño de la Partición</h3>
+  <pre><code>Last sector, +sectors, or +size{K,M,G} (20971520-21995519, default 21995519):</code></pre>
+  <p>La última pregunta es qué tamaño debe tener la partición. Hay tres técnicas diferentes para asignar el último sector: último sector, +sectores o +tamaño:</p>
+  <ul>
+    <li>Usar la técnica del último sector puede ser la más difícil porque se requieren un par de cálculos. Los sectores de un disco generalmente tienen un tamaño de 512 bytes, por lo que para crear una nueva partición de 100 MB se requieren aproximadamente 200,000 sectores. Para calcular el último sector, sume 200,000 al valor del sector de inicio. Típicamente, la técnica del último sector solo se usa para utilizar el resto del espacio disponible. En ese caso, acepte el valor predeterminado presionando la tecla Enter:</li>
+  </ul>
+  <pre><code>Last sector, +sectors, or +size{K,M,G} (20971520-21995519, default 21995519):
+Using default value 21995519</code></pre>
+  <ul>
+    <li>Usar la técnica de <code>+sectores</code> requiere un cálculo menos que la técnica del último sector. Con esta técnica, calcule el número de sectores necesarios y antepóngale el signo <code>+</code>. Por ejemplo, para crear una partición de aproximadamente 100 MB, ingrese el valor como <code>+200000</code>:</li>
+  </ul>
+  <pre><code>Last sector, +sectors, or +size{K,M,G} (20971520-21995519, default 21995519): +200000</code></pre>
+  <ul>
+    <li>La técnica final <code>+tamaño</code> es normalmente preferida ya que no se necesitan cálculos. Use el signo <code>+</code>, el tamaño para la partición y un sufijo para indicar la unidad. Por ejemplo, para especificar la partición de 100 MB, ingrese el valor para el sector final como <code>+100M</code>:</li>
+  </ul>
+  <pre><code>Last sector, +sectors, or +size{K,M,G} (20971520-21995519, default 21995519): +100M</code></pre>
+  <p>El siguiente es un ejemplo de una interacción con <code>fdisk</code> para crear una nueva partición de 100 MB utilizando estos pasos:</p>
+  <ul>
+    <li>La tabla de particiones actual se muestra con el comando <code>p</code>.</li>
+    <li>El comando <code>n</code> indica que se está creando una nueva partición.</li>
+    <li>El usuario ingresa <code>p</code> para crear una partición primaria.</li>
+    <li>La partición se asigna como número 3.</li>
+    <li>El valor predeterminado para el primer sector se elige presionando la tecla Enter.</li>
+    <li>Para el tamaño, el usuario elige <code>+100M</code> para una partición de cien megabytes.</li>
+  </ul>
+  <pre><code>Command (m for help): p
+
+Disk /dev/sda: 11.3 GB, 11261706240 bytes
+255 heads, 63 sectors/track, 1369 cylinders, total 21995520 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000ee7d2
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     1026047      512000   83  Linux
+/dev/sda2         1026048    20971519     9972736   8e  Linux LVM
+
+Command (m for help): n
+Command Action
+   e   extended
+   p   primary partition (1-4)
+p
+Partition number (1-4): 3
+First sector (20971520-21995519, default 20971520):
+Using default value 20971520
+Last sector, +sectors, or +size{K,M,G} (20971520-21995519, default 21995519): +100M</code></pre>
+  <p>Después de crear una partición, verifique que se haya creado correctamente mostrando la tabla de particiones:</p>
+  <pre><code>Command (m for help): p
+
+Disk /dev/sda: 11.3 GB, 11261706240 bytes
+255 heads, 63 sectors/track, 1369 cylinders, total 21995520 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000ee7d2
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     1026047      512000   83  Linux
+/dev/sda2         1026048    20971519     9972736   8e  Linux LVM
+/dev/sda3        20971520    21176319      102400   83  Linux</code></pre>
+  <p>Al verificar estos datos, preste mucha atención a los sectores de inicio y fin. Observe en la salida anterior que el sector de inicio de la partición <code>/dev/sda3</code> es un valor más alto que el sector final de la partición <code>/dev/sda2</code>. Cualquier superposición resultaría en pérdida de datos y debe evitarse.</p>
+  <p>No se han realizado cambios en el MBR, por lo que es posible salir ahora en caso de que se muestren errores en la nueva tabla de particiones. Para salir sin guardar cambios, use el comando <code>q</code>.</p>
+  <p><strong>Advertencia</strong></p>
+  <p>El comando <code>fdisk</code> es una herramienta de particionamiento destructiva. Cualquier cambio en la estructura de su partición puede sobrescribir la información de partición existente y hacer que los datos sean inaccesibles.</p>
+  <p>En el siguiente ejemplo, se agrega una cuarta partición como una partición extendida, y luego se crean dos particiones lógicas dentro de la partición extendida. Observe que una vez que se ha creado la partición extendida, la utilidad <code>fdisk</code> omite los dos primeros pasos, ya que la partición se designa automáticamente como lógica y se le asigna un número.</p>
+  <pre><code>Command (m for help): n
+Command Action
+   e   extended
+   p   primary partition (1-4)
+e
+Partition number (1-4): 4
+First sector (21176320-21995519, default 21176320):
+Using default value 21176320
+Last sector, +sectors, or +size{K,M,G} (21176320-21995519, default 21995519):
+Using default value 21995519
+Command (m for help): n
+First sector (21178368-21995519, default 21178368):
+Using default value 21178368
+Last sector, +sectors, or +size{K,M,G} (21178368-21995519, default 21995519): +100M
+Command (m for help): n
+First sector (21385216-21995519, default 21385216):
+Using default value 21385216
+Last sector, +sectors, or +size{K,M,G} (21385216-21995519, default 21995519):
+Using default value 21995519</code></pre>
+  <p>Observe que las particiones lógicas utilizan sectores de inicio y fin que están dentro de la partición extendida:</p>
+  <pre><code>Command (m for help): p
+
+Disk /dev/sda: 11.3 GB, 11261706240 bytes
+255 heads, 63 sectors/track, 1369 cylinders, total 21995520 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000ee7d2
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     1026047      512000   83  Linux
+/dev/sda2         1026048    20971519     9972736   8e  Linux LVM
+/dev/sda3        20971520    21176319      102400   83  Linux
+/dev/sda4        21176320    21995519      409600    5  Extended
+/dev/sda5        21178368    21383167      102400   83  Linux
+/dev/sda6        21385216    21995519      305152   83  Linux</code></pre>
+  <p>Elimine particiones usando el comando <code>d</code>. Tenga cuidado de evitar eliminar particiones existentes necesarias, ya que esto puede resultar en un sistema inutilizable.</p>
+  </section>
+  <hr>
+
+  <section id="20-3-4">
+  <h2>20.3.4 Cambio del Tipo de Sistema de Archivos</h2>
+  <p>Por defecto, la utilidad <code>fdisk</code> establece el tipo de sistema de archivos en Id 83 (Linux) para particiones primarias y lógicas. Para particiones extendidas, el Id debe ser 5 y nunca debe cambiarse.</p>
+  <p>Para cambiar el tipo de sistema de archivos, use el comando <code>t</code>:</p>
+  <pre><code>Command (m for help): t</code></pre>
+  <p>La utilidad <code>fdisk</code> le pedirá el número de la partición a cambiar:</p>
+  <pre><code>Partition number (1-6): 6</code></pre>
+  <p>Por último, se le pedirá al usuario que introduzca un valor hexadecimal para el Id. En la siguiente salida de ejemplo, el usuario introduce un valor de 82, lo que cambia el Id de la partición a Linux swap/Solaris:</p>
+  <pre><code>Hex code (type L to list codes): 82
+
+Changed system type of partition 6 to 82 (Linux swap / Solaris)</code></pre>
+  <p>Mientras está en el prompt de Código Hexadecimal, el usuario puede mostrar una lista de los códigos hexadecimales disponibles escribiendo el carácter <code>L</code>:</p>
+  <pre><code>Hex code (type L to list codes): L
+
+ 0  Empty           24  NEC DOS         81  Minix / old Lin bf  Solaris
+ 1  FAT12           39  Plan 9          82  Linux swap / So c1  DRDOS/sec (FAT-
+ 2  XENIX root      3c  PartitionMagic  83  Linux           c4  DRDOS/sec (FAT-
+ 3  XENIX usr       40  Venix 80286     84  OS/2 hidden C:  c6  DRDOS/sec (FAT-
+ 4  FAT16 <32M      41  PPC PReP Boot   85  Linux extended  c7  Syrinx
+ 5  Extended        42  SFS             86  NTFS volume set da  Non-FS data
+ 6  FAT16           4d  QNX4.x          87  NTFS volume set db  CP/M / CTOS / .
+ 7  HPFS/NTFS       4e  QNX4.x 2nd part 88  Linux plaintext de  Dell Utility
+ 8  AIX             4f  QNX4.x 3rd part 8e  Linux LVM       df  BootIt
+ 9  AIX bootable    50  OnTrack DM      93  Amoeba          e1  DOS access
+ a  OS/2 Boot Manag 51  OnTrack DM6 Aux 94  Amoeba BBT      e3  DOS R/O
+ b  W95 FAT32       52  CP/M            9f  BSD/OS          e4  SpeedStor
+ c  W95 FAT32 (LBA) 53  OnTrack DM6 Aux a0  IBM Thinkpad hi eb  BeOS fs
+ e  W95 FAT16 (LBA) 54  OnTrackDM6      a5  FreeBSD         ee  GPT
+ f  W95 Ext'd (LBA) 55  EZ-Drive        a6  OpenBSD         ef  EFI (FAT-12/16/
+10  OPUS            56  Golden Bow      a7  NeXTSTEP        f0  Linux/PA-RISC b
+11  Hidden FAT12    5c  Priam Edisk     a8  Darwin UFS      f1  SpeedStor
+12  Compaq diagnost 61  SpeedStor       a9  NetBSD          f4  SpeedStor
+14  Hidden FAT16 <3 63  GNU HURD or Sys ab  Darwin boot     f2  DOS secondary
+16  Hidden FAT16    64  Novell Netware  af  HFS / HFS+      fb  VMware VMFS
+17  Hidden HPFS/NTF 65  Novell Netware  b7  BSDI fs         fc  VMware VMKCORE
+18  AST SmartSleep  70  DiskSecure Mult b8  BSDI swap       fd  Linux raid auto
+1b  Hidden W95 FAT3 75  PC/IX           bb  Boot Wizard hid fe  LANstep
+1c  Hidden W95 FAT3 80  Old Minix       be  Solaris boot    ff  BBT
+1e  Hidden W95 FAT1</code></pre>
+  <p>Técnicamente, existen docenas de tipos de sistemas de archivos, como lo demuestra la salida anterior. Sin embargo, solo un puñado de estos sistemas de archivos se pueden usar de manera realista en un sistema operativo Linux. Muchos de los sistemas de archivos que se enumeran en el gráfico anterior son antiguos. Cada distribución de Linux puede admitir diferentes sistemas de archivos, ya que esto es en realidad una característica del kernel, por lo que es mejor consultar la documentación del sistema para determinar qué tipos de sistemas de archivos funcionan en una distribución particular.</p>
+  <p>En el siguiente ejemplo, la partición <code>/dev/sda6</code> se cambia a <code>82</code>, una partición de intercambio, utilizando los mismos pasos descritos anteriormente.</p>
+  <pre><code>Command (m for help): t
+Partition number (1-6): 6
+Hex code (type L to list codes): 82
+Changed system type of partition 6 to 82 (Linux swap / Solaris)</code></pre>
+  <p>Siempre es una buena idea verificar el nuevo Id imprimiendo la tabla de particiones:</p>
+  <pre><code>Command (m for help): p
+
+Disk /dev/sda: 11.3 GB, 11261706240 bytes
+255 heads, 63 sectors/track, 1369 cylinders, total 21995520 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000ee7d2
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     1026047      512000   83  Linux
+/dev/sda2         1026048    20971519     9972736   8e  Linux LVM
+/dev/sda3        20971520    21176319      102400   83  Linux
+/dev/sda4        21176320    21995519      409600    5  Extended
+/dev/sda5        21178368    21383167      102400   83  Linux
+/dev/sda6        21385216    21995519      305152   82  Linux swap / Solaris</code></pre>
+  </section>
+  <hr>
+
+  <section id="20-3-5">
+  <h2>20.3.5 Guardar Cambios</h2>
+  <p>Si los cambios que se han realizado en la tabla de particiones en memoria son correctos, confirme los cambios en el disco con <code>w</code>, seguido de Enter. La utilidad <code>fdisk</code> escribirá los cambios en memoria en el MBR real y saldrá. Sin embargo, también es posible salir de la utilidad <code>fdisk</code> sin realizar ningún cambio en el disco usando el comando <code>q</code>.</p>
+  <p>Tenga en cuenta el siguiente posible error después de guardar los cambios:</p>
+  <pre><code>The partition table has been altered!
+
+Calling iotctl() to re-read partition table.
+
+WARNING: Re-reading the partition table failed with error 16: Device or resource busy.
+The kernel still uses the old table. The table will be used at the next reboot or after you run partprobe(8) or kpartx(8)
+Syncing disks.</code></pre>
+  <p>Este error es el resultado de que el kernel no puede leer la nueva tabla de particiones en la memoria desde el MBR, algo de lo que la función <code>ioctl()</code> es responsable. Como se menciona en la salida de este error, los comandos <code>partprobe</code> o <code>kpartx</code> se pueden ejecutar para solucionar este problema si estos comandos están instalados en el sistema. Si no, entonces el sistema deberá reiniciarse antes de que se puedan usar las nuevas particiones.</p>
+  </section>
+  <hr>
+
+  <section id="20-4">
+  <h2>20.4 Gestión de GPT</h2>
+  <p>Algunos discos duros utilizan una tecnología de particionamiento llamada Master Boot Record (MBR), mientras que otros utilizan un tipo de particionamiento llamado GUID Partitioning Table (GPT). El tipo de particionamiento MBR se ha utilizado desde los primeros días de la computadora personal (PC), y el tipo GPT ha estado disponible desde el año 2000.</p>
+  <p>Los discos GPT utilizan un tipo de particionamiento más nuevo, que permite al usuario dividir el disco en más particiones de las que soporta MBR. GPT también permite tener particiones que pueden ser más grandes de dos terabytes (MBR no lo permite). Las herramientas para gestionar discos GPT se nombran de forma similar a sus contrapartes de <code>fdisk</code>: los programas <code>gdisk</code>, <code>cgdisk</code> y <code>sgdisk</code>.</p>
+  </section>
+  <hr>
+
+  <section id="20-4-1">
+  <h2>20.4.1 Gestión de GPT</h2>
+  <p>Para crear y gestionar particiones GPT desde la línea de comandos, puede usar la utilidad <code>gdisk</code>, también llamada GPT <code>fdisk</code>. Opera de manera similar a <code>fdisk</code>, excepto que opera en particiones GPT y requiere que se especifique el dispositivo para funcionar.</p>
+  <pre><code>sysadmin@localhost:~$ sudo gdisk /dev/sdb1
+GPT fdisk (gdisk) version 1.0.3
+
+Partition table scan:
+MBR: not present
+BSD: not present
+APM: not present
+GPT: not present
+
+Creating new GPT entries.
+
+Command (? for help): ?
+b	back up GPT data to a file
+c	change a partition's name
+d	delete a partition
+i	show detailed information on a partition
+l	list known partition types
+n	add a new partition
+o	create a new empty GUID partition table (GPT)
+p	print the partition table
+q	quit without saving changes
+r	recovery and transformation options (experts only)
+s	sort partitions
+t	change a partition's type code
+v	verify disk
+w	write table to disk and exit
+x	extra functionality (experts only)
+?	print this menu</code></pre>
+  <p>Cuando especifica un disco en blanco, escaneará el dispositivo e informará que no hay información de partición. Escribir un signo de interrogación <code>?</code> devuelve una lista de opciones de comando disponibles, escriba <code>n</code> para agregar una nueva partición.</p>
+  <pre><code>Command (? for help): n
+Partition number (1-128, default 1):
+First sector (34-62529502, default = 2048) or {+-}size{KMGTP}:
+Last sector (2048-62529502, default = 62529502) or {+-}size{KMGTP}:
+Current type is 'Linux filesystem'
+Hex code or GUID (L to show codes, Enter = 8300):
+Changed type of partition to 'Linux filesystem'</code></pre>
+  <p>Devuelve información sobre la nueva partición que se acaba de crear; también puede escribir <code>p</code> para imprimir la información de la tabla de particiones.</p>
+  <pre><code>Command (? for help): p
+Disk /dev/sdb1: 62529536 sectors, 29.8 GiB
+Sector size (logical/physical): 512/512 bytes
+Disk identifier (GUID): 78F1C87E-5159-4AD8-89BA-A5F79B854835
+Partition table holds up to 128 entries
+Main partition table begins at sector 2 and ends at sector 33
+First usable sector is 34, last usable sector is 62529502
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 2014 sectors (1007.0 KiB)
+
+Number Start (sector) End (sector) Size Code Name
+1 2048 62529502 29.8 GiB 8300 Linux filesystem</code></pre>
+  <p>El comando <code>v</code> verificará la partición para asegurarse de que no tenga errores.</p>
+  <pre><code>Command (? for help): v
+
+No problems found. 2014 free sectors (1007.0 KiB) available in 1
+segments, the largest of which is 2014 (1007.0 KiB) in size.</code></pre>
+  <p>El comando <code>o</code> le permite crear una nueva partición vacía; verifica que desea eliminar las particiones existentes antes de continuar.</p>
+  <pre><code>Command (? for help): o
+This option deletes all partitions and creates a new protective MBR.
+Proceed? (Y/N): y</code></pre>
+  <p>El comando <code>p</code> vuelve a imprimir la información sobre la nueva partición.</p>
+  <pre><code>Command (? for help): p
+Disk /dev/sdb1: 62529536 sectors, 29.8 GiB
+Sector size (logical/physical): 512/512 bytes
+Disk identifier (GUID): 4876B7C5-0ADB-4281-AA77-A3FFAEC5F2AF
+Partition table holds up to 128 entries
+Main partition table begins at sector 2 and ends at sector 33
+First usable sector is 34, last usable sector is 62529502
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 62529469 sectors (29.8 GiB)
+
+Number Start (sector) End (sector) Size Code Name</code></pre>
+  <p>El comando <code>w</code> escribe los datos de la partición en el disco y saldrá. Una vez más, verifica que desea continuar con la sobrescritura (eliminación) de las particiones existentes.</p>
+  <pre><code>Command (? for help): w
+
+Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+PARTITIONS!!
+
+Do you want to proceed? (Y/N): y
+OK; writing new GUID partition table (GPT) to /dev/sdb1.
+Warning: The kernel is still using the old partition table.
+The new table will be used at the next reboot or after you
+run partprobe(8) or kpartx(8)
+The operation has completed successfully.</code></pre>
+  </section>
+  <hr>
+
+  <section id="20-5">
+  <h2>20.5 GNU Parted</h2>
+  <p>Hasta ahora, ha aprendido a usar los comandos <code>fdisk</code> y <code>gdisk</code> para crear, listar y eliminar particiones. Otra herramienta disponible para crear y redimensionar particiones en un disco duro es el programa GNU Parted. El programa GNU Parted incluye la herramienta de línea de comandos <code>parted</code> y la herramienta de interfaz gráfica <code>gparted</code>. Una ventaja de usar GNU Parted es que, a diferencia de las herramientas <code>gdisk</code> y <code>fdisk</code>, que son particionadores destructivos, GNU Parted redimensionará de forma no destructiva una partición, así como el sistema de archivos que contiene.</p>
+
+  <h3>Uso de parted</h3>
+  <p>El programa <code>parted</code> se puede usar de dos maneras: modo de línea de comandos y modo interactivo. Al usar <code>parted</code> en cualquiera de los modos, se debe especificar un dispositivo. Para ello, se debe usar la siguiente sintaxis:</p>
+  <pre><code>parted DEVICE</code></pre>
+  <p>El argumento <code>DEVICE</code> se utiliza para especificar el disco duro a modificar, por ejemplo, <code>/dev/sdb</code>. Si no se utiliza este argumento, se elegirá un dispositivo predeterminado o puede aparecer un mensaje de error. Para usar <code>parted</code> en modo de línea de comandos, el argumento <code>DEVICE</code> debe ir seguido de opciones para crear o modificar una partición. Para ver una lista de opciones disponibles para <code>parted</code>, use la opción <code>--help</code>:</p>
+  <pre><code>root@localhost:~# parted --help
+Usage: parted [OPTION]... [DEVICE [COMMAND [PARAMETERS]...]...]
+Apply COMMANDs with PARAMETERS to DEVICE. If no COMMAND(s) are given, run in
+interactive mode.
+
+OPTIONs:
+  -h, --help                      displays this help message
+  -l, --list                      lists partition layout on all block devices
+  -m, --machine                   displays machine parseable output
+  -s, --script                    never prompts for user intervention
+  -v, --version                   displays the version
+  -a, --align=[none|cyl|min|opt]  alignment for new partitions
+
+COMMANDs:
+  align-check TYPE N                        check partition N for TYPE(min|opt)
+        alignment
+  help [COMMAND]                           print general help, or help on
+        COMMAND
+  mklabel,mktable LABEL-TYPE               create a new disklabel (partition
+        table)
+  mkpart PART-TYPE [FS-TYPE] START END     make a partition
+  name NUMBER NAME                         name partition NUMBER as NAME
+  print [devices|free|list,all|NUMBER]     display the partition table,
+        available devices, free space, all found partitions, or a particular partition
+  quit                                     exit program
+  rescue START END                         rescue a lost partition near START
+        and END
+  resizepart NUMBER END                    resize partition NUMBER
+Output Omitted...</code></pre>
+  <p><strong>Nota</strong>: Las opciones cortas y largas tradicionales, como <code>-l</code> o <code>--list</code>, deben usarse cuando se utiliza <code>parted</code> en modo de línea de comandos.</p>
+
+  <h3>Visualización de discos y particiones</h3>
+  <p>Para ver los discos en el sistema, use el comando <code>lsblk</code>:</p>
+  <pre><code>root@localhost:~# lsblk
+NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+sda    8:0    0 3.7T  0 disk
+|-sda1 8:1    0 512M  0 part
+|-sda2 8:2    0 3.5T  0 part /etc/hosts
+`-sda3 8:3    0 128G  0 part [SWAP]
+sdb   8:16    0 20G  0  disk</code></pre>
+  <p>El disco <code>sdb</code> que se observa en la salida anterior es el dispositivo objetivo para los ejemplos de particionamiento a continuación. Es un disco vacío que es el segundo dispositivo en el bus de dispositivos IDE.</p>
+  <p>A continuación, para ver cualquier información de partición existente con el comando <code>parted</code>, use lo siguiente:</p>
+  <pre><code>root@localhost:~# parted /dev/sdb print
+Model: ATA VMware Virtual I (scsi)
+Disk /dev/sdb: 21.5GB
+Sector size (logical/physical): 512B/512B
+Partition Table:
+Disk Flags:
+
+Number  Start  End  Size  Type  File system  Flags</code></pre>
+  <p>Tenga en cuenta en la salida anterior que no hay información de partición listada en el dispositivo <code>/dev/sdb</code>, ya que actualmente está en blanco.</p>
+
+  <h3>Creación de una tabla de particiones</h3>
+  <p>Para que el disco sea particionable, se debe crear una etiqueta de disco (tabla de particiones). Esto se hace con el siguiente comando:</p>
+  <pre><code>root@localhost:~# parted /dev/sdb mklabel msdos
+You may need to update the /etc/fstab</code></pre>
+  <p><strong>Nota</strong>: Si un disco tiene una tabla de particiones existente, el comando puede preguntar al usuario sobre la sobrescritura de la tabla de particiones actual, y en ese caso, el usuario escribiría la tecla <code>Y</code> y luego presionaría <code>Enter</code>.</p>
+
+  <h3>Creación de particiones</h3>
+  <p>Ahora que se ha escrito una tabla de particiones en el disco, se pueden crear particiones en el disco. Para crear una partición primaria que ocupe el primer 50% del disco, use el siguiente comando:</p>
+  <pre><code>root@localhost:~# parted /dev/sdb mkpart primary 0% 50%
+You may need to update the /etc/fstab</code></pre>
+  <p>Una vez que se ejecuta el comando, el usuario puede verificar que la partición se creó con el comando:</p>
+  <pre><code>root@localhost:~# parted /dev/sdb print
+Model: ATA VMware Virtual I (scsi)
+Disk /dev/sdb: 21.5GB
+Sector size (logical/physical): 512B/512B
+Partition Table:
+Disk Flags:
+
+Number  Start    End      Size    Type     File system  Flags
+1       1049kB   10.7GB   10.7GB  primary</code></pre>
+  <p>Si bien es posible formatear la partición resultante con un sistema de archivos durante el proceso <code>parted mkpart</code>, la experiencia ha indicado que el proceso de particionamiento se realiza mejor con <code>parted</code> y la creación de un sistema de archivos con el comando <code>mkfs</code> apropiado.</p>
+  <p>En este punto, se pueden escribir 3 particiones primarias más en el disco o una partición extendida que abarque el resto del espacio y luego particiones lógicas dentro de ella.</p>
+
+  <h3>Modo interactivo de parted</h3>
+  <p>El modo interactivo de la utilidad <code>parted</code> también se puede usar para crear o redimensionar particiones. Para comenzar a usar el modo interactivo, simplemente use el comando <code>parted</code> con un argumento de dispositivo para especificar la unidad:</p>
+  <pre><code>root@localhost:~# parted  /dev/sdb
+GNU Parted 3.2
+Using /dev/sda
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted)</code></pre>
+  <p>Tenga en cuenta en el ejemplo anterior que el prompt cambiará a <code>(parted)</code>. El comando <code>h</code> mostrará un menú o pantalla de ayuda:</p>
+  <pre><code>(parted) h
+  align-check TYPE N                        check partition N for TYPE(min|opt) alignment
+  help [COMMAND]                           print general help, or help on COMMAND
+  mklabel,mktable LABEL-TYPE               create a new disklabel (partition table)
+  mkpart PART-TYPE [FS-TYPE] START END     make a partition
+  name NUMBER NAME                         name partition NUMBER as NAME
+  print [devices|free|list,all|NUMBER]     display the partition table, available devices,
+ free space, all found partitions, or a particular partition
+  quit                                     exit program rescue START END rescue a lost
+ partition near START and END
+  resizepart NUMBER END                    resize partition NUMBER
+  rm NUMBER                                delete partition NUMBER
+  select DEVICE                            choose the device to edit
+  disk_set FLAG STATE                      change the FLAG on selected device
+  disk_toggle [FLAG]                       toggle the state of FLAG on selected device
+  set NUMBER FLAG STATE                    change the FLAG on partition NUMBER
+  toggle [NUMBER [FLAG]]                   toggle the state of FLAG on partition NUMBER
+  uni5 UNIT				      set the default unit to UNIT
+  version				      display the version number and copyright information of Gnu Parted</code></pre>
+  <p>Observe que muchos de los comandos utilizados en el modo de línea de comandos, como los comandos <code>mkpart</code>, <code>mklabel</code> y <code>print</code>, están disponibles en el modo interactivo. El proceso de creación y modificación de particiones usando <code>parted</code> en modo interactivo es similar a usar <code>fdisk</code> o <code>gdisk</code> en modo interactivo.</p>
+  </section>
+  <hr>
+
+<section id="20-5-1">
+  <h2>20.5.1 gparted</h2>
+  <p>Los sistemas modernos que utilizan la especificación UEFI (Unified Extensible Firmware Interface) y las particiones GPT para arrancar tienen sus propias herramientas gráficas y de línea de comandos para administrar el almacenamiento. Una poderosa herramienta gráfica es <strong>gparted</strong>, la interfaz gráfica de usuario del programa GNU Parted. GParted (Gnome Partition Editor) es una herramienta gráfica gratuita y multiplataforma para administrar discos duros. Funciona con Linux, Windows y macOS y permite la creación, reorganización y eliminación de particiones del sistema. Con esta herramienta, puede redimensionar particiones existentes para hacer espacio para un nuevo sistema operativo, habilitar y deshabilitar banderas de partición como <code>boot</code> y <code>hidden</code>, y realizar muchas otras tareas de particionamiento fácilmente con su intuitiva interfaz gráfica.</p>
+
+  <p>En la imagen a continuación, tenemos un disco en blanco que necesita ser particionado y se le debe crear un sistema de archivos antes de que pueda ser utilizado (montado) en el sistema. El particionamiento define el espacio en el dispositivo para que sea visible para el sistema operativo. Luego, se realiza un formato de alto nivel, que define el sistema de archivos a utilizar. Finalmente, el sistema de archivos se monta para que el sistema operativo pueda escribir datos en él.</p>
+  <div align="center">
+    <p>Ventana de GParted para /dev/sdb. El disco /dev/sdb muestra 29.82 GiB de espacio no asignado.</p>
+    
+  </div>
+
+  <p>Usando la utilidad <code>gparted</code>, podemos crear una nueva tabla de particiones GPT. Hay varios métodos que se pueden usar cuando se crea una tabla. Por ejemplo, un método de particionamiento común es hacer espacio en un disco existente para instalar otro sistema operativo redimensionando la partición existente. Además de realizar tareas de administración de disco, la herramienta <code>gparted</code> también puede intentar la recuperación de una partición corrupta y copiar una partición existente para realizar una copia de seguridad o crear una imagen.</p>
+  <div align="center">
+    <p>Ventana de GParted. El menú desplegable muestra el ratón seleccionando la opción GPT.</p>
+    
+  </div>
+
+  <p>Los parámetros para la nueva partición se pueden ingresar en el cuadro de diálogo, como el tamaño, el nombre, si es una partición primaria (donde se puede instalar un sistema operativo) y el tipo de sistema de archivos.</p>
+  <div align="center">
+    <p>Ventana "Crear nueva partición". La configuración muestra que el espacio libre precedente es de 1 MiB, el nuevo tamaño es de 30533 MiB, el espacio libre siguiente es de 0 MiB, la alineación es a MiB, la creación es como partición primaria y el sistema de archivos es ext4.</p>
+    
+  </div>
+
+  <p>Para ver detalles sobre la partición a crear, seleccionaría la información del dispositivo en el menú "Ver". En la imagen a continuación, en la parte inferior de la ventana, puede ver que hay una operación pendiente. Cuando haga clic en la marca de verificación verde debajo de la barra de menú, realizará la acción especificada y creará la nueva partición. Habrá un cuadro de diálogo que confirmará que desea continuar con la acción y otro que confirmará el éxito.</p>
+  <div align="center">
+    <p>Ventana de GParted muestra la nueva Partición GPT #1 de 29.82 GiB creada en /dev/sdb. El texto "1 operación pendiente" aparece en la parte inferior izquierda de la ventana.</p>
+    
+  </div>
+  </section>
+  <hr>
+
+<section id="20-6">
+  <h2>20.6 Gestión de Volúmenes Lógicos (LVM)</h2>
+  <p>La Gestión de Volúmenes Lógicos (LVM) es un método para administrar el espacio del disco duro que proporciona más flexibilidad que el particionamiento tradicional de discos. LVM se desarrolló específicamente para abordar algunas de las limitaciones del particionamiento tradicional. Para entender esto, considere los siguientes escenarios:</p>
+
+  <h3>Escenario #1</h3>
+  <p><strong>Sinopsis:</strong> Un administrador de sistemas realiza una instalación nueva de lo que se convertirá en una máquina de producción. El administrador elige implementar el siguiente esquema de particionamiento: <code>/</code> es de 2000MB, <code>/var</code> es de 500MB y <code>/home</code> es de 1000MB.</p>
+  <p>La intención detrás de este esquema de particionamiento era proporcionar mucho espacio para los cuatro usuarios que usarán el sistema. Al hacer de <code>/home</code> una partición separada, el administrador también puede implementar cuotas de disco.</p>
+  <p><strong>El Problema:</strong> Durante los primeros meses, el sistema funciona perfectamente. Sin embargo, comienzan a ocurrir errores. Los usuarios no pueden imprimir. Después de investigar un poco, el administrador descubre que la partición <code>/var</code> ahora está llena de entradas de archivos de registro. Desafortunadamente, aquí es también donde se envían los trabajos de impresión antes de ser enviados a la impresora.</p>
+  <p>La solución obvia es aumentar el tamaño de la partición <code>/var</code>. Con las particiones tradicionales, esto puede ser una pesadilla que puede requerir tiempo de inactividad para el sistema y quizás incluso una reinstalación. Uno de los grandes beneficios de LVM es la capacidad de aumentar el tamaño de la partición, denominada volumen en LVM, según sea necesario sin la necesidad de tiempo de inactividad del sistema.</p>
+  
+  <h3>Escenario #2</h3>
+  <p><strong>Sinopsis:</strong> Un administrador de sistemas agrega dos nuevos discos duros al sistema. Un disco duro es de 40GB y el segundo es de 20GB. Los requisitos para este sistema son colocar una base de datos muy grande en una sola partición que sea al menos de 60GB de tamaño. Esto no es posible con las particiones tradicionales en este escenario porque una partición debe residir en un solo disco duro.</p>
+  <p>Con LVM, un volumen (piense en una partición) puede extenderse a través de múltiples discos duros. Esto proporciona mucha más flexibilidad que las particiones tradicionales y es necesario para los entornos de Big Data actuales.</p>
+
+  <h3>Escenario #3</h3>
+  <p><strong>Sinopsis:</strong> Un administrador de sistemas quiere hacer una copia de seguridad de los datos en la partición <code>/home</code>. Para obtener una copia de seguridad limpia, todos los usuarios deben cerrar sesión en el sistema y la partición <code>/home</code> debe desmontarse, lo que resulta en tiempo de inactividad. Esto se debe a la forma en que funcionan los programas de copia de seguridad del sistema de archivos: primero hacen una copia de seguridad de los metadatos del sistema de archivos y luego hacen una copia de seguridad del contenido del archivo. Con un sistema de archivos en vivo, los cambios en los archivos durante la copia de seguridad dan como resultado copias de seguridad posiblemente corruptas que pueden ser inútiles.</p>
+  <p>La solución es utilizar una característica llamada instantánea LVM (snapshot). Un administrador puede usar esta instantánea para hacer una copia de seguridad de un sistema de archivos que parecerá estático, pero no requerirá ningún tiempo de inactividad del sistema.</p>
+
+  <p><strong>Nota:</strong> La gestión de volúmenes lógicos es un tema amplio y variado, y una discusión completa está más allá del alcance de esta clase. El objetivo de esta sección será cubrir la gestión de volúmenes lógicos en la medida de las posibles preguntas del examen LPIC-1.</p>
+  <p>Comprender qué es la Gestión de Volúmenes Lógicos, las ventajas de la Gestión de Volúmenes Lógicos sobre el particionamiento tradicional y la Gestión de Volúmenes Lógicos básica es necesario no solo para un administrador de sistemas junior, sino también para cualquiera que realice el examen LPIC-1.</p>
+  </section>
+  <hr>
+
+<section id="20-6-1">
+  <h2>20.6.1 Conceptos de LVM</h2>
+  <p>Los pasos para implementar LVM incluyen lo siguiente:</p>
+  <ul>
+    <li>Conectar los dispositivos físicos al sistema.</li>
+    <li>Usar <code>pvcreate</code> para convertir los dispositivos deseados en volúmenes físicos, lo que los asignará para su inclusión en el esquema LVM. Esto escribirá un encabezado en el dispositivo físico y los hará visibles para el proceso LVM.</li>
+    <li>Usar <code>vgcreate</code> para incorporar todos los volúmenes físicos deseados en una colección virtual llamada grupo de volúmenes. El grupo de volúmenes ahora actuará como un equivalente multidisco de un volumen físico en el que puede ocurrir el particionamiento.</li>
+    <li>Usar <code>lvcreate</code> para crear la versión LVM de las particiones de disco (llamadas volúmenes lógicos) en el grupo de volúmenes creado previamente. Los volúmenes lógicos actúan como particiones en el sentido de que el usuario puede crear sistemas de archivos en ellos, montarlos y, en general, usarlos como una partición tradicional.</li>
+  </ul>
+  <p>Las principales ventajas de usar LVM en general y volúmenes lógicos en particular son la capacidad de agrupar espacio de múltiples dispositivos físicos, redimensionarlos (así como los sistemas de archivos en ellos) y mucho más.</p>
+
+  <p>Para desarrollar una mejor comprensión de cómo funcionan estos pasos, considere una situación en la que se agregan tres nuevos discos duros al sistema: <code>/dev/sdb</code>, <code>/dev/sdc</code> y <code>/dev/sdd</code>.</p>
+  <div align="center">
+    
+  </div>
+  <p>En este punto, son solo tres discos duros que no tienen nada, incluida una tabla de particiones. Para usarlos como parte de LVM, primero ejecute el comando <code>pvcreate</code> en cada uno:</p>
+  <pre><code>root@localhost:~# pvcreate /dev/sdb
+root@localhost:~# pvcreate /dev/sdc
+root@localhost:~# pvcreate /dev/sdd</code></pre>
+  <div align="center">
+    
+  </div>
+  <p>Inicialmente, estos discos duros no parecerán diferentes. Sin embargo, ahora hay un pequeño bloque de datos, llamado encabezado, al principio de cada uno que define cada dispositivo como un volumen físico.</p>
+
+  <p>El siguiente paso es crear un grupo de volúmenes que consista en estos tres volúmenes físicos. Esto se puede lograr con el siguiente comando:</p>
+  <pre><code>root@localhost:~# vgcreate vol1 /dev/sdb /dev/sdc /dev/sdd</code></pre>
+  <div align="center">
+    
+  </div>
+  <p>Esto significa ahora que todo el espacio de los tres volúmenes físicos se puede utilizar para crear volúmenes lógicos. Si <code>/dev/sdb</code> es de 50GB, <code>/dev/sdc</code> es de 20GB y <code>/dev/sdd</code> es de 10GB, se podría crear un único volumen lógico de 80GB de tamaño. Además, si se agregara otro volumen físico al sistema (agregar un nuevo disco duro, usar el comando <code>pvcreate</code> y luego un comando llamado <code>vgextend</code>), entonces este nuevo espacio podría usarse para crear más volúmenes lógicos o aumentar el tamaño de los volúmenes lógicos existentes.</p>
+
+  <p>Cualquier espacio en el grupo de volúmenes <code>vol1</code> se puede usar para crear un volumen lógico con un comando como el siguiente:</p>
+  <pre><code>root@localhost:~# lvcreate -L 200M -n logical_vol1 vol1</code></pre>
+  <p>La opción <code>-L</code> se usa para especificar el tamaño del volumen lógico. El valor de <code>200M</code> significa crear un volumen lógico de 200MB. La opción <code>-n</code> se usa para proporcionar un nombre al volumen lógico. El nombre resultante del volumen lógico creado por el comando anterior será <code>logical_vol1</code>. El último argumento, <code>vol1</code>, es el nombre del grupo de volúmenes de donde el volumen lógico obtendrá su espacio físico. El comando <code>lvcreate</code> anterior daría como resultado un nuevo nombre de dispositivo de <code>/dev/vol1/logical_vol1</code> que podría usarse como una partición tradicional.</p>
+  <div align="center">
+    
+  </div>
+
+  <p>Para los sistemas basados en Red Hat, la herramienta gráfica <code>system-config-lvm</code> no solo simplifica el proceso de trabajar con LVM, sino que también ayuda a visualizar lo que está sucediendo:</p>
+  <div align="center">
+    
+  </div>
+  <p>Tenga en cuenta que esta herramienta puede no estar disponible, ya que no forma parte del sistema operativo base, pero puede ser parte de un paquete de software adicional opcional.</p>
+  </section>
+  <hr>
+
+<section id="20-7">
+  <h2>20.7 Creación de un Sistema de Archivos</h2>
+  <p>Si se utiliza el comando <code>fdisk</code> para crear una partición, entonces el sistema de archivos tendrá que crearse por separado.</p>
+
+  <p>El comando <code>mkfs</code> se puede usar para crear un sistema de archivos. Para crear un sistema de archivos de tipo <code>vfat</code>, que es compatible con múltiples sistemas operativos, incluido Microsoft Windows, ejecute un comando como el siguiente:</p>
+  <pre><code>root@localhost:~# mkfs -t vfat /dev/sdb1</code></pre>
+  <p>El comando <code>mkfs</code> es un envoltorio que ejecuta otro comando, que en realidad creará el sistema de archivos correcto. Cuando se le proporciona la opción <code>-t vfat</code>, el comando <code>mkfs</code> llamará al comando <code>mkdosfs</code> para crear el sistema de archivos real. Esto es importante saberlo porque el comando <code>mkfs</code> proporciona opciones genéricas, mientras que el comando subyacente puede tener opciones específicas del sistema de archivos que crea. Consulte la documentación, como las páginas man, para ver estas opciones adicionales.</p>
+
+  <p>Un sistema de archivos muy común es el Cuarto Sistema de Archivos Extendido, <code>ext4</code>, el sistema de archivos predeterminado en muchas distribuciones de Linux. Para crear este tipo de sistema de archivos, ejecute un comando como el siguiente:</p>
+  <pre><code>root@localhost:~# mkfs -t ext4 /dev/sdb1</code></pre>
+  <p>En este caso, el comando <code>mkfs</code> terminaría llamando al comando <code>mke2fs</code>, que es capaz de crear sistemas de archivos de tipo <code>ext2</code>, <code>ext3</code> y <code>ext4</code>.</p>
+
+  <p><strong>Nota:</strong> Al crear un sistema de archivos, la partición se sobrescribe, por lo que los datos previamente almacenados en la partición se perderán. Como resultado, tenga mucho cuidado al ejecutar el comando <code>mkfs</code>.</p>
+  <p>Afortunadamente, el comando <code>mkfs</code> no funcionará si la partición está actualmente en uso, lo que significa que está montada.</p>
+
+  <h3>Opciones de creación de sistemas de archivos</h3>
+  <p>Cada sistema de archivos tiene muchas opciones para modificar sus características. Para usar estas opciones, ejecute el comando de creación del sistema de archivos directamente, en lugar del comando <code>mkfs</code>.</p>
+  <p>Por ejemplo, el comando <code>mke2fs</code> tiene varias opciones que modificarán cómo se comportará el sistema de archivos una vez que se haya creado. Algunas de estas características se pueden cambiar después de que se haya creado el sistema de archivos, pero otras no. La siguiente tabla describe algunas de las características comunes que un administrador de sistemas puede cambiar para los sistemas de archivos <code>ext2/ext3/ext4</code>:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Opción</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>-b</code></td>
+        <td>Especifica el tamaño de bloque del sistema de archivos. Si bien el valor predeterminado suele ser adecuado para sistemas de archivos normales, para sistemas de archivos con grandes bases de datos, un tamaño de bloque más grande es más ideal.</td>
+      </tr>
+      <tr>
+        <td><code>-N</code></td>
+        <td>Especifica el número de inodos. Recuerde que cada archivo necesita un inodo, por lo que este valor es importante. Por defecto, el comando <code>mke2fs</code> utiliza una fórmula basada en el tamaño del sistema de archivos para determinar cuántos inodos crear. Típicamente, esto genera un gran número de inodos, lo que en sistemas de archivos con solo un puñado de archivos grandes resulta en espacio desperdiciado, ya que estos inodos ocupan espacio incluso si no están en uso. El número de inodos no se puede cambiar fácilmente después de que se haya creado el sistema de archivos.</td>
+      </tr>
+      <tr>
+        <td><code>-m</code></td>
+        <td>
+          <p>Especifica qué porcentaje del sistema de archivos está reservado para uso del sistema. Considere la salida parcial del comando <code>df</code> que se muestra a continuación:</p>
+          <pre><code>Filesystem  Size  Used  Avail Use% Mounted on
+/dev/sda2   485M  114M  346M  25%  /</code></pre>
+          <p>Parece haber algo mal con esta salida. Si se usan 114M de un sistema de archivos de 485M, ¡entonces debería haber 368M disponibles, no 346M! Además, el <code>Use%</code>, que muestra cuánto espacio se ha utilizado, es inexacto. Debería ser más cercano al 23%.</p>
+          <p>La razón por la que estos números son inexactos es que el 5% del sistema de archivos está reservado para uso del sistema. Los usuarios regulares no pueden usar este espacio, por lo que se considera que no está disponible; como resultado, el comando <code>df</code> lo tiene en cuenta al informar el espacio disponible.</p>
+          <p>Para especificar un porcentaje diferente de espacio reservado, use la opción <code>-m</code>. Esta es una opción útil para sistemas de archivos que el usuario <code>root</code> no suele usar, como el sistema de archivos <code>/home</code>.</p>
+          <p>El comando <code>df</code> se cubrirá con mayor detalle más adelante en el curso.</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Considere esto</h3>
+  <p>El comando <code>mkfs</code> creará los sistemas de archivos apropiados para todos, excepto ISO 9660 y Universal Disc Format. ISO 9660 es el formato colocado en discos CD-ROM y Universal Disc Format se usa para formatear DVD. Para crear un sistema de archivos ISO 9660, use el comando <code>mkisofs</code>. Para crear un sistema de archivos Universal Disc Format, use el comando <code>mkudffs</code>.</p>
+  </section>
+  <hr>
+
+<section id="20-8">
+  <h2>20.8 exFAT</h2>
+  <p>El sistema de archivos exFAT (Extended File Allocation Table) es un sistema de archivos propietario y ligero creado por Microsoft en 2006 para su uso con sistemas de almacenamiento de memoria flash como tarjetas SD y unidades USB. Fue diseñado para reemplazar al FAT32 y amplía enormemente las cantidades permitidas para archivos y directorios. Linux no es compatible de forma nativa con exFAT, y al intentar acceder a datos en dispositivos formateados con él, a los usuarios se les mostrará un cuadro de diálogo de error como este.</p>
+  <div align="center">
+    
+  </div>
+  <p>Afortunadamente, Samsung publicó un controlador GPL para exFAT para que los usuarios de Linux puedan compartir datos con otros sistemas operativos que lo admiten, como Windows 10 y macOS.</p>
+
+  <p>Para demostrar cómo instalar los paquetes necesarios para acceder a la unidad exFAT, considere la imagen siguiente, que muestra una unidad USB de 63 GB con la aplicación Ubuntu Discos.</p>
+  <div align="center">
+    
+  </div>
+  <p>Desde la línea de comandos, deberá asegurarse de que el repositorio adecuado, en este caso, el repositorio <code>universe</code>, esté instalado. Para asegurarse de que el repositorio esté instalado, se puede usar el comando <code>add-apt-repository</code>. En el ejemplo siguiente, la salida del comando <code>add-apt-repository</code> establece que el repositorio ya está presente en el sistema. Sin embargo, si no lo estuviera, el comando <code>add-apt-repository</code> podría usarse para instalarlo:</p>
+  <pre><code>sysadmin@localhost:~$ sudo add-apt-repository universe
+[sudo] password for sysadmin:
+'universe' distribution component is already enabled for all sources.</code></pre>
+  <p><strong>Nota:</strong> Un repositorio es una colección de datos almacenados en un servidor. En Linux, los repositorios se utilizan para almacenar actualizaciones del sistema y aplicaciones que se pueden descargar.</p>
+  <p>El comando <code>add-apt-repository</code> es parte de la herramienta APT (Advanced Package Tool) utilizada para la gestión de paquetes.</p>
+  <p>Los repositorios y la gestión de paquetes se tratarán con mayor detalle más adelante en el curso.</p>
+
+  <p>A continuación, el comando <code>apt update</code> se puede usar para confirmar que todo en el repositorio está actualizado:</p>
+  <pre><code>sysadmin@localhost:~$ sudo apt update
+Hit:1 http://us.archive.ubuntu.com/ubuntu cosmic InRelease
+Get:2 http://us.archive.ubuntu.com/ubuntu cosmic-updates InRelease [88.7 kB]
+Get:3 http://us.archive.ubuntu.com/ubuntu cosmic-security InRelease [88.7 kB]
+Hit 4: http://us.archive.ubuntu.com/ubuntu cosmic-backports InRelease
+Fetched 177 kB in 1s (139 kB/s)
+Reading package lists… Done
+Building dependency tree
+Reading state information… Done
+11 packages can be upgraded. Run ‘apt list —upgradable’ to see them.</code></pre>
+  <p>A continuación, los paquetes necesarios <code>exfat-fuse</code> y <code>exfat-utils</code> deberán instalarse utilizando el comando <code>apt install</code>.</p>
+  <p>Por último, monte la unidad (este paso también se puede realizar desde el administrador de archivos).</p>
+  <div align="center">
+    
+  </div>
+  </section>
+  <hr>
+
+  <section id="20-9">
+  <h2>20.9 BTRFS</h2>
+  <p>BTRFS (a veces pronunciado "b-tree FS" o "butter FS") es un sistema de archivos nativo de Linux creado por Oracle y desarrollado por múltiples compañías, así como por muchos colaboradores individuales, para abordar las limitaciones de los sistemas de archivos anteriores.</p>
+
+  <h3>Copia en Escritura (Copy-On-Write)</h3>
+  <p>BTRFS es un sistema de copia en escritura (COW). Aunque es una característica técnica compleja, el punto principal de la copia en escritura es que BTRFS no sobrescribirá un archivo existente con actualizaciones, lo que los sistemas de archivos tradicionales que no son COW hacen rutinariamente.</p>
+  <p>Por ejemplo, si tiene un archivo llamado <code>datafile1.txt</code> y realiza actualizaciones en el contenido del archivo, en un sistema de archivos tradicional que no es COW, el archivo se sobrescribiría con los nuevos datos, lo que haría que la recuperación de la versión original del archivo solo pudiera realizarse restaurando desde una copia de seguridad. En lugar de que BTRFS sobrescriba <code>datafile1.txt</code>, dejará ese archivo en su lugar, intacto, y escribirá las partes nuevas o modificadas del archivo en otro lugar, y luego cambiará los metadatos del archivo para abarcar el cambio.</p>
+  <p>La copia en escritura es una de las razones por las que BTRFS tiene una ventaja significativa en el tiempo de recuperación ante fallas de hardware, cortes de energía u otras formas de catástrofe. La versión original del archivo permanecerá intacta y seguirá estando disponible incluso cuando se escriban versiones o cambios posteriores en otro lugar. Esto tiene el beneficio adicional de actuar como un tipo de diario porque las transacciones (actualizaciones) se completan o no, y si no, las partes del archivo ya escritas en el disco están sanas y salvas en el disco.</p>
+
+  <h3>Instantáneas (Snapshots)</h3>
+  <p>El uso de la copia en escritura de BTRFS también hace que las instantáneas sean posibles y muy útiles para el operador del sistema. Una instantánea tradicional es efectivamente una copia de un sistema de archivos/volumen que se realiza y se marca con la hora. BTRFS hace esto de manera diferente, declara una referencia al original como una instantánea y, si no se cambia nada, no ocupa espacio adicional.</p>
+  <p>Cuando se realiza un cambio después de una instantánea, los cambios se anotan y registran, pero solo ese cambio se realiza realmente como una copia; el resto del sistema de archivos no necesita copiarse también. Esta es una medida tremenda de ahorro de espacio, lo que permite que el uso de instantáneas para incluso los cambios más pequeños sea algo que no causará problemas de espacio.</p>
+  <p>Para demostrarlo, suponga que, después de la instalación, el operador del sistema realiza una instantánea del sistema de archivos/volumen y luego crea el archivo <code>datafile1.txt</code>. La instantánea inicial no incluye el archivo <code>datafile1.txt</code>, pero una segunda o subsiguiente instantánea sí lo haría. Por lo tanto, una comparación de la primera y segunda instantánea mostraría que la única diferencia entre ellas es la adición del archivo <code>datafile1.txt</code>.</p>
+  <p>La clonación tradicional, las copias de seguridad o incluso algunas implementaciones de instantáneas copiarían todo o parte del sistema de archivos o volumen original, pero una instantánea BTRFS utiliza el sistema de archivos original como base, y las instantáneas posteriores solo contienen las diferencias entre el estado original y la instantánea anterior, lo que hace que las instantáneas sean extremadamente eficientes en el espacio.</p>
+
+  <h3>Subvolúmenes</h3>
+  <p>Otra característica muy importante de BTRFS es su gestión de volúmenes, que es manejada por el gestor de volúmenes BTRFS. Aquellos familiarizados con Logical Volume Manager (LVM) comprenderán el concepto básico de que BTRFS puede basar sus volúmenes/sistemas de archivos en múltiples dispositivos físicos. Cualquier volumen puede basarse en uno o más discos físicos y también puede contener subvolúmenes, que son efectivamente porciones de un volumen que se utilizan como un disco virtual.</p>
+
+  <h3>Considere esto</h3>
+  <p>El almacenamiento virtual se representa lógicamente. La computación lógica básicamente significa que se representa como software en lugar de hardware. La razón para crear almacenamiento lógico es que se puede fusionar para crear un gran conjunto de almacenamiento. Para pasar del hardware al software, la capacidad de almacenamiento físico de todos los dispositivos de almacenamiento debe unirse para formar un gran disco virtual.</p>
+  <p>Una de las principales áreas donde los subvolúmenes pueden ser útiles es en la aplicación de actualizaciones a un sistema. Para hacer esto, se crea un subvolumen que abarca el volumen principal, se aplican las actualizaciones, luego se inspecciona el sistema en busca de cualquier problema con las actualizaciones y, si no se encuentran problemas, todo continúa normalmente. Si se encuentran problemas, las actualizaciones del sistema se pueden revertir al estado del volumen original.</p>
+
+  <h3>Compresión</h3>
+  <p>BTRFS también cuenta con opciones de compresión que se pueden activar mediante opciones de montaje, con la opción <code>compress</code> utilizando varios niveles o tipos, o ninguna compresión. Incluso existe una opción de compresión que forzará la compresión de tipos de archivos que no se comprimen bien. Es importante tener en cuenta que la compresión generalmente requiere al menos una cantidad mínima de procesamiento para lograrse, por lo que los sistemas de archivos extremadamente grandes con archivos difíciles de comprimir producirán una carga del sistema mayor de lo habitual.</p>
+  <p>A medida que avance en su aprendizaje, quedará claro que Linux es un sistema en constante cambio que se mejora y modifica a medida que surgen las necesidades. Las particiones y los sistemas de archivos no son una excepción; de hecho, están evolucionando rápidamente, incluso a medida que avanza en este curso. Cada sistema mejora al anterior, y se necesita una sólida comprensión de los sistemas anteriores no solo para el conocimiento fundamental, sino también porque los sistemas Linux pueden funcionar durante años o incluso décadas. Se pedirá a los administradores de sistemas experimentados que mantengan, solucionen problemas y migren sistemas antiguos a tecnologías más nuevas a medida que evolucionen las necesidades comerciales.</p>
+  </section>
+  <hr>
+
+  <section id="20-10">
+  <h2>20.10 Creación de Espacio de Intercambio (Swap Space)</h2>
+  <p>Considere una situación en la que un sistema tiene un total de 8 GB de RAM. Inicialmente, este sistema funciona correctamente; sin embargo, con el tiempo y a medida que se agrega nuevo software al sistema, comienzan a aparecer errores de "RAM insuficiente". Quedarse sin RAM utilizable ha sido un problema para los sistemas operativos desde que se introdujo la RAM por primera vez.</p>
+
+  <p>Si bien la mejor solución podría ser agregar más RAM al sistema, esto no siempre es posible. Las limitaciones de hardware o las restricciones presupuestarias pueden requerir otra solución. El espacio de intercambio (swap space) está diseñado para proporcionar una solución a este problema.</p>
+  <p>El espacio de intercambio (también llamado memoria virtual) es un espacio en el disco duro que puede ser utilizado por el kernel y las rutinas de administración de memoria para almacenar datos que normalmente se almacenan en la RAM. Cuando la RAM comienza a llenarse, el kernel tomará algunos de estos datos y los intercambiará al disco duro. Más tarde, cuando sea necesario, los datos se volverán a intercambiar a la RAM.</p>
+  <p>Incluso si el sistema tiene mucha RAM, crear un espacio de intercambio sigue siendo útil porque si el sistema alguna vez falla, el espacio de intercambio se utiliza para almacenar un archivo de volcado de fallas que los administradores de sistemas avanzados utilizan para determinar por qué el sistema falló. Como resultado, típicamente el tamaño del espacio de intercambio es al menos igual al tamaño de la RAM.</p>
+
+  <h3>Considere esto</h3>
+  <p>La regla de "el espacio de intercambio debe ser igual a la RAM" funciona hasta cierto punto; sin embargo, hay mucha discusión sobre qué hacer cuando un sistema tiene una cantidad muy grande de RAM, ya que parece un desperdicio dedicar 128, 256 o 512 GB de espacio en disco al intercambio.</p>
+  <p>Es mejor investigar las cantidades recomendadas de espacio de intercambio por el proveedor o el organizador de la distribución. Las principales distribuciones compatibles tendrán soporte y recomendaciones para las cantidades de intercambio en su documentación.</p>
+
+  <p>Hay dos tipos de espacios de intercambio que se pueden crear:</p>
+  <ul>
+    <li><strong>Partición de Intercambio:</strong> La más común de las dos, una partición de intercambio es una partición que no tiene un sistema de archivos regular y no está montada. Durante la instalación, se crea una partición de intercambio, pero se pueden crear particiones de intercambio adicionales más adelante.</li>
+    <li><strong>Archivo de Intercambio:</strong> En caso de que no quede espacio sin particionar en el disco duro, se puede usar un archivo de intercambio. Las particiones de intercambio suelen ser más rápidas que los archivos de intercambio, ya que son un sistema de archivos, no un archivo, que se encuentra encima de otro sistema de archivos. Los archivos de intercambio son más flexibles y se pueden crear sobre la marcha sin necesidad de reparticionar el disco duro.</li>
+  </ul>
+  </section>
+  <hr>
+
+  <section id="20-10-1">
+  <h2>20.10.1 Creación de una Partición de Intercambio</h2>
+  <p>Los pasos para crear una partición de intercambio son:</p>
+
+  <ol>
+    <li>
+      <p>Crear una partición con una ID de 82 usando <code>fdisk</code> como se describió anteriormente:</p>
+      <pre><code>Command (m for help): n
+Command Action
+   e   extended
+   p   primary partition (1-4)
+p
+Partition number (1-4): 3
+First sector (20971520-21995519, default 20971520):
+Using default value 20971520
+Last sector, +sectors, or +size{K,M,G} (20971520-21995519, default 21995519): +100
+
+Command (m for help): t
+Partition number (1-6): 3
+Hex code (type L to list codes): 82
+Changed system type of partition 3 to 82 (Linux swap / Solaris)</code></pre>
+    </li>
+    <li>
+      <p>Convertir la partición a espacio de intercambio con el comando <code>mkswap</code>.</p>
+      <pre><code>root@localhost:~# mkswap /dev/sda3
+Setting up swapspace version1, size = 102396 KiB
+no label, UUID=59aaf06e-7109-471f-88a5-e81dd7c82d76</code></pre>
+    </li>
+    <li>
+      <p>Habilitar la partición como espacio de intercambio actual con el comando <code>swapon</code>:</p>
+      <pre><code>root@localhost:~# swapon /dev/sda3</code></pre>
+    </li>
+  </ol>
+  <p>La opción <code>-s</code> del comando <code>swapon</code> mostrará el espacio de intercambio actualmente utilizado:</p>
+  <pre><code>root@localhost:~# swapon -s
+Filename                                Type            Size    Used    Priority
+/devdm-1                                partition       1015800 0       -1
+/dev/sda3                               partition       102392  0       -2</code></pre>
+  <p><strong>Nota:</strong> El comando <code>swapon</code> solo habilita temporalmente una partición de intercambio. Si se reinicia el sistema, la partición de intercambio seguirá existiendo, pero no estará habilitada como espacio de intercambio. El administrador debe ejecutar el comando <code>swapon</code> nuevamente o hacer uso de una función de montaje que se demuestra más adelante en el curso.</p>
+  </section>
+  <hr>
+
+  <section id="20-10-2">
+  <h2>20.10.2 Creación de un Archivo de Intercambio</h2>
+  <p>Los pasos para crear un archivo de intercambio:</p>
+
+  <ol>
+    <li>
+      <p>Crear un archivo grande usando el comando <code>dd</code>. Para determinar qué sistema de archivos tiene espacio para el archivo de intercambio, se ejecutó el comando <code>df</code>. El sistema de archivos <code>/</code> tiene mucho espacio, por lo que el archivo de intercambio se colocó en el directorio <code>/var</code>:</p>
+      <pre><code>root@localhost:~# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda9        58G  7.7G   49G  14%
+tmpfs           7.9G     0  7.9G   0% /dev
+shm              64M     0   64M   0% /dev/shm
+/dev/sda9        58G  7.7G   49G  14% /etc/hosts
+root@localhost:~# dd if=/dev/zero of=/var/extraswap bs=1M count=100
+100+0 records in
+100+0 records out
+104857600 bytes (105 MB) copied, 0.320096 s, 328 MB/s</code></pre>
+      <p>Observe que el archivo resultante tiene aproximadamente 100 MB de tamaño, 100 bloques de 1 MB de tamaño. Las opciones <code>bs=100M</code> y <code>count=1</code> habrían resultado en el mismo tamaño. El archivo está lleno de valores binarios cero que provienen del archivo <code>/dev/zero</code>. Lo que realmente hay en el archivo no importa; el tamaño del archivo es lo importante.</p>
+    </li>
+    <li>
+      <p>Convertir el archivo a espacio de intercambio con el comando <code>mkswap</code>:</p>
+      <pre><code>root@localhost:~# mkswap /var/extraswap
+Setting up swapspace version 1, size = 102396 KiB
+no label, UUID=908e51f8-a022-4508-8819-73e1d8837e2b</code></pre>
+    </li>
+    <li>
+      <p>Habilitar el archivo como espacio de intercambio actual con el comando <code>swapon</code>:</p>
+      <pre><code>root@localhost:~# swapon /var/extraswap
+root@localhost:~# swapon -s
+Filename                                Type            Size    Used    Priority
+/devdm-1                                partition       1015800 0       -1
+/dev/sda3                               partition       102392  0       -2
+/var/extraswap                          file            102392  0       -3</code></pre>
+    </li>
+  </ol>
+  </section>
+  <hr>
+  
+
+
+  <hr>
+  <div class="volver">
+    <a href="../index.html">← Volver al índice</a>
+  </div>
+
+</body>
+</html>
